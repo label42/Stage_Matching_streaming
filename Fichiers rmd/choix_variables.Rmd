@@ -1,0 +1,8 @@
+---
+title: "Analyse choix de variables"
+author: "Abel AUSSANT"
+date: "04/05/2022"
+output: html_document
+---
+
+
