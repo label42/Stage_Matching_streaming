@@ -11,9 +11,11 @@ knitr::opts_chunk$set(warning = FALSE)
 
 pacman::p_load(tidyverse, questionr, gtsummary, gt, survey)
 
-d <- read.csv("C:/Users/abela/Desktop/Espace de travail Sociologie/EHESS/M2 QESS/Mémoire M2/Données officielles Quetelet/PC2018/Csv/pc18_quetelet_octobre2021.csv",sep=";")
+d <- read.csv("../Data/pc18_quetelet_octobre2021.csv",sep=";")
 
 source("../recodage_matching.R")
+
+source("../Fonctions/tests_cor.R")
 
 # il manque 4 pondération...
 d_survey <- subset(d, !is.na(d$POND))
@@ -93,31 +95,28 @@ tab1_t
 
 d_tmp <- subset(d, !is.na(d$VITENCOUPLE_r) & !is.na(d$E83))
 
-cor_nbr_genre <- cor(d_tmp$nbr_genre_music, as.numeric(d_tmp$VITENCOUPLE_r))
-cor_stream <- cor(d_tmp$E83, as.numeric(d_tmp$VITENCOUPLE_r))
+force_lien_d_cohen(d, "nbr_genre_music", "VITENCOUPLE_r")
+Vcramer_stream <- cramer.v(table(d$E83, d$VITENCOUPLE_r))
 
-lm_nbr_genre <- summary(lm(nbr_genre_music ~ VITENCOUPLE_r + E83, data = d_tmp))
 
 ```
 
-Coef. de Correlation entre nbr_genre_music et VITENCOUPLE_r = `r cor_nbr_genre`
+V de cramer entre stream et VITENCOUPLE_r = `r Vcramer_stream`
 
-Coef. de Correlation entre stream et VITENCOUPLE_r = `r cor_stream`
-
-R² de nbr_genre_music ~ VITENCOUPLE_r + E83 = `r lm_nbr_genre$r.squared`
 Association faible avec le nombre de styles écoutés. A rejeter.
 
-## Voyage à l'étrangé au cours des 12 mois pour vacances
 
-```{r ETRANGER_VAC}
+## Sorties en groupe
+
+```{r Sorties_amis}
 
 
 
 tab1 <- d_survey %>%
   tbl_svysummary(
-    include = c("stream_spe", "voyage_etranger"), #L'ensemble des variables que l'on veut dans le tableau
+    include = c("stream_spe", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
-    by = voyage_etranger, #La variale avec laquelle on croise les données qui ira en colonne
+    by = sorties_ami, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_categorical() ~ c(1,0))
@@ -131,7 +130,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par Voyage à l'étrangé au cours des 12 mois pour vacances") %>%
+  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par sorties entre amis ou en famille") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -142,9 +141,9 @@ tab1_t
 
 tab1 <- d_survey %>%
   tbl_svysummary(
-    include = c("nbr_genre_music", "voyage_etranger"), #L'ensemble des variables que l'on veut dans le tableau
+    include = c("nbr_genre_music", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
-    by = voyage_etranger, #La variale avec laquelle on croise les données qui ira en colonne
+    by = sorties_ami, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_categorical() ~ c(1,0))
@@ -158,7 +157,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Nombre de styles écoutés par voyage à l'étrangé au cours des 12 mois pour vacances") %>%
+  tab_header(title = "Nombre de styles écoutés par sorties entre amis ou en famille") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -167,21 +166,180 @@ tab1_t <- tab1 %>%
 
 tab1_t
 
-d_tmp <- subset(d, !is.na(d$voyage_etranger) & !is.na(d$E83))
+d_tmp <- subset(d, !is.na(d$sorties_ami) & !is.na(d$E83))
 
-cor_nbr_genre <- cor(d_tmp$nbr_genre_music, d_tmp$voyage_etranger)
-cor_stream <- cor(d_tmp$E83, d_tmp$voyage_etranger)
-
-lm_nbr_genre <- summary(lm(nbr_genre_music ~ voyage_etranger + E83, data = d_tmp))
+force_lien_d_cohen(d, "nbr_genre_music", "sorties_ami")
+Vcramer_stream <- cramer.v(table(d$E83, d$sorties_ami))
 
 ```
 
-Coef. de Correlation entre nbr_genre_music et voyage_etranger = `r cor_nbr_genre`
 
-Coef. de Correlation entre stream et voyage_etranger = `r cor_stream`
-
-R² de nbr_genre_music ~ voyage_etranger + E83 = `r lm_nbr_genre$r.squared`
+V de cramer entre stream et Sorties_amis = `r Vcramer_stream`
 
 Associations avec les deux variables, à considérer.
 
 
+```{r freq_info}
+
+
+
+tab1 <- d_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
+    by = freq_info, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt()
+
+tab1_t <- tab1 %>%
+  tab_source_note(source_note = html("Source : 
+                                     <br> Champ : 
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par fréquence de suivi actualité") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab1_t
+
+tab1 <- d_survey %>%
+  tbl_svysummary(
+    include = c("nbr_genre_music", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
+    by = freq_info, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt()
+
+tab1_t <- tab1 %>%
+  tab_source_note(source_note = html("Source : 
+                                     <br> Champ : 
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Nombre de styles écoutés par fréquence de suivi actualité") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab1_t
+
+d_tmp <- subset(d, !is.na(d$freq_info) & !is.na(d$E83))
+
+force_lien_d_cohen(d, "nbr_genre_music", "freq_info")
+Vcramer_stream <- cramer.v(table(d$E83, d$freq_info))
+
+```
+
+
+V de cramer entre stream et freq_info = `r Vcramer_stream`
+
+Association très faible, peu pertinant.
+
+
+```{r comp_var_lecture}
+
+
+
+
+
+d_tmp <- subset(d, !is.na(d$freq_lecture) & !is.na(d$E83) & !is.na(d$autojuge_lecture))
+
+
+
+force_lien_d_cohen(d, "nbr_genre_music", "autojuge_lecture")
+Vcramer_stream_auto <- cramer.v(table(d$E83, d$autojuge_lecture))
+
+force_lien_d_cohen(d, "nbr_genre_music", "freq_lecture")
+Vcramer_stream_freq <- cramer.v(table(d$E83, d$freq_lecture))
+
+```
+
+V de cramer entre stream et autojuge_lecture = `r Vcramer_stream_auto`
+
+V de cramer entre stream et freq_lecture = `r Vcramer_stream_freq`
+
+La fréquence de lecture semble légérement mieux. Pas flagrant cela dit. 
+
+```{r logement}
+
+
+
+tab1 <- d_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "logement"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
+    by = logement, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt()
+
+tab1_t <- tab1 %>%
+  tab_source_note(source_note = html("Source : 
+                                     <br> Champ : 
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par statut logement") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab1_t
+
+tab1 <- d_survey %>%
+  tbl_svysummary(
+    include = c("nbr_genre_music", "logement"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
+    by = logement, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt()
+
+tab1_t <- tab1 %>%
+  tab_source_note(source_note = html("Source : 
+                                     <br> Champ : 
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Nombre de styles écoutés par statut logement") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab1_t
+
+d_tmp <- subset(d, !is.na(d$logement) & !is.na(d$E83))
+
+force_lien_d_cohen(d, "nbr_genre_music", "logement")
+Vcramer_stream <- cramer.v(table(d$E83, d$logement))
+
+```
+
+
+V de cramer entre stream et logement = `r Vcramer_stream`
+
+Association faible ou juste lié à l'age (différence propriétaire sans crédit/avec crédit), peu pertinant.
