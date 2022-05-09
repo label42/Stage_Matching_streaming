@@ -501,6 +501,16 @@ d <- d %>% mutate(
   ))
 d$equip_lecture <- as.factor(d$equip_lecture)
 
+## Recodage de d$F9 en d$lecture_nonFR
+d$lecture_nonFR <- as.character(d$F9)
+d$lecture_nonFR <- fct_recode(d$lecture_nonFR,
+  "Oui" = "1",
+  "Non" = "2",
+  NULL = "3",
+  NULL = "4"
+)
+d$lecture_nonFR <- fct_explicit_na(d$lecture_nonFR, na_level = "Ne lit pas de livre")
+
 #######################################
 #### Sortie culturelles legitimes #####
 #######################################
@@ -635,6 +645,18 @@ d <- d %>% mutate(
 
 # matrise une autre langue que le francais
 d$autre_langue <- d$M122 
+
+## Recodage de d$D6 en d$info_nonFR
+d$info_nonFR <- as.character(d$D6)
+d$info_nonFR <- fct_recode(d$info_nonFR,
+  "Oui" = "1",
+  "Non" = "2",
+  NULL = "3",
+  NULL = "4"
+)
+d$info_nonFR <- fct_explicit_na(d$info_nonFR, na_level = "Ne s'informe pas")
+
+
 
 ##################
 #### Musique #####
