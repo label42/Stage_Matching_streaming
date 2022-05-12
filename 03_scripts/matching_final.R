@@ -5,7 +5,7 @@ source(here("03_scripts", "gestion_NA_matching.R"))
 
 
 
-#variables à utliser dans le modèle en vue du matching
+#variables Ã  utliser dans le modÃ¨le en vue du matching
 list_var <- c("nbr_genre_music","stream_spe", "SEXE_r", "AGE", "AGE_5_r", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere",
               "music_amateur",
               "freq_tv", "equip_tv", "clip_tv",
@@ -18,7 +18,7 @@ list_var <- c("nbr_genre_music","stream_spe", "SEXE_r", "AGE", "AGE_5_r", "CRITR
               "tv_enfance", "musique_enfance", "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance",
               "audivisuel_nonFR")
 
-#Gestio ligne contenant des NA pour les variable servant à l'estimation du propensity score
+#Gestio ligne contenant des NA pour les variable servant Ã  l'estimation du propensity score
 PC18_to_m <- clear_NA_to_m(PC18, list_var)
 
 res_match_3to1_replace <- matchit(stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere +

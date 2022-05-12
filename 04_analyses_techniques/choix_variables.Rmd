@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 knitr::opts_chunk$set(warning = FALSE)
 
-pacman::p_load(tidyverse, questionr, gtsummary, gt, survey)
+pacman::p_load(tidyverse, questionr, gtsummary, gt, survey, here)
 
 
 
@@ -17,10 +17,10 @@ source(here("02_import", "import_bases.R"))
 
 source(here("03_scripts", "tests_association.R"))
 
-# il manque 4 pondération...
+# il manque 4 pondÃ©ration...
 PC18_s <- PC18
 
-#pour que la pop total soit égale au nombre de ligne dans la base (on divise la pondération par la somme de toutes les pondération divisé par le nombre d'individus)
+#pour que la pop total soit Ã©gale au nombre de ligne dans la base (on divise la pondÃ©ration par la somme de toutes les pondÃ©ration divisÃ© par le nombre d'individus)
 PC18_s$POND <- PC18_s$POND/5629.778
 
 print(sum(PC18_s$POND))
@@ -41,8 +41,8 @@ theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "VITENCOUPLE_r"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
-    by = VITENCOUPLE_r, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spÃ©cialisÃ©e"),
+    by = VITENCOUPLE_r, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_categorical() ~ c(1,0))
@@ -68,8 +68,8 @@ tab1_t
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "VITENCOUPLE_r"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
-    by = VITENCOUPLE_r, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux Ã©coutÃ©s"),
+    by = VITENCOUPLE_r, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_categorical() ~ c(1,0))
@@ -83,7 +83,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Nombre de styles écoutés par vit en couple") %>%
+  tab_header(title = "Nombre de styles Ã©coutÃ©s par vit en couple") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -103,7 +103,7 @@ Vcramer_stream <- cramer.v(table(d$E83, d$VITENCOUPLE_r))
 
 V de cramer entre stream et VITENCOUPLE_r = `r Vcramer_stream`
 
-Association faible avec le nombre de styles écoutés. A rejeter.
+Association faible avec le nombre de styles Ã©coutÃ©s. A rejeter.
 
 
 ## Sorties en groupe
@@ -115,8 +115,8 @@ Association faible avec le nombre de styles écoutés. A rejeter.
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
-    by = sorties_ami, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spÃ©cialisÃ©e"),
+    by = sorties_ami, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_categorical() ~ c(1,0))
@@ -142,8 +142,8 @@ tab1_t
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
-    by = sorties_ami, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux Ã©coutÃ©s"),
+    by = sorties_ami, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_categorical() ~ c(1,0))
@@ -157,7 +157,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Nombre de styles écoutés par sorties entre amis ou en famille") %>%
+  tab_header(title = "Nombre de styles Ã©coutÃ©s par sorties entre amis ou en famille") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -176,7 +176,7 @@ Vcramer_stream <- cramer.v(table(d$E83, d$sorties_ami))
 
 V de cramer entre stream et Sorties_amis = `r Vcramer_stream`
 
-Associations avec les deux variables, à considérer.
+Associations avec les deux variables, Ã  considÃ©rer.
 
 
 ```{r freq_info}
@@ -186,8 +186,8 @@ Associations avec les deux variables, à considérer.
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
-    by = freq_info, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spÃ©cialisÃ©e"),
+    by = freq_info, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_categorical() ~ c(1,0))
@@ -201,7 +201,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par fréquence de suivi actualité") %>%
+  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par frÃ©quence de suivi actualitÃ©") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -213,8 +213,8 @@ tab1_t
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
-    by = freq_info, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux Ã©coutÃ©s"),
+    by = freq_info, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_categorical() ~ c(1,0))
@@ -228,7 +228,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Nombre de styles écoutés par fréquence de suivi actualité") %>%
+  tab_header(title = "Nombre de styles Ã©coutÃ©s par frÃ©quence de suivi actualitÃ©") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -247,7 +247,7 @@ Vcramer_stream <- cramer.v(table(d$E83, d$freq_info))
 
 V de cramer entre stream et freq_info = `r Vcramer_stream`
 
-Association très faible, peu pertinant.
+Association trÃ¨s faible, peu pertinant.
 
 
 ```{r comp_var_lecture}
@@ -272,7 +272,7 @@ V de cramer entre stream et autojuge_lecture = `r Vcramer_stream_auto`
 
 V de cramer entre stream et freq_lecture = `r Vcramer_stream_freq`
 
-La fréquence de lecture semble légérement mieux. Pas flagrant cela dit. 
+La frÃ©quence de lecture semble lÃ©gÃ©rement mieux. Pas flagrant cela dit. 
 
 ```{r logement}
 
@@ -281,8 +281,8 @@ La fréquence de lecture semble légérement mieux. Pas flagrant cela dit.
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "logement"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
-    by = logement, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spÃ©cialisÃ©e"),
+    by = logement, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_categorical() ~ c(1,0))
@@ -308,8 +308,8 @@ tab1_t
 tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "logement"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
-    by = logement, #La variale avec laquelle on croise les données qui ira en colonne
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux Ã©coutÃ©s"),
+    by = logement, #La variale avec laquelle on croise les donnÃ©es qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_categorical() ~ c(1,0))
@@ -323,7 +323,7 @@ tab1_t <- tab1 %>%
   tab_source_note(source_note = html("Source : 
                                      <br> Champ : 
                                      <br>Lecture : ")) %>%
-  tab_header(title = "Nombre de styles écoutés par statut logement") %>%
+  tab_header(title = "Nombre de styles Ã©coutÃ©s par statut logement") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -342,4 +342,4 @@ Vcramer_stream <- cramer.v(table(d$E83, d$logement))
 
 V de cramer entre stream et logement = `r Vcramer_stream`
 
-Association faible ou juste lié à l'age (différence propriétaire sans crédit/avec crédit), peu pertinant.
+Association faible ou juste liÃ© Ã  l'age (diffÃ©rence propriÃ©taire sans crÃ©dit/avec crÃ©dit), peu pertinant.

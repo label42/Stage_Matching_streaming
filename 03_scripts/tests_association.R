@@ -11,7 +11,7 @@ to_dummy = function(data, col) {
 }
 
 
-# Fonction pour calculer le D de cohen entre une variable numérique et une variable catégorielle non dicotomique
+# Fonction pour calculer le D de cohen entre une variable numÃ©rique et une variable catÃ©gorielle non dicotomique
 
 force_lien_d_cohen = function(data, v_num, v_cat){
   data[,v_cat] <- fct_explicit_na(data[,v_cat], na_level = "Non dispo")
