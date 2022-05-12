@@ -11,23 +11,23 @@ knitr::opts_chunk$set(warning = FALSE)
 
 pacman::p_load(tidyverse, questionr, gtsummary, gt, survey)
 
-d <- read.csv("../Data/pc18_quetelet_octobre2021.csv",sep=";")
 
-source("../recodage_matching.R")
 
-source("../Fonctions/tests_cor.R")
+source(here("02_import", "import_bases.R"))
+
+source(here("03_scripts", "tests_association.R"))
 
 # il manque 4 pondération...
-d_survey <- subset(d, !is.na(d$POND))
+PC18_s <- PC18
 
 #pour que la pop total soit égale au nombre de ligne dans la base (on divise la pondération par la somme de toutes les pondération divisé par le nombre d'individus)
-d_survey$POND <- d_survey$POND/5629.778
+PC18_s$POND <- PC18_s$POND/5629.778
 
-print(sum(d_survey$POND))
+print(sum(PC18_s$POND))
 
-d_survey <- survey::svydesign(id = ~IDENT18, data = d_survey, weights = d_survey$POND)
+PC18_s <- survey::svydesign(id = ~IDENT18, data = PC18_s, weights = PC18_s$POND)
 
-d_survey <- subset(d_survey, music_12m != "Jamais")
+PC18_s <- subset(PC18_s, music_12m != "Jamais")
 
 theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 ```
@@ -38,7 +38,7 @@ theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 
 
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "VITENCOUPLE_r"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
@@ -65,7 +65,7 @@ tab1_t <- tab1 %>%
 
 tab1_t
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "VITENCOUPLE_r"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
@@ -112,7 +112,7 @@ Association faible avec le nombre de styles écoutés. A rejeter.
 
 
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
@@ -139,7 +139,7 @@ tab1_t <- tab1 %>%
 
 tab1_t
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "sorties_ami"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
@@ -183,7 +183,7 @@ Associations avec les deux variables, à considérer.
 
 
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
@@ -210,7 +210,7 @@ tab1_t <- tab1 %>%
 
 tab1_t
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "freq_info"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
@@ -278,7 +278,7 @@ La fréquence de lecture semble légérement mieux. Pas flagrant cela dit.
 
 
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("stream_spe", "logement"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming spécialisée"),
@@ -305,7 +305,7 @@ tab1_t <- tab1 %>%
 
 tab1_t
 
-tab1 <- d_survey %>%
+tab1 <- PC18_s %>%
   tbl_svysummary(
     include = c("nbr_genre_music", "logement"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés"),
