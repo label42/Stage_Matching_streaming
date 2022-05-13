@@ -1,0 +1,1446 @@
+Start:  AIC=6972.85
+stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    CS_mere + sorties_ami + music_amateur + freq_jv + freq_tv + 
+    equip_tv + clip_tv + freq_film + equip_film + film_stream_VOD + 
+    film_replay + film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- CRITREVENU_r             10   6749.8 6961.8
+- PCS_MENAGE                6   6745.6 6965.6
+- CS_mere                   6   6746.5 6966.5
+- CS_pere                   6   6746.6 6966.6
+- freq_jv                   4   6743.4 6967.4
+- musique_enfance           3   6742.0 6968.0
+- equip_lecture             3   6743.0 6969.0
+- DIPLOME_mere              3   6743.4 6969.4
+- sorties_ami               4   6746.0 6970.0
+- DIPLOME_r                 4   6746.2 6970.2
+- DIPLOME_pere              3   6744.2 6970.2
+- freq_lecture              4   6746.3 6970.3
+- freq_serie                3   6744.5 6970.5
+- equip_film                2   6742.7 6970.7
+- nbr_genre_film_cine       1   6740.8 6970.8
+- serie_num                 1   6740.8 6970.8
+- autre_langue              1   6740.9 6970.9
+- film_num                  1   6740.9 6970.9
+- h_travail_semaine         1   6740.9 6970.9
+- film_replay               1   6740.9 6970.9
+- nbr_genre_serie           1   6740.9 6970.9
+- ordi                      1   6740.9 6970.9
+- cinema_enfance            3   6745.0 6971.0
+- acces_internet            1   6741.1 6971.1
+- nbr_genre_ecoute_enfance  1   6741.1 6971.1
+- tv_enfance                3   6745.3 6971.3
+- serie_stream_autre        1   6741.4 6971.4
+- nbr_genre_parent_ecoute   1   6741.4 6971.4
+- film_DVD                  1   6741.6 6971.6
+- SEXE_r                    1   6742.7 6972.7
+- serie_DVD                 1   6742.7 6972.7
+- equip_serie               2   6744.7 6972.7
+<none>                          6740.8 6972.8
+- galerie_12m               1   6743.6 6973.6
+- serie_replay              1   6743.6 6973.6
+- clip_tv                   1   6743.7 6973.7
+- equip_tv                  2   6746.3 6974.3
+- naiss_parents             3   6748.4 6974.4
+- freq_film                 3   6749.3 6975.3
+- musee_art_12m             1   6748.2 6978.2
+- serie_stream_VOD          1   6750.4 6980.4
+- nbr_genre_film            1   6750.7 6980.7
+- music_amateur             1   6752.3 6982.3
+- audivisuel_nonFR          1   6754.2 6984.2
+- reseaux_sociaux           1   6754.3 6984.3
+- film_stream_autre         1   6761.4 6991.4
+- freq_tv                   2   6764.3 6992.3
+- culture_en_ligne          1   6763.0 6993.0
+- info_internet             2   6771.9 6999.9
+- film_stream_VOD           1   6775.9 7005.9
+- freq_internet             3   6792.2 7018.2
+- AGE                       1   6792.7 7022.7
+
+Step:  AIC=6961.82
+stream_spe ~ SEXE_r + AGE + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    CS_mere + sorties_ami + music_amateur + freq_jv + freq_tv + 
+    equip_tv + clip_tv + freq_film + equip_film + film_stream_VOD + 
+    film_replay + film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- CS_mere                   6   6755.4 6955.4
+- CS_pere                   6   6755.7 6955.7
+- PCS_MENAGE                6   6756.0 6956.0
+- freq_jv                   4   6752.4 6956.4
+- musique_enfance           3   6750.8 6956.8
+- equip_lecture             3   6751.9 6957.9
+- DIPLOME_mere              3   6752.2 6958.2
+- DIPLOME_r                 4   6755.3 6959.3
+- sorties_ami               4   6755.4 6959.4
+- freq_lecture              4   6755.4 6959.4
+- freq_serie                3   6753.4 6959.4
+- DIPLOME_pere              3   6753.5 6959.5
+- equip_film                2   6751.7 6959.7
+- nbr_genre_film_cine       1   6749.8 6959.8
+- serie_num                 1   6749.8 6959.8
+- film_num                  1   6749.8 6959.8
+- autre_langue              1   6749.8 6959.8
+- ordi                      1   6749.9 6959.9
+- film_replay               1   6749.9 6959.9
+- h_travail_semaine         1   6749.9 6959.9
+- nbr_genre_serie           1   6749.9 6959.9
+- cinema_enfance            3   6754.0 6960.0
+- acces_internet            1   6750.1 6960.1
+- nbr_genre_ecoute_enfance  1   6750.2 6960.2
+- serie_stream_autre        1   6750.3 6960.3
+- nbr_genre_parent_ecoute   1   6750.4 6960.4
+- tv_enfance                3   6754.4 6960.4
+- film_DVD                  1   6750.6 6960.6
+- equip_serie               2   6753.4 6961.4
+- SEXE_r                    1   6751.6 6961.6
+- serie_DVD                 1   6751.6 6961.6
+<none>                          6749.8 6961.8
+- galerie_12m               1   6752.5 6962.5
+- clip_tv                   1   6752.6 6962.6
+- serie_replay              1   6752.7 6962.7
+- naiss_parents             3   6757.5 6963.5
+- equip_tv                  2   6755.6 6963.6
+- freq_film                 3   6757.9 6963.9
+- musee_art_12m             1   6757.3 6967.3
+- nbr_genre_film            1   6759.6 6969.6
+- serie_stream_VOD          1   6759.8 6969.8
+- music_amateur             1   6761.4 6971.4
+- audivisuel_nonFR          1   6762.9 6972.9
+- reseaux_sociaux           1   6763.2 6973.2
+- film_stream_autre         1   6770.6 6980.6
+- freq_tv                   2   6773.3 6981.3
+- culture_en_ligne          1   6771.7 6981.7
+- info_internet             2   6781.1 6989.1
+- film_stream_VOD           1   6786.1 6996.1
+- freq_internet             3   6801.1 7007.1
+- AGE                       1   6803.4 7013.4
+
+Step:  AIC=6955.42
+stream_spe ~ SEXE_r + AGE + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + music_amateur + freq_jv + freq_tv + equip_tv + 
+    clip_tv + freq_film + equip_film + film_stream_VOD + film_replay + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- PCS_MENAGE                6   6761.3 6949.3
+- CS_pere                   6   6761.8 6949.8
+- freq_jv                   4   6758.1 6950.1
+- musique_enfance           3   6756.6 6950.6
+- DIPLOME_mere              3   6757.2 6951.2
+- equip_lecture             3   6757.6 6951.6
+- DIPLOME_r                 4   6760.8 6952.8
+- freq_lecture              4   6761.0 6953.0
+- sorties_ami               4   6761.1 6953.1
+- freq_serie                3   6759.1 6953.1
+- equip_film                2   6757.3 6953.3
+- DIPLOME_pere              3   6759.4 6953.4
+- serie_num                 1   6755.4 6953.4
+- nbr_genre_film_cine       1   6755.4 6953.4
+- film_num                  1   6755.4 6953.4
+- autre_langue              1   6755.4 6953.4
+- ordi                      1   6755.5 6953.5
+- nbr_genre_serie           1   6755.5 6953.5
+- film_replay               1   6755.5 6953.5
+- h_travail_semaine         1   6755.6 6953.6
+- acces_internet            1   6755.7 6953.7
+- nbr_genre_ecoute_enfance  1   6755.8 6953.8
+- cinema_enfance            3   6759.9 6953.9
+- nbr_genre_parent_ecoute   1   6755.9 6953.9
+- serie_stream_autre        1   6756.0 6954.0
+- tv_enfance                3   6760.2 6954.2
+- film_DVD                  1   6756.3 6954.3
+- equip_serie               2   6759.0 6955.0
+- serie_DVD                 1   6757.2 6955.2
+- SEXE_r                    1   6757.3 6955.3
+<none>                          6755.4 6955.4
+- galerie_12m               1   6757.8 6955.8
+- clip_tv                   1   6758.3 6956.3
+- serie_replay              1   6758.5 6956.5
+- equip_tv                  2   6761.3 6957.3
+- naiss_parents             3   6763.5 6957.5
+- freq_film                 3   6763.6 6957.6
+- musee_art_12m             1   6763.5 6961.5
+- nbr_genre_film            1   6764.8 6962.8
+- serie_stream_VOD          1   6765.6 6963.6
+- music_amateur             1   6766.7 6964.7
+- audivisuel_nonFR          1   6768.1 6966.1
+- reseaux_sociaux           1   6768.7 6966.7
+- film_stream_autre         1   6776.7 6974.7
+- culture_en_ligne          1   6776.7 6974.7
+- freq_tv                   2   6779.0 6975.0
+- info_internet             2   6786.8 6982.8
+- film_stream_VOD           1   6791.7 6989.7
+- freq_internet             3   6806.5 7000.5
+- AGE                       1   6812.1 7010.1
+
+Step:  AIC=6949.34
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    DIPLOME_pere + CS_pere + DIPLOME_mere + sorties_ami + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + freq_film + equip_film + 
+    film_stream_VOD + film_replay + film_stream_autre + film_DVD + 
+    film_num + nbr_genre_film + freq_serie + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + serie_num + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + ordi + 
+    acces_internet + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + musique_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- freq_jv                   4   6764.0 6944.0
+- musique_enfance           3   6762.4 6944.4
+- CS_pere                   6   6768.5 6944.5
+- DIPLOME_mere              3   6763.2 6945.2
+- equip_lecture             3   6763.8 6945.8
+- freq_lecture              4   6766.8 6946.8
+- freq_serie                3   6765.0 6947.0
+- equip_film                2   6763.2 6947.2
+- nbr_genre_film_cine       1   6761.3 6947.3
+- serie_num                 1   6761.3 6947.3
+- autre_langue              1   6761.4 6947.4
+- sorties_ami               4   6767.4 6947.4
+- film_num                  1   6761.4 6947.4
+- ordi                      1   6761.4 6947.4
+- film_replay               1   6761.4 6947.4
+- nbr_genre_serie           1   6761.4 6947.4
+- DIPLOME_pere              3   6765.5 6947.5
+- acces_internet            1   6761.6 6947.6
+- h_travail_semaine         1   6761.6 6947.6
+- nbr_genre_ecoute_enfance  1   6761.7 6947.7
+- cinema_enfance            3   6765.8 6947.8
+- serie_stream_autre        1   6761.8 6947.8
+- nbr_genre_parent_ecoute   1   6761.9 6947.9
+- tv_enfance                3   6766.0 6948.0
+- film_DVD                  1   6762.2 6948.2
+- equip_serie               2   6764.9 6948.9
+- serie_DVD                 1   6763.0 6949.0
+- SEXE_r                    1   6763.3 6949.3
+<none>                          6761.3 6949.3
+- DIPLOME_r                 4   6769.4 6949.4
+- galerie_12m               1   6763.7 6949.7
+- clip_tv                   1   6764.1 6950.1
+- serie_replay              1   6764.3 6950.3
+- equip_tv                  2   6767.5 6951.5
+- freq_film                 3   6769.6 6951.6
+- naiss_parents             3   6770.1 6952.1
+- musee_art_12m             1   6770.2 6956.2
+- nbr_genre_film            1   6770.7 6956.7
+- serie_stream_VOD          1   6771.7 6957.7
+- music_amateur             1   6773.4 6959.4
+- audivisuel_nonFR          1   6774.2 6960.2
+- reseaux_sociaux           1   6774.2 6960.2
+- film_stream_autre         1   6782.0 6968.0
+- culture_en_ligne          1   6782.2 6968.2
+- freq_tv                   2   6784.5 6968.5
+- info_internet             2   6793.1 6977.1
+- film_stream_VOD           1   6798.6 6984.6
+- freq_internet             3   6813.1 6995.1
+- AGE                       1   6817.3 7003.3
+
+Step:  AIC=6944.01
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    DIPLOME_pere + CS_pere + DIPLOME_mere + sorties_ami + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + equip_film + film_stream_VOD + 
+    film_replay + film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- CS_pere                   6   6771.0 6939.0
+- musique_enfance           3   6765.1 6939.1
+- DIPLOME_mere              3   6765.8 6939.8
+- equip_lecture             3   6766.6 6940.6
+- freq_lecture              4   6769.5 6941.5
+- freq_serie                3   6767.6 6941.6
+- sorties_ami               4   6769.8 6941.8
+- equip_film                2   6765.9 6941.9
+- DIPLOME_pere              3   6768.0 6942.0
+- serie_num                 1   6764.0 6942.0
+- nbr_genre_film_cine       1   6764.0 6942.0
+- autre_langue              1   6764.0 6942.0
+- ordi                      1   6764.1 6942.1
+- film_num                  1   6764.1 6942.1
+- film_replay               1   6764.1 6942.1
+- nbr_genre_serie           1   6764.1 6942.1
+- h_travail_semaine         1   6764.2 6942.2
+- acces_internet            1   6764.3 6942.3
+- cinema_enfance            3   6768.4 6942.4
+- nbr_genre_ecoute_enfance  1   6764.4 6942.4
+- serie_stream_autre        1   6764.5 6942.5
+- nbr_genre_parent_ecoute   1   6764.5 6942.5
+- tv_enfance                3   6768.8 6942.8
+- film_DVD                  1   6764.9 6942.9
+- equip_serie               2   6767.6 6943.6
+- serie_DVD                 1   6765.6 6943.6
+<none>                          6764.0 6944.0
+- DIPLOME_r                 4   6772.0 6944.0
+- SEXE_r                    1   6766.1 6944.1
+- galerie_12m               1   6766.4 6944.4
+- clip_tv                   1   6766.8 6944.8
+- serie_replay              1   6766.9 6944.9
+- freq_film                 3   6772.1 6946.1
+- equip_tv                  2   6770.2 6946.2
+- naiss_parents             3   6773.1 6947.1
+- musee_art_12m             1   6772.7 6950.7
+- nbr_genre_film            1   6773.8 6951.8
+- serie_stream_VOD          1   6774.5 6952.5
+- music_amateur             1   6776.2 6954.2
+- audivisuel_nonFR          1   6776.8 6954.8
+- reseaux_sociaux           1   6777.4 6955.4
+- freq_tv                   2   6786.7 6962.7
+- culture_en_ligne          1   6785.0 6963.0
+- film_stream_autre         1   6785.0 6963.0
+- info_internet             2   6795.4 6971.4
+- film_stream_VOD           1   6801.5 6979.5
+- freq_internet             3   6816.7 6990.7
+- AGE                       1   6822.6 7000.6
+
+Step:  AIC=6939.03
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    DIPLOME_pere + DIPLOME_mere + sorties_ami + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + equip_film + film_stream_VOD + 
+    film_replay + film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- musique_enfance           3   6772.3 6934.3
+- DIPLOME_mere              3   6772.8 6934.8
+- equip_lecture             3   6773.8 6935.8
+- DIPLOME_pere              3   6774.0 6936.0
+- freq_serie                3   6774.5 6936.5
+- sorties_ami               4   6776.7 6936.7
+- freq_lecture              4   6776.8 6936.8
+- equip_film                2   6773.0 6937.0
+- nbr_genre_film_cine       1   6771.0 6937.0
+- serie_num                 1   6771.0 6937.0
+- autre_langue              1   6771.0 6937.0
+- ordi                      1   6771.1 6937.1
+- film_num                  1   6771.1 6937.1
+- nbr_genre_serie           1   6771.1 6937.1
+- film_replay               1   6771.2 6937.2
+- h_travail_semaine         1   6771.2 6937.2
+- acces_internet            1   6771.3 6937.3
+- nbr_genre_ecoute_enfance  1   6771.4 6937.4
+- serie_stream_autre        1   6771.5 6937.5
+- nbr_genre_parent_ecoute   1   6771.7 6937.7
+- tv_enfance                3   6775.7 6937.7
+- cinema_enfance            3   6775.8 6937.8
+- film_DVD                  1   6772.0 6938.0
+- serie_DVD                 1   6772.6 6938.6
+- equip_serie               2   6774.8 6938.8
+<none>                          6771.0 6939.0
+- SEXE_r                    1   6773.3 6939.3
+- galerie_12m               1   6773.4 6939.4
+- clip_tv                   1   6773.7 6939.7
+- serie_replay              1   6774.1 6940.1
+- DIPLOME_r                 4   6780.4 6940.4
+- equip_tv                  2   6777.1 6941.1
+- freq_film                 3   6779.2 6941.2
+- naiss_parents             3   6781.1 6943.1
+- musee_art_12m             1   6779.8 6945.8
+- nbr_genre_film            1   6780.5 6946.5
+- serie_stream_VOD          1   6780.9 6946.9
+- music_amateur             1   6783.5 6949.5
+- reseaux_sociaux           1   6784.5 6950.5
+- audivisuel_nonFR          1   6784.7 6950.7
+- freq_tv                   2   6793.9 6957.9
+- film_stream_autre         1   6792.1 6958.1
+- culture_en_ligne          1   6792.1 6958.1
+- info_internet             2   6802.0 6966.0
+- film_stream_VOD           1   6809.8 6975.8
+- freq_internet             3   6824.2 6986.2
+- AGE                       1   6828.6 6994.6
+
+Step:  AIC=6934.28
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    DIPLOME_pere + DIPLOME_mere + sorties_ami + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + equip_film + film_stream_VOD + 
+    film_replay + film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR + 
+    autre_langue
+
+                           Df Deviance    AIC
+- DIPLOME_mere              3   6774.0 6930.0
+- equip_lecture             3   6775.0 6931.0
+- DIPLOME_pere              3   6775.2 6931.2
+- freq_serie                3   6775.7 6931.7
+- freq_lecture              4   6777.9 6931.9
+- sorties_ami               4   6778.1 6932.1
+- equip_film                2   6774.2 6932.2
+- nbr_genre_film_cine       1   6772.3 6932.3
+- autre_langue              1   6772.3 6932.3
+- serie_num                 1   6772.3 6932.3
+- ordi                      1   6772.3 6932.3
+- film_num                  1   6772.4 6932.4
+- nbr_genre_serie           1   6772.4 6932.4
+- film_replay               1   6772.4 6932.4
+- h_travail_semaine         1   6772.5 6932.5
+- acces_internet            1   6772.6 6932.6
+- serie_stream_autre        1   6772.8 6932.8
+- nbr_genre_ecoute_enfance  1   6772.9 6932.9
+- nbr_genre_parent_ecoute   1   6772.9 6932.9
+- film_DVD                  1   6773.3 6933.3
+- tv_enfance                3   6777.6 6933.6
+- cinema_enfance            3   6777.7 6933.7
+- serie_DVD                 1   6773.8 6933.8
+- equip_serie               2   6776.1 6934.1
+<none>                          6772.3 6934.3
+- SEXE_r                    1   6774.4 6934.4
+- galerie_12m               1   6774.7 6934.7
+- clip_tv                   1   6775.0 6935.0
+- serie_replay              1   6775.4 6935.4
+- DIPLOME_r                 4   6781.7 6935.7
+- equip_tv                  2   6778.4 6936.4
+- freq_film                 3   6780.5 6936.5
+- naiss_parents             3   6782.2 6938.2
+- musee_art_12m             1   6780.9 6940.9
+- nbr_genre_film            1   6781.8 6941.8
+- serie_stream_VOD          1   6782.1 6942.1
+- music_amateur             1   6785.3 6945.3
+- reseaux_sociaux           1   6785.8 6945.8
+- audivisuel_nonFR          1   6785.9 6945.9
+- freq_tv                   2   6795.0 6953.0
+- film_stream_autre         1   6793.2 6953.2
+- culture_en_ligne          1   6793.4 6953.4
+- info_internet             2   6803.4 6961.4
+- film_stream_VOD           1   6810.9 6970.9
+- freq_internet             3   6826.0 6982.0
+- AGE                       1   6830.5 6990.5
+
+Step:  AIC=6930.02
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    DIPLOME_pere + sorties_ami + music_amateur + freq_tv + equip_tv + 
+    clip_tv + freq_film + equip_film + film_stream_VOD + film_replay + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR + 
+    autre_langue
+
+                           Df Deviance    AIC
+- DIPLOME_pere              3   6776.0 6926.0
+- equip_lecture             3   6776.7 6926.7
+- freq_serie                3   6777.5 6927.5
+- sorties_ami               4   6779.7 6927.7
+- freq_lecture              4   6779.7 6927.7
+- equip_film                2   6776.0 6928.0
+- autre_langue              1   6774.0 6928.0
+- nbr_genre_film_cine       1   6774.0 6928.0
+- serie_num                 1   6774.0 6928.0
+- ordi                      1   6774.1 6928.1
+- nbr_genre_serie           1   6774.1 6928.1
+- film_num                  1   6774.1 6928.1
+- film_replay               1   6774.2 6928.2
+- h_travail_semaine         1   6774.3 6928.3
+- acces_internet            1   6774.3 6928.3
+- serie_stream_autre        1   6774.5 6928.5
+- nbr_genre_parent_ecoute   1   6774.6 6928.6
+- nbr_genre_ecoute_enfance  1   6774.6 6928.6
+- film_DVD                  1   6775.1 6929.1
+- tv_enfance                3   6779.1 6929.1
+- cinema_enfance            3   6779.4 6929.4
+- serie_DVD                 1   6775.6 6929.6
+- equip_serie               2   6777.7 6929.7
+<none>                          6774.0 6930.0
+- SEXE_r                    1   6776.3 6930.3
+- galerie_12m               1   6776.5 6930.5
+- clip_tv                   1   6776.7 6930.7
+- serie_replay              1   6777.2 6931.2
+- DIPLOME_r                 4   6783.5 6931.5
+- freq_film                 3   6782.2 6932.2
+- equip_tv                  2   6780.3 6932.3
+- naiss_parents             3   6783.9 6933.9
+- musee_art_12m             1   6783.0 6937.0
+- nbr_genre_film            1   6783.6 6937.6
+- serie_stream_VOD          1   6784.0 6938.0
+- music_amateur             1   6787.1 6941.1
+- reseaux_sociaux           1   6787.6 6941.6
+- audivisuel_nonFR          1   6787.7 6941.7
+- freq_tv                   2   6796.6 6948.6
+- culture_en_ligne          1   6794.8 6948.8
+- film_stream_autre         1   6794.8 6948.8
+- info_internet             2   6804.9 6956.9
+- film_stream_VOD           1   6812.5 6966.5
+- freq_internet             3   6827.7 6977.7
+- AGE                       1   6835.2 6989.2
+
+Step:  AIC=6925.97
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    sorties_ami + music_amateur + freq_tv + equip_tv + clip_tv + 
+    freq_film + equip_film + film_stream_VOD + film_replay + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + equip_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR + 
+    autre_langue
+
+                           Df Deviance    AIC
+- equip_lecture             3   6778.6 6922.6
+- freq_serie                3   6779.5 6923.5
+- freq_lecture              4   6781.7 6923.7
+- sorties_ami               4   6781.7 6923.7
+- equip_film                2   6777.9 6923.9
+- autre_langue              1   6776.0 6924.0
+- nbr_genre_film_cine       1   6776.0 6924.0
+- serie_num                 1   6776.0 6924.0
+- ordi                      1   6776.0 6924.0
+- nbr_genre_serie           1   6776.1 6924.1
+- film_replay               1   6776.1 6924.1
+- film_num                  1   6776.1 6924.1
+- h_travail_semaine         1   6776.2 6924.2
+- acces_internet            1   6776.3 6924.3
+- serie_stream_autre        1   6776.5 6924.5
+- nbr_genre_ecoute_enfance  1   6776.6 6924.6
+- nbr_genre_parent_ecoute   1   6776.7 6924.7
+- film_DVD                  1   6777.1 6925.1
+- tv_enfance                3   6781.1 6925.1
+- cinema_enfance            3   6781.5 6925.5
+- serie_DVD                 1   6777.6 6925.6
+- equip_serie               2   6779.6 6925.6
+<none>                          6776.0 6926.0
+- galerie_12m               1   6778.4 6926.4
+- SEXE_r                    1   6778.5 6926.5
+- clip_tv                   1   6778.7 6926.7
+- serie_replay              1   6779.3 6927.3
+- DIPLOME_r                 4   6786.1 6928.1
+- equip_tv                  2   6782.1 6928.1
+- freq_film                 3   6784.3 6928.3
+- naiss_parents             3   6785.9 6929.9
+- musee_art_12m             1   6785.1 6933.1
+- nbr_genre_film            1   6785.5 6933.5
+- serie_stream_VOD          1   6786.0 6934.0
+- music_amateur             1   6789.0 6937.0
+- reseaux_sociaux           1   6789.3 6937.3
+- audivisuel_nonFR          1   6789.5 6937.5
+- freq_tv                   2   6798.6 6944.6
+- film_stream_autre         1   6796.9 6944.9
+- culture_en_ligne          1   6797.3 6945.3
+- info_internet             2   6807.0 6953.0
+- film_stream_VOD           1   6814.3 6962.3
+- freq_internet             3   6829.4 6973.4
+- AGE                       1   6837.1 6985.1
+
+Step:  AIC=6922.59
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    sorties_ami + music_amateur + freq_tv + equip_tv + clip_tv + 
+    freq_film + equip_film + film_stream_VOD + film_replay + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + serie_num + nbr_genre_serie + 
+    info_internet + freq_lecture + nbr_genre_film_cine + musee_art_12m + 
+    galerie_12m + ordi + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- freq_serie                3   6782.2 6920.2
+- sorties_ami               4   6784.5 6920.5
+- autre_langue              1   6778.6 6920.6
+- nbr_genre_film_cine       1   6778.6 6920.6
+- serie_num                 1   6778.6 6920.6
+- equip_film                2   6780.6 6920.6
+- ordi                      1   6778.6 6920.6
+- nbr_genre_serie           1   6778.7 6920.7
+- film_replay               1   6778.7 6920.7
+- film_num                  1   6778.7 6920.7
+- h_travail_semaine         1   6778.9 6920.9
+- acces_internet            1   6778.9 6920.9
+- serie_stream_autre        1   6779.0 6921.0
+- nbr_genre_ecoute_enfance  1   6779.2 6921.2
+- freq_lecture              4   6785.2 6921.2
+- nbr_genre_parent_ecoute   1   6779.3 6921.3
+- tv_enfance                3   6783.6 6921.6
+- film_DVD                  1   6779.7 6921.7
+- serie_DVD                 1   6780.2 6922.2
+- cinema_enfance            3   6784.2 6922.2
+- equip_serie               2   6782.3 6922.3
+<none>                          6778.6 6922.6
+- SEXE_r                    1   6781.0 6923.0
+- clip_tv                   1   6781.2 6923.2
+- galerie_12m               1   6781.2 6923.2
+- serie_replay              1   6781.9 6923.9
+- equip_tv                  2   6784.9 6924.9
+- freq_film                 3   6786.9 6924.9
+- DIPLOME_r                 4   6789.0 6925.0
+- naiss_parents             3   6788.4 6926.4
+- musee_art_12m             1   6787.7 6929.7
+- nbr_genre_film            1   6788.1 6930.1
+- serie_stream_VOD          1   6788.6 6930.6
+- music_amateur             1   6791.9 6933.9
+- reseaux_sociaux           1   6792.0 6934.0
+- audivisuel_nonFR          1   6792.5 6934.5
+- film_stream_autre         1   6799.5 6941.5
+- freq_tv                   2   6801.7 6941.7
+- culture_en_ligne          1   6800.3 6942.3
+- info_internet             2   6810.4 6950.4
+- film_stream_VOD           1   6817.0 6959.0
+- freq_internet             3   6832.3 6970.3
+- AGE                       1   6839.4 6981.4
+
+Step:  AIC=6920.22
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    sorties_ami + music_amateur + freq_tv + equip_tv + clip_tv + 
+    freq_film + equip_film + film_stream_VOD + film_replay + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    equip_serie + serie_stream_VOD + serie_replay + serie_stream_autre + 
+    serie_DVD + serie_num + nbr_genre_serie + info_internet + 
+    freq_lecture + nbr_genre_film_cine + musee_art_12m + galerie_12m + 
+    ordi + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- sorties_ami               4   6788.2 6918.2
+- serie_num                 1   6782.2 6918.2
+- nbr_genre_film_cine       1   6782.2 6918.2
+- autre_langue              1   6782.2 6918.2
+- nbr_genre_serie           1   6782.2 6918.2
+- ordi                      1   6782.2 6918.2
+- equip_film                2   6784.2 6918.2
+- film_num                  1   6782.4 6918.4
+- film_replay               1   6782.4 6918.4
+- h_travail_semaine         1   6782.5 6918.5
+- freq_lecture              4   6788.6 6918.6
+- acces_internet            1   6782.6 6918.6
+- serie_stream_autre        1   6782.7 6918.7
+- nbr_genre_ecoute_enfance  1   6782.8 6918.8
+- nbr_genre_parent_ecoute   1   6782.9 6918.9
+- equip_serie               3   6787.2 6919.2
+- film_DVD                  1   6783.3 6919.3
+- tv_enfance                3   6787.4 6919.4
+- serie_DVD                 1   6783.7 6919.7
+- cinema_enfance            3   6787.8 6919.8
+<none>                          6782.2 6920.2
+- SEXE_r                    1   6784.5 6920.5
+- galerie_12m               1   6784.9 6920.9
+- clip_tv                   1   6785.1 6921.1
+- serie_replay              1   6785.8 6921.8
+- freq_film                 3   6790.3 6922.3
+- equip_tv                  2   6788.5 6922.5
+- DIPLOME_r                 4   6793.0 6923.0
+- naiss_parents             3   6792.1 6924.1
+- musee_art_12m             1   6791.2 6927.2
+- nbr_genre_film            1   6791.4 6927.4
+- serie_stream_VOD          1   6792.4 6928.4
+- music_amateur             1   6795.3 6931.3
+- reseaux_sociaux           1   6795.7 6931.7
+- audivisuel_nonFR          1   6796.0 6932.0
+- freq_tv                   2   6805.1 6939.1
+- film_stream_autre         1   6803.3 6939.3
+- culture_en_ligne          1   6803.7 6939.7
+- info_internet             2   6813.7 6947.7
+- film_stream_VOD           1   6821.3 6957.3
+- freq_internet             3   6835.4 6967.4
+- AGE                       1   6843.8 6979.8
+
+Step:  AIC=6918.17
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + serie_num + 
+    nbr_genre_serie + info_internet + freq_lecture + nbr_genre_film_cine + 
+    musee_art_12m + galerie_12m + ordi + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR + 
+    autre_langue
+
+                           Df Deviance    AIC
+- nbr_genre_film_cine       1   6788.2 6916.2
+- serie_num                 1   6788.2 6916.2
+- autre_langue              1   6788.2 6916.2
+- ordi                      1   6788.2 6916.2
+- nbr_genre_serie           1   6788.2 6916.2
+- equip_film                2   6790.3 6916.3
+- film_num                  1   6788.3 6916.3
+- film_replay               1   6788.3 6916.3
+- acces_internet            1   6788.6 6916.6
+- h_travail_semaine         1   6788.6 6916.6
+- nbr_genre_ecoute_enfance  1   6788.6 6916.6
+- freq_lecture              4   6794.6 6916.6
+- serie_stream_autre        1   6788.7 6916.7
+- nbr_genre_parent_ecoute   1   6788.9 6916.9
+- equip_serie               3   6793.0 6917.0
+- film_DVD                  1   6789.2 6917.2
+- tv_enfance                3   6793.5 6917.5
+- serie_DVD                 1   6789.7 6917.7
+<none>                          6788.2 6918.2
+- cinema_enfance            3   6794.2 6918.2
+- SEXE_r                    1   6790.6 6918.6
+- clip_tv                   1   6791.1 6919.1
+- galerie_12m               1   6791.1 6919.1
+- serie_replay              1   6791.8 6919.8
+- freq_film                 3   6796.4 6920.4
+- equip_tv                  2   6794.6 6920.6
+- DIPLOME_r                 4   6799.4 6921.4
+- naiss_parents             3   6798.0 6922.0
+- nbr_genre_film            1   6797.4 6925.4
+- musee_art_12m             1   6797.4 6925.4
+- serie_stream_VOD          1   6798.3 6926.3
+- music_amateur             1   6800.9 6928.9
+- audivisuel_nonFR          1   6801.6 6929.6
+- reseaux_sociaux           1   6802.1 6930.1
+- freq_tv                   2   6811.3 6937.3
+- film_stream_autre         1   6809.3 6937.3
+- culture_en_ligne          1   6810.0 6938.0
+- info_internet             2   6820.6 6946.6
+- film_stream_VOD           1   6827.3 6955.3
+- freq_internet             3   6842.0 6966.0
+- AGE                       1   6851.3 6979.3
+
+Step:  AIC=6916.17
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + serie_num + 
+    nbr_genre_serie + info_internet + freq_lecture + musee_art_12m + 
+    galerie_12m + ordi + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- serie_num                 1   6788.2 6914.2
+- autre_langue              1   6788.2 6914.2
+- ordi                      1   6788.2 6914.2
+- nbr_genre_serie           1   6788.2 6914.2
+- equip_film                2   6790.3 6914.3
+- film_num                  1   6788.3 6914.3
+- film_replay               1   6788.3 6914.3
+- acces_internet            1   6788.6 6914.6
+- h_travail_semaine         1   6788.6 6914.6
+- nbr_genre_ecoute_enfance  1   6788.6 6914.6
+- freq_lecture              4   6794.7 6914.7
+- serie_stream_autre        1   6788.7 6914.7
+- nbr_genre_parent_ecoute   1   6788.9 6914.9
+- equip_serie               3   6793.0 6915.0
+- film_DVD                  1   6789.3 6915.3
+- tv_enfance                3   6793.5 6915.5
+- serie_DVD                 1   6789.7 6915.7
+<none>                          6788.2 6916.2
+- cinema_enfance            3   6794.2 6916.2
+- SEXE_r                    1   6790.6 6916.6
+- clip_tv                   1   6791.1 6917.1
+- galerie_12m               1   6791.1 6917.1
+- serie_replay              1   6791.9 6917.9
+- freq_film                 3   6796.4 6918.4
+- equip_tv                  2   6794.7 6918.7
+- DIPLOME_r                 4   6799.5 6919.5
+- naiss_parents             3   6798.1 6920.1
+- nbr_genre_film            1   6797.7 6923.7
+- musee_art_12m             1   6797.7 6923.7
+- serie_stream_VOD          1   6798.3 6924.3
+- music_amateur             1   6800.9 6926.9
+- audivisuel_nonFR          1   6801.6 6927.6
+- reseaux_sociaux           1   6802.1 6928.1
+- film_stream_autre         1   6809.3 6935.3
+- freq_tv                   2   6811.3 6935.3
+- culture_en_ligne          1   6810.1 6936.1
+- info_internet             2   6820.6 6944.6
+- film_stream_VOD           1   6827.3 6953.3
+- freq_internet             3   6842.2 6964.2
+- AGE                       1   6851.4 6977.4
+
+Step:  AIC=6914.18
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + nbr_genre_serie + 
+    info_internet + freq_lecture + musee_art_12m + galerie_12m + 
+    ordi + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR + autre_langue
+
+                           Df Deviance    AIC
+- autre_langue              1   6788.2 6912.2
+- ordi                      1   6788.2 6912.2
+- nbr_genre_serie           1   6788.2 6912.2
+- equip_film                2   6790.3 6912.3
+- film_num                  1   6788.3 6912.3
+- film_replay               1   6788.3 6912.3
+- acces_internet            1   6788.6 6912.6
+- h_travail_semaine         1   6788.6 6912.6
+- nbr_genre_ecoute_enfance  1   6788.6 6912.6
+- freq_lecture              4   6794.7 6912.7
+- serie_stream_autre        1   6788.7 6912.7
+- nbr_genre_parent_ecoute   1   6788.9 6912.9
+- equip_serie               3   6793.0 6913.0
+- film_DVD                  1   6789.3 6913.3
+- tv_enfance                3   6793.5 6913.5
+- serie_DVD                 1   6789.7 6913.7
+<none>                          6788.2 6914.2
+- cinema_enfance            3   6794.2 6914.2
+- SEXE_r                    1   6790.6 6914.6
+- clip_tv                   1   6791.1 6915.1
+- galerie_12m               1   6791.1 6915.1
+- serie_replay              1   6791.9 6915.9
+- freq_film                 3   6796.4 6916.4
+- equip_tv                  2   6794.7 6916.7
+- DIPLOME_r                 4   6799.5 6917.5
+- naiss_parents             3   6798.1 6918.1
+- nbr_genre_film            1   6797.7 6921.7
+- musee_art_12m             1   6797.7 6921.7
+- serie_stream_VOD          1   6798.4 6922.4
+- music_amateur             1   6800.9 6924.9
+- audivisuel_nonFR          1   6801.6 6925.6
+- reseaux_sociaux           1   6802.1 6926.1
+- film_stream_autre         1   6809.3 6933.3
+- freq_tv                   2   6811.3 6933.3
+- culture_en_ligne          1   6810.1 6934.1
+- info_internet             2   6820.6 6942.6
+- film_stream_VOD           1   6827.4 6951.4
+- freq_internet             3   6842.2 6962.2
+- AGE                       1   6851.5 6975.5
+
+Step:  AIC=6912.19
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + nbr_genre_serie + 
+    info_internet + freq_lecture + musee_art_12m + galerie_12m + 
+    ordi + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR
+
+                           Df Deviance    AIC
+- ordi                      1   6788.2 6910.2
+- nbr_genre_serie           1   6788.2 6910.2
+- equip_film                2   6790.3 6910.3
+- film_num                  1   6788.3 6910.3
+- film_replay               1   6788.4 6910.4
+- acces_internet            1   6788.6 6910.6
+- h_travail_semaine         1   6788.6 6910.6
+- nbr_genre_ecoute_enfance  1   6788.7 6910.7
+- freq_lecture              4   6794.7 6910.7
+- serie_stream_autre        1   6788.7 6910.7
+- nbr_genre_parent_ecoute   1   6788.9 6910.9
+- equip_serie               3   6793.0 6911.0
+- film_DVD                  1   6789.3 6911.3
+- tv_enfance                3   6793.6 6911.6
+- serie_DVD                 1   6789.7 6911.7
+<none>                          6788.2 6912.2
+- cinema_enfance            3   6794.2 6912.2
+- SEXE_r                    1   6790.6 6912.6
+- clip_tv                   1   6791.1 6913.1
+- galerie_12m               1   6791.1 6913.1
+- serie_replay              1   6791.9 6913.9
+- freq_film                 3   6796.4 6914.4
+- equip_tv                  2   6794.7 6914.7
+- DIPLOME_r                 4   6799.9 6915.9
+- naiss_parents             3   6798.8 6916.8
+- nbr_genre_film            1   6797.7 6919.7
+- musee_art_12m             1   6797.7 6919.7
+- serie_stream_VOD          1   6798.4 6920.4
+- music_amateur             1   6800.9 6922.9
+- reseaux_sociaux           1   6802.1 6924.1
+- audivisuel_nonFR          1   6802.2 6924.2
+- film_stream_autre         1   6809.3 6931.3
+- freq_tv                   2   6811.3 6931.3
+- culture_en_ligne          1   6810.1 6932.1
+- info_internet             2   6820.6 6940.6
+- film_stream_VOD           1   6827.4 6949.4
+- freq_internet             3   6842.2 6960.2
+- AGE                       1   6851.5 6973.5
+
+Step:  AIC=6910.2
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + nbr_genre_serie + 
+    info_internet + freq_lecture + musee_art_12m + galerie_12m + 
+    acces_internet + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR
+
+                           Df Deviance    AIC
+- nbr_genre_serie           1   6788.2 6908.2
+- equip_film                2   6790.3 6908.3
+- film_num                  1   6788.4 6908.4
+- film_replay               1   6788.4 6908.4
+- acces_internet            1   6788.6 6908.6
+- h_travail_semaine         1   6788.6 6908.6
+- nbr_genre_ecoute_enfance  1   6788.7 6908.7
+- freq_lecture              4   6794.7 6908.7
+- serie_stream_autre        1   6788.7 6908.7
+- nbr_genre_parent_ecoute   1   6788.9 6908.9
+- equip_serie               3   6793.0 6909.0
+- film_DVD                  1   6789.3 6909.3
+- tv_enfance                3   6793.6 6909.6
+- serie_DVD                 1   6789.7 6909.7
+<none>                          6788.2 6910.2
+- cinema_enfance            3   6794.2 6910.2
+- SEXE_r                    1   6790.6 6910.6
+- clip_tv                   1   6791.1 6911.1
+- galerie_12m               1   6791.2 6911.2
+- serie_replay              1   6791.9 6911.9
+- freq_film                 3   6796.4 6912.4
+- equip_tv                  2   6794.7 6912.7
+- DIPLOME_r                 4   6799.9 6913.9
+- naiss_parents             3   6798.8 6914.8
+- nbr_genre_film            1   6797.7 6917.7
+- musee_art_12m             1   6797.7 6917.7
+- serie_stream_VOD          1   6798.4 6918.4
+- music_amateur             1   6801.0 6921.0
+- reseaux_sociaux           1   6802.1 6922.1
+- audivisuel_nonFR          1   6802.2 6922.2
+- freq_tv                   2   6811.3 6929.3
+- film_stream_autre         1   6809.3 6929.3
+- culture_en_ligne          1   6810.1 6930.1
+- info_internet             2   6820.7 6938.7
+- film_stream_VOD           1   6827.4 6947.4
+- freq_internet             3   6844.1 6960.1
+- AGE                       1   6851.8 6971.8
+
+Step:  AIC=6908.25
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    equip_film + film_stream_VOD + film_replay + film_stream_autre + 
+    film_DVD + film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + info_internet + 
+    freq_lecture + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + tv_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR
+
+                           Df Deviance    AIC
+- equip_film                2   6790.3 6906.3
+- film_num                  1   6788.4 6906.4
+- film_replay               1   6788.4 6906.4
+- acces_internet            1   6788.6 6906.6
+- h_travail_semaine         1   6788.7 6906.7
+- nbr_genre_ecoute_enfance  1   6788.7 6906.7
+- freq_lecture              4   6794.7 6906.7
+- serie_stream_autre        1   6788.8 6906.8
+- nbr_genre_parent_ecoute   1   6788.9 6906.9
+- equip_serie               3   6793.3 6907.3
+- film_DVD                  1   6789.4 6907.4
+- tv_enfance                3   6793.6 6907.6
+- serie_DVD                 1   6789.9 6907.9
+<none>                          6788.2 6908.2
+- cinema_enfance            3   6794.3 6908.3
+- SEXE_r                    1   6790.6 6908.6
+- clip_tv                   1   6791.1 6909.1
+- galerie_12m               1   6791.2 6909.2
+- serie_replay              1   6791.9 6909.9
+- freq_film                 3   6796.5 6910.5
+- equip_tv                  2   6794.8 6910.8
+- DIPLOME_r                 4   6800.0 6912.0
+- naiss_parents             3   6798.9 6912.9
+- musee_art_12m             1   6797.8 6915.8
+- serie_stream_VOD          1   6798.5 6916.5
+- nbr_genre_film            1   6798.7 6916.7
+- music_amateur             1   6801.0 6919.0
+- reseaux_sociaux           1   6802.1 6920.1
+- audivisuel_nonFR          1   6802.2 6920.2
+- freq_tv                   2   6811.4 6927.4
+- film_stream_autre         1   6809.5 6927.5
+- culture_en_ligne          1   6810.1 6928.1
+- info_internet             2   6820.7 6936.7
+- film_stream_VOD           1   6827.5 6945.5
+- freq_internet             3   6844.4 6958.4
+- AGE                       1   6851.9 6969.9
+
+Step:  AIC=6906.32
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_replay + film_stream_autre + film_DVD + 
+    film_num + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_stream_autre + serie_DVD + info_internet + 
+    freq_lecture + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + tv_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR
+
+                           Df Deviance    AIC
+- film_replay               1   6790.4 6904.4
+- film_num                  1   6790.6 6904.6
+- acces_internet            1   6790.7 6904.7
+- h_travail_semaine         1   6790.7 6904.7
+- nbr_genre_ecoute_enfance  1   6790.8 6904.8
+- freq_lecture              4   6796.8 6904.8
+- serie_stream_autre        1   6790.9 6904.9
+- nbr_genre_parent_ecoute   1   6791.0 6905.0
+- tv_enfance                3   6795.6 6905.6
+- film_DVD                  1   6791.6 6905.6
+- serie_DVD                 1   6792.0 6906.0
+<none>                          6790.3 6906.3
+- cinema_enfance            3   6796.5 6906.5
+- SEXE_r                    1   6792.7 6906.7
+- clip_tv                   1   6793.1 6907.1
+- freq_film                 4   6799.2 6907.2
+- galerie_12m               1   6793.3 6907.3
+- serie_replay              1   6793.6 6907.6
+- equip_serie               3   6798.1 6908.1
+- DIPLOME_r                 4   6801.8 6909.8
+- naiss_parents             3   6800.9 6910.9
+- equip_tv                  2   6799.5 6911.5
+- musee_art_12m             1   6800.0 6914.0
+- serie_stream_VOD          1   6800.3 6914.3
+- nbr_genre_film            1   6800.9 6914.9
+- music_amateur             1   6803.1 6917.1
+- reseaux_sociaux           1   6804.4 6918.4
+- audivisuel_nonFR          1   6804.5 6918.5
+- freq_tv                   2   6813.7 6925.7
+- culture_en_ligne          1   6812.6 6926.6
+- film_stream_autre         1   6814.6 6928.6
+- info_internet             2   6822.7 6934.7
+- film_stream_VOD           1   6831.1 6945.1
+- freq_internet             3   6846.6 6956.6
+- AGE                       1   6854.6 6968.6
+
+Step:  AIC=6904.4
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + film_DVD + film_num + 
+    nbr_genre_film + equip_serie + serie_stream_VOD + serie_replay + 
+    serie_stream_autre + serie_DVD + info_internet + freq_lecture + 
+    musee_art_12m + galerie_12m + acces_internet + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR
+
+                           Df Deviance    AIC
+- film_num                  1   6790.7 6902.7
+- acces_internet            1   6790.8 6902.8
+- h_travail_semaine         1   6790.8 6902.8
+- nbr_genre_ecoute_enfance  1   6790.9 6902.9
+- freq_lecture              4   6796.9 6902.9
+- serie_stream_autre        1   6791.0 6903.0
+- nbr_genre_parent_ecoute   1   6791.1 6903.1
+- tv_enfance                3   6795.6 6903.6
+- film_DVD                  1   6791.6 6903.6
+- serie_DVD                 1   6792.1 6904.1
+<none>                          6790.4 6904.4
+- cinema_enfance            3   6796.6 6904.6
+- SEXE_r                    1   6792.8 6904.8
+- clip_tv                   1   6793.2 6905.2
+- galerie_12m               1   6793.4 6905.4
+- freq_film                 4   6799.4 6905.4
+- serie_replay              1   6794.1 6906.1
+- equip_serie               3   6798.2 6906.2
+- DIPLOME_r                 4   6801.8 6907.8
+- naiss_parents             3   6801.0 6909.0
+- equip_tv                  2   6799.5 6909.5
+- musee_art_12m             1   6800.0 6912.0
+- serie_stream_VOD          1   6800.4 6912.4
+- nbr_genre_film            1   6800.9 6912.9
+- music_amateur             1   6803.1 6915.1
+- reseaux_sociaux           1   6804.5 6916.5
+- audivisuel_nonFR          1   6804.6 6916.6
+- freq_tv                   2   6813.8 6923.8
+- culture_en_ligne          1   6812.6 6924.6
+- film_stream_autre         1   6814.6 6926.6
+- info_internet             2   6822.7 6932.7
+- film_stream_VOD           1   6831.2 6943.2
+- freq_internet             3   6846.7 6954.7
+- AGE                       1   6854.6 6966.6
+
+Step:  AIC=6902.66
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + film_DVD + nbr_genre_film + 
+    equip_serie + serie_stream_VOD + serie_replay + serie_stream_autre + 
+    serie_DVD + info_internet + freq_lecture + musee_art_12m + 
+    galerie_12m + acces_internet + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR
+
+                           Df Deviance    AIC
+- acces_internet            1   6791.0 6901.0
+- h_travail_semaine         1   6791.1 6901.1
+- nbr_genre_ecoute_enfance  1   6791.1 6901.1
+- freq_lecture              4   6797.2 6901.2
+- serie_stream_autre        1   6791.2 6901.2
+- nbr_genre_parent_ecoute   1   6791.4 6901.4
+- tv_enfance                3   6795.9 6901.9
+- film_DVD                  1   6792.0 6902.0
+- serie_DVD                 1   6792.3 6902.3
+<none>                          6790.7 6902.7
+- cinema_enfance            3   6796.8 6902.8
+- SEXE_r                    1   6793.3 6903.3
+- clip_tv                   1   6793.4 6903.4
+- galerie_12m               1   6793.6 6903.6
+- freq_film                 4   6799.7 6903.7
+- serie_replay              1   6794.4 6904.4
+- equip_serie               3   6798.6 6904.6
+- DIPLOME_r                 4   6802.3 6906.3
+- naiss_parents             3   6801.3 6907.3
+- equip_tv                  2   6799.8 6907.8
+- musee_art_12m             1   6800.3 6910.3
+- serie_stream_VOD          1   6800.6 6910.6
+- nbr_genre_film            1   6801.7 6911.7
+- music_amateur             1   6803.4 6913.4
+- reseaux_sociaux           1   6804.8 6914.8
+- audivisuel_nonFR          1   6805.0 6915.0
+- freq_tv                   2   6814.2 6922.2
+- culture_en_ligne          1   6813.0 6923.0
+- film_stream_autre         1   6815.1 6925.1
+- info_internet             2   6823.4 6931.4
+- film_stream_VOD           1   6831.5 6941.5
+- freq_internet             3   6846.8 6952.8
+- AGE                       1   6855.2 6965.2
+
+Step:  AIC=6901.02
+stream_spe ~ SEXE_r + AGE + h_travail_semaine + DIPLOME_r + naiss_parents + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + film_DVD + nbr_genre_film + 
+    equip_serie + serie_stream_VOD + serie_replay + serie_stream_autre + 
+    serie_DVD + info_internet + freq_lecture + musee_art_12m + 
+    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR
+
+                           Df Deviance    AIC
+- h_travail_semaine         1   6791.5 6899.5
+- nbr_genre_ecoute_enfance  1   6791.5 6899.5
+- serie_stream_autre        1   6791.5 6899.5
+- freq_lecture              4   6797.5 6899.5
+- nbr_genre_parent_ecoute   1   6791.7 6899.7
+- film_DVD                  1   6792.3 6900.3
+- tv_enfance                3   6796.3 6900.3
+- serie_DVD                 1   6792.7 6900.7
+<none>                          6791.0 6901.0
+- cinema_enfance            3   6797.2 6901.2
+- SEXE_r                    1   6793.6 6901.6
+- clip_tv                   1   6793.8 6901.8
+- galerie_12m               1   6794.0 6902.0
+- freq_film                 4   6800.1 6902.1
+- serie_replay              1   6794.9 6902.9
+- equip_serie               3   6799.0 6903.0
+- DIPLOME_r                 4   6802.8 6904.8
+- naiss_parents             3   6801.7 6905.7
+- equip_tv                  2   6800.2 6906.2
+- musee_art_12m             1   6800.6 6908.6
+- serie_stream_VOD          1   6801.0 6909.0
+- nbr_genre_film            1   6802.1 6910.1
+- music_amateur             1   6803.7 6911.7
+- reseaux_sociaux           1   6805.1 6913.1
+- audivisuel_nonFR          1   6805.4 6913.4
+- freq_tv                   2   6814.5 6920.5
+- culture_en_ligne          1   6813.4 6921.4
+- film_stream_autre         1   6815.5 6923.5
+- info_internet             2   6823.9 6929.9
+- film_stream_VOD           1   6832.0 6940.0
+- freq_internet             3   6858.2 6962.2
+- AGE                       1   6855.2 6963.2
+
+Step:  AIC=6899.46
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + serie_stream_autre + serie_DVD + 
+    info_internet + freq_lecture + musee_art_12m + galerie_12m + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + tv_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR
+
+                           Df Deviance    AIC
+- freq_lecture              4   6798.0 6898.0
+- nbr_genre_ecoute_enfance  1   6792.0 6898.0
+- serie_stream_autre        1   6792.0 6898.0
+- nbr_genre_parent_ecoute   1   6792.1 6898.1
+- film_DVD                  1   6792.8 6898.8
+- serie_DVD                 1   6793.1 6899.1
+- tv_enfance                3   6797.2 6899.2
+<none>                          6791.5 6899.5
+- cinema_enfance            3   6797.6 6899.6
+- clip_tv                   1   6794.3 6900.3
+- galerie_12m               1   6794.4 6900.4
+- SEXE_r                    1   6794.5 6900.5
+- freq_film                 4   6800.7 6900.7
+- equip_serie               3   6799.3 6901.3
+- serie_replay              1   6795.4 6901.4
+- naiss_parents             3   6802.1 6904.1
+- equip_tv                  2   6800.7 6904.7
+- DIPLOME_r                 4   6804.9 6904.9
+- musee_art_12m             1   6800.9 6906.9
+- serie_stream_VOD          1   6801.5 6907.5
+- nbr_genre_film            1   6802.8 6908.8
+- music_amateur             1   6804.1 6910.1
+- audivisuel_nonFR          1   6805.7 6911.7
+- reseaux_sociaux           1   6805.7 6911.7
+- freq_tv                   2   6815.2 6919.2
+- culture_en_ligne          1   6813.7 6919.7
+- film_stream_autre         1   6815.7 6921.7
+- info_internet             2   6824.2 6928.2
+- film_stream_VOD           1   6832.7 6938.7
+- freq_internet             3   6859.2 6961.2
+- AGE                       1   6858.6 6964.6
+
+Step:  AIC=6897.99
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + serie_stream_autre + serie_DVD + 
+    info_internet + musee_art_12m + galerie_12m + freq_internet + 
+    reseaux_sociaux + culture_en_ligne + tv_enfance + cinema_enfance + 
+    nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + audivisuel_nonFR
+
+                           Df Deviance    AIC
+- serie_stream_autre        1   6798.5 6896.5
+- nbr_genre_ecoute_enfance  1   6798.6 6896.6
+- nbr_genre_parent_ecoute   1   6798.6 6896.6
+- film_DVD                  1   6799.2 6897.2
+- serie_DVD                 1   6799.7 6897.7
+- tv_enfance                3   6803.9 6897.9
+<none>                          6798.0 6898.0
+- cinema_enfance            3   6804.1 6898.1
+- galerie_12m               1   6800.8 6898.8
+- clip_tv                   1   6801.0 6899.0
+- SEXE_r                    1   6801.2 6899.2
+- freq_film                 4   6807.4 6899.4
+- equip_serie               3   6805.9 6899.9
+- serie_replay              1   6802.0 6900.0
+- naiss_parents             3   6808.4 6902.4
+- equip_tv                  2   6807.4 6903.4
+- DIPLOME_r                 4   6811.8 6903.8
+- musee_art_12m             1   6806.8 6904.8
+- serie_stream_VOD          1   6807.9 6905.9
+- nbr_genre_film            1   6809.3 6907.3
+- music_amateur             1   6810.9 6908.9
+- reseaux_sociaux           1   6811.9 6909.9
+- audivisuel_nonFR          1   6812.3 6910.3
+- freq_tv                   2   6821.6 6917.6
+- culture_en_ligne          1   6820.4 6918.4
+- film_stream_autre         1   6822.2 6920.2
+- info_internet             2   6832.6 6928.6
+- film_stream_VOD           1   6839.7 6937.7
+- freq_internet             3   6865.2 6959.2
+- AGE                       1   6869.8 6967.8
+
+Step:  AIC=6896.54
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + serie_DVD + info_internet + 
+    musee_art_12m + galerie_12m + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    nbr_genre_ecoute_enfance + audivisuel_nonFR
+
+                           Df Deviance    AIC
+- nbr_genre_ecoute_enfance  1   6799.1 6895.1
+- nbr_genre_parent_ecoute   1   6799.1 6895.1
+- film_DVD                  1   6799.8 6895.8
+- serie_DVD                 1   6800.3 6896.3
+- tv_enfance                3   6804.4 6896.4
+<none>                          6798.5 6896.5
+- cinema_enfance            3   6804.7 6896.7
+- galerie_12m               1   6801.3 6897.3
+- clip_tv                   1   6801.5 6897.5
+- SEXE_r                    1   6801.6 6897.6
+- freq_film                 4   6807.8 6897.8
+- equip_serie               3   6806.1 6898.1
+- serie_replay              1   6802.5 6898.5
+- naiss_parents             3   6808.9 6900.9
+- DIPLOME_r                 4   6812.2 6902.2
+- equip_tv                  2   6808.3 6902.3
+- musee_art_12m             1   6807.3 6903.3
+- serie_stream_VOD          1   6808.5 6904.5
+- nbr_genre_film            1   6809.7 6905.7
+- music_amateur             1   6811.6 6907.6
+- reseaux_sociaux           1   6812.5 6908.5
+- audivisuel_nonFR          1   6812.6 6908.6
+- freq_tv                   2   6822.0 6916.0
+- culture_en_ligne          1   6820.8 6916.8
+- film_stream_autre         1   6827.1 6923.1
+- info_internet             2   6833.0 6927.0
+- film_stream_VOD           1   6840.7 6936.7
+- freq_internet             3   6865.9 6957.9
+- AGE                       1   6869.9 6965.9
+
+Step:  AIC=6895.14
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + serie_DVD + info_internet + 
+    musee_art_12m + galerie_12m + freq_internet + reseaux_sociaux + 
+    culture_en_ligne + tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + 
+    audivisuel_nonFR
+
+                          Df Deviance    AIC
+- film_DVD                 1   6800.4 6894.4
+- nbr_genre_parent_ecoute  1   6800.4 6894.4
+- serie_DVD                1   6800.9 6894.9
+<none>                         6799.1 6895.1
+- tv_enfance               3   6805.2 6895.2
+- cinema_enfance           3   6805.5 6895.5
+- galerie_12m              1   6802.0 6896.0
+- SEXE_r                   1   6802.2 6896.2
+- clip_tv                  1   6802.3 6896.3
+- freq_film                4   6808.6 6896.6
+- equip_serie              3   6806.7 6896.7
+- serie_replay             1   6803.1 6897.1
+- naiss_parents            3   6809.4 6899.4
+- equip_tv                 2   6808.8 6900.8
+- DIPLOME_r                4   6812.9 6900.9
+- musee_art_12m            1   6808.0 6902.0
+- serie_stream_VOD         1   6809.1 6903.1
+- nbr_genre_film           1   6811.0 6905.0
+- music_amateur            1   6812.6 6906.6
+- reseaux_sociaux          1   6813.2 6907.2
+- audivisuel_nonFR         1   6813.3 6907.3
+- freq_tv                  2   6822.7 6914.7
+- culture_en_ligne         1   6821.8 6915.8
+- film_stream_autre        1   6827.6 6921.6
+- info_internet            2   6833.6 6925.6
+- film_stream_VOD          1   6841.2 6935.2
+- freq_internet            3   6866.5 6956.5
+- AGE                      1   6872.0 6966.0
+
+Step:  AIC=6894.4
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + serie_DVD + info_internet + musee_art_12m + 
+    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + cinema_enfance + nbr_genre_parent_ecoute + audivisuel_nonFR
+
+                          Df Deviance    AIC
+- serie_DVD                1   6801.3 6893.3
+- nbr_genre_parent_ecoute  1   6801.8 6893.8
+<none>                         6800.4 6894.4
+- tv_enfance               3   6806.7 6894.7
+- cinema_enfance           3   6806.9 6894.9
+- galerie_12m              1   6803.2 6895.2
+- SEXE_r                   1   6803.6 6895.6
+- clip_tv                  1   6803.6 6895.6
+- freq_film                4   6809.8 6895.8
+- equip_serie              3   6808.2 6896.2
+- serie_replay             1   6804.4 6896.4
+- naiss_parents            3   6811.2 6899.2
+- equip_tv                 2   6810.2 6900.2
+- DIPLOME_r                4   6814.5 6900.5
+- musee_art_12m            1   6809.4 6901.4
+- serie_stream_VOD         1   6810.1 6902.1
+- nbr_genre_film           1   6813.2 6905.2
+- reseaux_sociaux          1   6814.2 6906.2
+- music_amateur            1   6814.2 6906.2
+- audivisuel_nonFR         1   6814.7 6906.7
+- freq_tv                  2   6824.0 6914.0
+- culture_en_ligne         1   6823.1 6915.1
+- film_stream_autre        1   6828.7 6920.7
+- info_internet            2   6835.1 6925.1
+- film_stream_VOD          1   6842.6 6934.6
+- freq_internet            3   6868.1 6956.1
+- AGE                      1   6873.6 6965.6
+
+Step:  AIC=6893.31
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + info_internet + musee_art_12m + galerie_12m + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + tv_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + audivisuel_nonFR
+
+                          Df Deviance    AIC
+- nbr_genre_parent_ecoute  1   6802.7 6892.7
+<none>                         6801.3 6893.3
+- tv_enfance               3   6807.7 6893.7
+- cinema_enfance           3   6807.8 6893.8
+- galerie_12m              1   6804.2 6894.2
+- SEXE_r                   1   6804.4 6894.4
+- clip_tv                  1   6804.5 6894.5
+- freq_film                4   6810.6 6894.6
+- equip_serie              3   6809.0 6895.0
+- serie_replay             1   6805.2 6895.2
+- naiss_parents            3   6811.9 6897.9
+- equip_tv                 2   6811.2 6899.2
+- DIPLOME_r                4   6815.2 6899.2
+- musee_art_12m            1   6810.2 6900.2
+- serie_stream_VOD         1   6810.9 6900.9
+- nbr_genre_film           1   6813.5 6903.5
+- music_amateur            1   6815.1 6905.1
+- reseaux_sociaux          1   6815.3 6905.3
+- audivisuel_nonFR         1   6815.4 6905.4
+- freq_tv                  2   6824.7 6912.7
+- culture_en_ligne         1   6824.0 6914.0
+- film_stream_autre        1   6830.0 6920.0
+- info_internet            2   6836.1 6924.1
+- film_stream_VOD          1   6843.9 6933.9
+- freq_internet            3   6868.9 6954.9
+- AGE                      1   6874.6 6964.6
+
+Step:  AIC=6892.67
+stream_spe ~ SEXE_r + AGE + DIPLOME_r + naiss_parents + music_amateur + 
+    freq_tv + equip_tv + clip_tv + freq_film + film_stream_VOD + 
+    film_stream_autre + nbr_genre_film + equip_serie + serie_stream_VOD + 
+    serie_replay + info_internet + musee_art_12m + galerie_12m + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + tv_enfance + 
+    cinema_enfance + audivisuel_nonFR
+
+                    Df Deviance    AIC
+<none>                   6802.7 6892.7
+- tv_enfance         3   6809.0 6893.0
+- cinema_enfance     3   6809.6 6893.6
+- SEXE_r             1   6805.6 6893.6
+- galerie_12m        1   6805.8 6893.8
+- clip_tv            1   6805.8 6893.8
+- freq_film          4   6812.2 6894.2
+- equip_serie        3   6810.4 6894.4
+- serie_replay       1   6806.6 6894.6
+- naiss_parents      3   6813.6 6897.6
+- equip_tv           2   6812.5 6898.5
+- DIPLOME_r          4   6816.6 6898.6
+- musee_art_12m      1   6811.9 6899.9
+- serie_stream_VOD   1   6812.2 6900.2
+- nbr_genre_film     1   6815.8 6903.8
+- reseaux_sociaux    1   6816.7 6904.7
+- music_amateur      1   6817.2 6905.2
+- audivisuel_nonFR   1   6817.4 6905.4
+- freq_tv            2   6826.4 6912.4
+- culture_en_ligne   1   6825.7 6913.7
+- film_stream_autre  1   6831.4 6919.4
+- info_internet      2   6837.8 6923.8
+- film_stream_VOD    1   6845.4 6933.4
+- freq_internet      3   6870.2 6954.2
+- AGE                1   6880.1 6968.1
