@@ -1,0 +1,236 @@
+---
+title: "Analyses_differents_matching"
+author: "Abel AUSSANT"
+date: "13/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(MatchIt)
+library(cobalt)
+
+
+source(here("02_import", "import_bases.R"))
+
+source(here("03_scripts", "gestion_NA_matching.R"))
+
+list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "DIPLOME_r", 
+    "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere", 
+    "music_amateur", "freq_tv", "equip_tv", "clip_tv", "freq_film", 
+    "film_stream_VOD", "film_stream_autre", "nbr_genre_film", "equip_serie", 
+    "serie_stream_VOD", "serie_replay", "info_internet", "musee_art_12m", 
+    "galerie_12m", "freq_internet", "reseaux_sociaux", "culture_en_ligne", 
+    "tv_enfance", "audivisuel_nonFR")
+
+PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
+
+model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + audivisuel_nonFR")
+
+```
+
+Ce document vise à comparer différents paramètre pour la mise en oeuvre du matching afin de selectionner celui produisant le mailleur compromis possible entre équilibrage des covaraibles et taille de l'échantillion.
+
+# Matching 1 pour 1 sans remise, aucune contrainte sur des variables spécifiques
+
+```{r 1:1_sans_remise}
+res_match_1to1_nore <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = FALSE,
+)
+
+love.plot(res_match_1to1_nore, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+```
+
+Ce matching simple ne necessite pas d'investigation plus poussé, il peut immédiatement être écarté des candidats. On voit que la qualité d'équlibrage est très mauvaise pour de nombreuses variables dont l'âge.
+
+On en conclut que le matching sans remise n'est probablement pas une bonne stratégie dans notre cas.
+
+# Matching 1 pour 1 avec remise, aucune contrainte sur des variables spécifiques
+
+```{r 1:1_remise}
+res_match_1to1_re <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+)
+
+love.plot(res_match_1to1_re, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+bal.tab(res_match_1to1_re)
+
+```
+
+Le love plot comparant l'echantillion apparié et l'échantillion de départ montre une qualité d'équilibrage relativement bonne pour l'ensemble des co-variables. En revanche, la taille de l'echantillion aparait comme problématique. En effet seul 1220 individus contrôles on était inclu dans l'echantillion, ce qui peut sans doute être améliorer sans perdre en qualité d'équilibrage. 
+
+(*Pas sur à 100% de l'interprétation de l'ESS*) Pire l"effective sample size" qui est une mesure de la taille d'un échantillon hypothétique non pondéré par les poids d'appareiement (remise) nous indique un échantillion de 551 individus. Autrement dit, si on prend en compte le fait que certains individus ont un poid plus faible du fait qu'ils ont été utilisé plusieurs fois, alors on arrive à un échantillion de 551 individus. Cela pourrait poser des problèmes de précision des estimateurs.
+
+# Matching 3 pour 1 avec remise, aucune contrainte sur des variables spécifiques
+
+```{r 3:1_remise}
+res_match_3to1_re <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 3
+)
+
+love.plot(res_match_3to1_re, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+bal.tab(res_match_3to1_re)
+
+```
+
+Pour remédier au problème de précision des estimateurs, on décider de matcher chque individus traités avec plusieurs individus contrôle. Cela a pour effet d'augmenter le groupe controle, mais peut avoir un effet néfaste sur l'équilibrage. Avec un matching 3 pour 1, toujours avec remise, on obtient un groupe contrôle de 2339 individus distincts. Si on prend en compte les remises et qu'on calcule un echantillion effectif théorique, on arrive alors à 838 individus. L'équlibrage ne semble gloabalement pas avoir été perturbé outre mesure.
+
+# Matching 5 pour 1 avec remise, aucune contrainte sur des variables spécifiques
+
+```{r 5:1_remise}
+res_match_5to1_re <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5
+)
+
+love.plot(res_match_5to1_re, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+bal.tab(res_match_5to1_re)
+
+```
+
+En passant à 5 pour 1, on augmente encore un peu l'ESS. Il faut maintenant investiguer plus avant la qualité de l'equilibrage. Regardont d'abord le support commun.
+
+```{r test_equilibrage_1}
+#Très bon. Petit soucis de support commun à la fin de la distribution qui nous fait perdre quelques individus.
+bal.plot(res_match_5to1_re, var.name = "distance", which = "both",
+         type = "histogram", mirror = TRUE)
+
+bal.plot(res_match_5to1_re, var.name = "distance", which = "both",
+         type = "density", mirror = F)
+```
+
+On voit apparaitre un problème de support commun au niveau de propensity score les plus élevé dans le groupe traité. Cela signifie qu'il n'existe aucun individus proche dans le groupe controle, il peut être judicieux de supprimer ces individus traité ne disposant pas d'homologue non traité. On perd en représentativité du groupe traité, mais on réduit le biais. Voyons combien on perd d'indidividu.
+
+```{r}
+
+res_match_5to1_re <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, discard = "treated"
+)
+
+bal.tab(res_match_5to1_re)
+
+
+```
+
+Seuls 25 individus étaient concernés par ces problèmes de support commun. Un effet de bord interessant est par ailleurs intervenu, l'ESS a augmenté pour monter à environ 1040 individu. Cela est du au fait que des individus controle matché de nombreuses dans les régions limites du support commun ne sont plus remis autant de fois qu'auparavant.
+
+Une fois le problème du support commun résolu, on peut essayer de regarder de plus pret l'equlibrage de certaines variables clefs, comme l'âge par exemple.
+
+```{r}
+bal.plot(res_match_5to1_re, var.name = "AGE")
+
+```
+
+L'observation unidimentionnelle par la différence de moyenne standard peut cacher des écart important à certains endroits de la distribution. C'est le cas pour l'age, où des moins de 25 sont sur représenté dans le groupe traité, avec que les 45 - 55 sont sous représenté. Cela est particulièrement problématique dans notre cas, quand on sait que l'age est le facteur de confusion le plus important pour les phénomènes qui nous occupent.
+
+L'emploi de la méthode du caliper, qui permet de définir un écart d'age maximum entre deux individus matché peut permettre de remédier au problème. Essayons.
+
+```{r 5:1_remise_cali_age}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2),std.caliper = F, discard = "treated"
+)
+
+bal.plot(res_match_5to1_re_cali, var.name = "AGE")
+
+love.plot(res_match_5to1_re_cali, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+bal.tab(res_match_5to1_re_cali)
+
+```
+
+L'application de ce type de caliper a convenablement régler le problème d'équilibrage sur notre variable d'age. Il n'a par ailleurs pas sensiblement perturbé l'équilibrage de nos autres variables.
+Si on veut essayer d'obtenir une meilleur qualité d'equilibrage sur l'ensemble des variables, on peut appliquer un caliper sur le propensity score lui même, au risque de perdre des individus si aucun n'est trouvé dans la distance définit. Voyons comment notre échantillion se comporte si on procède ainsi, avec un écart maximal de 0.01 pour le propensity score (c'est a dire une probabilité de pratiquer le streaming d'1 %).
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c(0.01,"AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+love.plot(res_match_5to1_re_cali, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+bal.tab(res_match_5to1_re_cali)
+```
+
+Procéder ainsi nous oblige à nous délester de 112 individus traités supplémentaires, pour une amélioration de l'équlibrage non quaitifiabe a partir d'un seul love plot. Il serait peut-être préférable de s'assurer de l'équlibrage de certain variables considérer comme particulièrement déterminante et d'agir en conséquence plutot que de raisonner au niveau de toutes les variables avec un caliper sur propensity score.
+
+Le diplome apparait comme une autre variable très importante pour nous. Observons :
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+bal.plot(res_match_5to1_re_cali, var.name = "DIPLOME_r", 
+         type = "histogram", mirror = F)
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+En ce qui concerne le diplome, l'écart de proportion entre les groupe est extremement faible, et ce pour toutes les modalités. La différence de proportion ajusté est toujours inférieur à 0.03, les standard de qualité généralement retenus étant à 0.05, on a ici un équilibrage de très bonne qualité.
+
+Si on applique cette règle communément utilisé dans la littérature, seule une modidalité, d'une de nos covariables dépasse le seuil, et cela de très peu : CS_mere_Artisant/commerçant  -0.0546. Au vu des standards observé dans les travaux consacrés méttant en oeuvre la méthode, la qualité d'équlibrage obtenue ici est tout a fait acceptable et même très bonne.
+
