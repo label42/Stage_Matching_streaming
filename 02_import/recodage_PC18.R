@@ -7,6 +7,15 @@ library(questionr)
 #### Socio démo ####
 ####################
 
+# on supprime les individus sans pondération
+PC18 <- subset(PC18, !is.na(PC18$POND))
+
+
+#pour que la pop total soit égale au nombre de ligne dans la base 
+#(on divise la pondération par la somme de toutes les pondérations divisées par le nombre d'individus)
+tmp <- sum(PC18$POND)/nrow(PC18) 
+PC18$POND <- PC18$POND/tmp
+
 PC18 <- PC18 %>% mutate(    
   SEXE_r = case_when(
     SEXE == 1 ~ "Homme",

@@ -1,0 +1,106 @@
+---
+title: "Estimations effets"
+author: "Abel AUSSANT"
+date: "17/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(lmtest)
+library(sandwich)
+
+
+source(here("02_import", "import_bases.R"))
+
+source(here("03_scripts", "matching_final.R"))
+
+
+```
+ Ce document consiste en une compilation d'estimation d'effet en mobilisant systématiquement une comparaison avant/après matching.
+ 
+# Effet sur la diversité des gouts
+
+L'estimation la plus simple pour estimer l'effet du streaming sur la diversité des gout consiste en une comparaison de moyenne pour le nombre de styles musicaux écoutés entre groupe traité et groupe non traité.
+
+```{r}
+
+mean_bfm_nostrm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 0], PC18_to_m$POND[PC18_to_m$stream_spe == 0])
+mean_bfm_strm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 1], PC18_to_m$POND[PC18_to_m$stream_spe == 1])
+
+mean_afm_nostrm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 0], PC18_m$weights[PC18_m$stream_spe == 0])
+mean_afm_strm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 1], PC18_m$weights[PC18_m$stream_spe == 1])
+
+means <- data.frame(`Non streamer` = c(mean_bfm_nostrm, mean_afm_nostrm), Streamer = c(mean_bfm_strm, mean_afm_strm))
+means <- mutate(means, across(everything(), round, 2))
+
+rownames(means) <- c("Avant matching","Après matching")
+
+kableExtra::kable(means)
+```
+
+On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (moins de 0,2). 
+
+On peut procéder de la même manière avec une regression linéaire. 
+
+**Avant matching**
+
+```{r}
+lm_nbr_genre_bfm <- lm(nbr_genre_music ~ stream_spe, PC18_to_m, weights = POND)
+
+coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
+
+```
+
+**Après matching**
+
+```{r}
+lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe, PC18_m, weights = weights)
+
+coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+
+
+```
+
+On trouve des résultats proches de ce qu'on pouvait observer en comparant les moyennes. Par ailleurs on voit que le variation dans l'echantillion matché n'est pas significative quand on utlise les erreurs standards robust à l'hétéroscedasticité.
+
+Enfin, on peut utiliser les variables de contrôle utiliser pour le matching dans le modèle. Cela réduit encore davantage le biais.
+
+**Avant matching**
+
+```{r}
+lm_nbr_genre_bfm <- lm(nbr_genre_music ~ stream_spe + SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + audivisuel_nonFR, PC18_to_m, weights = POND)
+
+coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
+
+summary(lm_nbr_genre_bfm)$adj.r.squared
+
+
+```
+
+**Après matching**
+
+```{r}
+lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe + SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
+    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+    film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+    serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+    tv_enfance + audivisuel_nonFR, PC18_m, weights = weights)
+
+coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+
+summary(lm_nbr_genre_afm)$adj.r.squared
+
+```

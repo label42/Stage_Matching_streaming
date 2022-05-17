@@ -40,7 +40,7 @@ model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MEN
 
 ```
 
-Ce document vise à comparer différents paramètre pour la mise en oeuvre du matching afin de selectionner celui produisant le mailleur compromis possible entre équilibrage des covaraibles et taille de l'échantillion.
+Ce document vise à comparer différents paramètres pour la mise en œuvre du matching afin de sélectionner celui produisant le mailleur compromis possible entre équilibrage des covariables et taille de l'échantillon.
 
 # Matching 1 pour 1 sans remise, aucune contrainte sur des variables spécifiques
 
@@ -60,9 +60,9 @@ love.plot(res_match_1to1_nore,
 
 ```
 
-Ce matching simple ne necessite pas d'investigation plus poussé, il peut immédiatement être écarté des candidats. On voit que la qualité d'équlibrage est très mauvaise pour de nombreuses variables dont l'âge.
+Ce matching simple ne nécessite pas d'investigation plus poussée, il peut immédiatement être écarté des candidats. On voit que la qualité d'équilibrage est très mauvaise pour de nombreuses variables dont l'âge.
 
-On en conclut que le matching sans remise n'est probablement pas une bonne stratégie dans notre cas.
+On en conclut que le matching sans remises n'est probablement pas une bonne stratégie dans notre cas.
 
 # Matching 1 pour 1 avec remise, aucune contrainte sur des variables spécifiques
 
@@ -84,9 +84,9 @@ bal.tab(res_match_1to1_re)
 
 ```
 
-Le love plot comparant l'echantillion apparié et l'échantillion de départ montre une qualité d'équilibrage relativement bonne pour l'ensemble des co-variables. En revanche, la taille de l'echantillion aparait comme problématique. En effet seul 1220 individus contrôles on était inclu dans l'echantillion, ce qui peut sans doute être améliorer sans perdre en qualité d'équilibrage. 
+Le love plot comparant l'échantillon apparié et l'échantillon de départ montre une qualité d'équilibrage relativement bonne pour l'ensemble des co-variables. En revanche, la taille de l'échantillon apparait comme problématique. En effet, seuls 1220 individus contrôles ont été inclus dans l'échantillon, ce qui peut sans doute être amélioré sans perdre en qualité d'équilibrage. 
 
-(*Pas sur à 100% de l'interprétation de l'ESS*) Pire l"effective sample size" qui est une mesure de la taille d'un échantillon hypothétique non pondéré par les poids d'appareiement (remise) nous indique un échantillion de 551 individus. Autrement dit, si on prend en compte le fait que certains individus ont un poid plus faible du fait qu'ils ont été utilisé plusieurs fois, alors on arrive à un échantillion de 551 individus. Cela pourrait poser des problèmes de précision des estimateurs.
+(*Pas sûr à 100% de l'interprétation de l'ESS*) Pire l"effective sample size" qui est une mesure de la taille d'un échantillon hypothétique non pondéré par les poids d'appariement (remise) nous indique un échantillon de 551 individus. Autrement dit, si on prend en compte le fait que certains individus ont un poids plus faible du fait qu'ils ont été utilisés plusieurs fois, alors on arrive à un échantillon de 551 individus. Cela pourrait poser des problèmes de précision des estimateurs.
 
 # Matching 3 pour 1 avec remise, aucune contrainte sur des variables spécifiques
 
@@ -109,7 +109,7 @@ bal.tab(res_match_3to1_re)
 
 ```
 
-Pour remédier au problème de précision des estimateurs, on décider de matcher chque individus traités avec plusieurs individus contrôle. Cela a pour effet d'augmenter le groupe controle, mais peut avoir un effet néfaste sur l'équilibrage. Avec un matching 3 pour 1, toujours avec remise, on obtient un groupe contrôle de 2339 individus distincts. Si on prend en compte les remises et qu'on calcule un echantillion effectif théorique, on arrive alors à 838 individus. L'équlibrage ne semble gloabalement pas avoir été perturbé outre mesure.
+Pour remédier au problème de précision des estimateurs, on peut décider de matcher chaque individu traité avec plusieurs individus contrôles. Cela a pour effet d'augmenter le groupe contrôle, mais peut avoir un effet néfaste sur l'équilibrage. Avec un matching 3 pour 1, toujours avec remise, on obtient un groupe contrôle de 2339 individus distincts. Si on prend en compte les remises et qu'on calcule un échantillon effectif théorique, on arrive alors à 838 individus. L'équilibrage ne semble globalement pas avoir été perturbé outre mesure.
 
 # Matching 5 pour 1 avec remise, aucune contrainte sur des variables spécifiques
 
@@ -132,7 +132,7 @@ bal.tab(res_match_5to1_re)
 
 ```
 
-En passant à 5 pour 1, on augmente encore un peu l'ESS. Il faut maintenant investiguer plus avant la qualité de l'equilibrage. Regardont d'abord le support commun.
+En passant à 5 pour 1, on augmente encore un peu l'ESS. Il faut maintenant investiguer plus avant la qualité de l'équilibrage. Regardons d'abord le support commun.
 
 ```{r test_equilibrage_1}
 #Très bon. Petit soucis de support commun à la fin de la distribution qui nous fait perdre quelques individus.
@@ -143,7 +143,7 @@ bal.plot(res_match_5to1_re, var.name = "distance", which = "both",
          type = "density", mirror = F)
 ```
 
-On voit apparaitre un problème de support commun au niveau de propensity score les plus élevé dans le groupe traité. Cela signifie qu'il n'existe aucun individus proche dans le groupe controle, il peut être judicieux de supprimer ces individus traité ne disposant pas d'homologue non traité. On perd en représentativité du groupe traité, mais on réduit le biais. Voyons combien on perd d'indidividu.
+On voit apparaitre un problème de support commun au niveau de propensity score les plus élevés dans le groupe traité. Cela signifie qu'il n'existe aucun individu proche dans le groupe contrôle, il peut être judicieux de supprimer ces individus traités ne disposant pas d'homologues non traités. On perd en représentativité du groupe traité, mais on réduit le biais. Voyons combien on perd d'individus.
 
 ```{r}
 
@@ -158,18 +158,18 @@ bal.tab(res_match_5to1_re)
 
 ```
 
-Seuls 25 individus étaient concernés par ces problèmes de support commun. Un effet de bord interessant est par ailleurs intervenu, l'ESS a augmenté pour monter à environ 1040 individu. Cela est du au fait que des individus controle matché de nombreuses dans les régions limites du support commun ne sont plus remis autant de fois qu'auparavant.
+Seuls 25 individus étaient concernés par ces problèmes de support commun. Un effet de bord intéressant est par ailleurs intervenu, l'ESS a augmenté pour monter à environ 1040 individus. Cela est dû au fait que des individus contrôle matchés de nombreuses dans les régions limites du support commun ne sont plus remis autant de fois qu'auparavant.
 
-Une fois le problème du support commun résolu, on peut essayer de regarder de plus pret l'equlibrage de certaines variables clefs, comme l'âge par exemple.
+Une fois le problème du support commun résolu, on peut essayer de regarder de plus près l'équilibrage de certaines variables clefs, comme l'âge par exemple.
 
 ```{r}
 bal.plot(res_match_5to1_re, var.name = "AGE")
 
 ```
 
-L'observation unidimentionnelle par la différence de moyenne standard peut cacher des écart important à certains endroits de la distribution. C'est le cas pour l'age, où des moins de 25 sont sur représenté dans le groupe traité, avec que les 45 - 55 sont sous représenté. Cela est particulièrement problématique dans notre cas, quand on sait que l'age est le facteur de confusion le plus important pour les phénomènes qui nous occupent.
+L'observation unidimensionnelle par la différence de moyenne standard peut cacher des écarts importants à certains endroits de la distribution. C'est le cas pour l'âge, où les moins de 25 sont sur-représentés dans le groupe traité, avec que les 45 - 55 sont sous-représentés. Cela est particulièrement problématique dans notre cas, quand on sait que l'âge est le facteur de confusion le plus important pour les phénomènes qui nous occupent.
 
-L'emploi de la méthode du caliper, qui permet de définir un écart d'age maximum entre deux individus matché peut permettre de remédier au problème. Essayons.
+L'emploi de la méthode du caliper, qui permet de définir un écart d'âge maximum entre deux individus matchés, peut permettre de remédier au problème. Essayons.
 
 ```{r 5:1_remise_cali_age}
 res_match_5to1_re_cali <- matchit(model_matching
@@ -192,8 +192,8 @@ bal.tab(res_match_5to1_re_cali)
 
 ```
 
-L'application de ce type de caliper a convenablement régler le problème d'équilibrage sur notre variable d'age. Il n'a par ailleurs pas sensiblement perturbé l'équilibrage de nos autres variables.
-Si on veut essayer d'obtenir une meilleur qualité d'equilibrage sur l'ensemble des variables, on peut appliquer un caliper sur le propensity score lui même, au risque de perdre des individus si aucun n'est trouvé dans la distance définit. Voyons comment notre échantillion se comporte si on procède ainsi, avec un écart maximal de 0.01 pour le propensity score (c'est a dire une probabilité de pratiquer le streaming d'1 %).
+L'application de ce type de caliper a convenablement réglé le problème d'équilibrage sur notre variable d'âge. Il n'a par ailleurs pas sensiblement perturbé l'équilibrage de nos autres variables.
+Si on veut essayer d'obtenir une meilleure qualité d'équilibrage sur l'ensemble des variables, on peut appliquer un caliper sur le propensity score lui-même, au risque de perdre des individus si aucun n'est trouvé dans la distance définie. Voyons comment notre échantillon se comporte si on procède ainsi, avec un écart maximal de 0.01 pour le propensity score (c'est-à-dire une probabilité de pratiquer le streaming de 1 %)
 
 ```{r}
 res_match_5to1_re_cali <- matchit(model_matching
@@ -213,9 +213,9 @@ love.plot(res_match_5to1_re_cali,
 bal.tab(res_match_5to1_re_cali)
 ```
 
-Procéder ainsi nous oblige à nous délester de 112 individus traités supplémentaires, pour une amélioration de l'équlibrage non quaitifiabe a partir d'un seul love plot. Il serait peut-être préférable de s'assurer de l'équlibrage de certain variables considérer comme particulièrement déterminante et d'agir en conséquence plutot que de raisonner au niveau de toutes les variables avec un caliper sur propensity score.
+Procéder ainsi nous oblige à nous délester de 112 individus traités supplémentaires, pour une amélioration de l'équilibrage non quantifiable à partir d'un seul love plot. Il serait peut-être préférable de s'assurer de l'équilibrage de certaines variables considérées comme particulièrement déterminantes et d'agir en conséquence plutôt que de raisonner au niveau de toutes les variables avec un caliper sur le propensity score.
 
-Le diplome apparait comme une autre variable très importante pour nous. Observons :
+Le diplômé apparait comme une autre variable très importante pour nous. Observons : 
 
 ```{r}
 res_match_5to1_re_cali <- matchit(model_matching
@@ -230,7 +230,75 @@ bal.plot(res_match_5to1_re_cali, var.name = "DIPLOME_r",
 bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
 ```
 
-En ce qui concerne le diplome, l'écart de proportion entre les groupe est extremement faible, et ce pour toutes les modalités. La différence de proportion ajusté est toujours inférieur à 0.03, les standard de qualité généralement retenus étant à 0.05, on a ici un équilibrage de très bonne qualité.
+En ce qui concerne le diplôme, l'écart de proportion entre les groupes est extrêmement faible, et ce pour toutes les modalités. La différence de proportion ajustée est toujours inférieure à 0.03, les standards de qualité généralement retenus étant à 0.05, on a ici un équilibrage de très bonne qualité.
 
-Si on applique cette règle communément utilisé dans la littérature, seule une modidalité, d'une de nos covariables dépasse le seuil, et cela de très peu : CS_mere_Artisant/commerçant  -0.0546. Au vu des standards observé dans les travaux consacrés méttant en oeuvre la méthode, la qualité d'équlibrage obtenue ici est tout a fait acceptable et même très bonne.
+Si on applique cette règle communément utilisée dans la littérature, seule une modalité, d'une de nos covariables dépasse le seuil, et cela de très peu : CS_mere_Artisant/commerçant  -0.0546. Au vu des standards observés dans les travaux consacrés mettant en œuvre la méthode, la qualité d'équilibrage obtenue ici est tout à fait acceptable et même très bonne.
 
+Les poids issue du matching prennent en compte les remises, en pondérant plus faiblement les individus réutilisés de multiples fois, mais on peut tout de même se demander combien de fois les individus les plus matché le sont. Il ne faut pas oublier qu'on match chaque fois avec 5 individus contrôle, ce qui augmente mécaniquement le nombre de remise. Voici les 100 individus les plus matchés et leur caractéristiques.
+
+```{r}
+match_matrix <- as.data.frame(res_match_5to1_re_cali$match.matrix) %>%
+  mutate(across(everything(),as.numeric))
+match_count <- as.data.frame(table(unlist(match_matrix)))
+match_count <- match_count[order(match_count$Freq, decreasing = T),]
+
+
+match_count[1:100,]
+
+most_matched <- as.character(match_count$Var1[1:100])
+
+PC18_to_m[most_matched, list_var_match]
+
+```
+
+On voit que certains individus sont réutilisés jusqu'à 40 fois, sachant qu'ils sont toujours accompagnés de 4 autres individus. Je ne sais pas estimer à quel point cela est un problème.
+
+On peut essayer de mettre en oeuvre une stratégie de matching différente qui limiterai le nombre de réutilisation. Par exemple en faisant un matching 2:1 et en authorisant un replacement de 5 maximum. Essayons et testons la qualité de l'équilibrage.
+
+```{r}
+res_match_2to1_re5max_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 2, caliper = c("AGE" = 2), std.caliper = F, discard = "treated", reuse.max = 5
+
+)
+
+bal.tab(res_match_2to1_re5max_cali, binary = "std", thresholds = c(m = 0.05))
+
+love.plot(res_match_2to1_re5max_cali, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+```
+
+Des problèmes importants d'équlibrage apparaissent, notamment sur des variables concernant les pratiques culturelles qu'on considère comme centrale pour eviter les biais de selection (musee_art_12m, audiovisuel_nonFR, nbr_genre_film, etc.)
+
+
+Avec un ratio de 1:1
+
+```{r}
+res_match_2to1_re5max_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 1, caliper = c("AGE" = 2), std.caliper = F, discard = "treated", reuse.max = 5
+
+)
+
+bal.tab(res_match_2to1_re5max_cali, binary = "std", thresholds = c(m = 0.05))
+
+love.plot(res_match_2to1_re5max_cali, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+```
+
+L'equilibrage est ici grandement amélioré. Les problèmes restant sont marginaux (SMD très proche de 0.05, rappelons que beaucoup de papier utilise un treshold de 0.1, on est donc déjà plus rigoureux que la norme en utilisant 0.5) et concernent seulement quelques modalités de variables d'origines sociale assez peu impactante dans les modèles d'estimation du streaming ou des goûts.
+
+On s'en sort avec un ESS de 842, ce qui est tout de même asez faible. A discuter.

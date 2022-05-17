@@ -37,13 +37,12 @@ na_count
 
 ```
 
- On voit que matiÃ¨re diplome contient 6000+ NA, surement pas utile de garder la variable.
+ On voit que matiére diplome contient 6000+ NA, surement pas utile de garder la variable.
 
-  
-Tous les NA de stream_spe correspondent aux gens qui n'Ã©coutent pas de musique, on peut supprimer ces individus.
+Tous les NA de stream_spe correspondent aux gens qui n'écoutent pas de musique, on peut supprimer ces individus.
 
 Les na dans heures travail semaine correspondent aux gens qui ne travaillent pas, solution simple est de remplacer par 0. Sinon on supprime la variable.
   
-Pour Le revenu, le diplome des parents et le pays de naissance des parents (france ou Ã©tranger), il reste pas mal de NA
+Pour le revenu, le diplome des parents et le pays de naissance des parents (france ou étranger), il reste pas mal de NA
 Il me semble que ces variables sont importantes, mais on ne peut se permettre de supprimer autant d'individus.
 Dans l'attente d'une meilleur solution, on se contente d'explicite NA.
