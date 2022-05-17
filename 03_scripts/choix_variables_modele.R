@@ -61,6 +61,68 @@ summary(best_glm_stream_all_var)
 
 DescTools::PseudoR2(best_glm_stream_all_var, which = "all")
 
+### Documentation des variables retenues
+# todo: un tableau avec la liste des variables testées, leur signification/label
+# et une indication de retenues/non retenue dans modèle restreint et non 
+# restreint
+
+library(tidyverse)
+list_var_all <- tibble(var = c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere",
+                               "sorties_ami", 
+                               "music_amateur", 
+                               "freq_jv", 
+                               "freq_tv", "equip_tv", "clip_tv",
+                               "freq_film", "equip_film", "film_stream_VOD", "film_replay", "film_stream_autre", "film_DVD", "film_num", "nbr_genre_film",
+                               "freq_serie", "equip_serie", "serie_stream_VOD", "serie_replay", "serie_stream_autre", "serie_DVD", "serie_num", "nbr_genre_serie",
+                               "info_internet",
+                               "freq_lecture", "equip_lecture",
+                               "nbr_genre_film_cine", "musee_art_12m", "galerie_12m",
+                               "ordi", "acces_internet", "freq_internet", "reseaux_sociaux", "culture_en_ligne",
+                               "tv_enfance", "musique_enfance", "cinema_enfance", "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance",
+                               "audivisuel_nonFR", "autre_langue"),
+                       modele = "all")
+
+# liste de variable choisi grce à une regression stepwise
+list_var_match <- tibble(var = c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "DIPLOME_r", 
+                                 "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere", 
+                                 "music_amateur", "freq_tv", "equip_tv", "clip_tv", "freq_film", 
+                                 "film_stream_VOD", "film_stream_autre", "nbr_genre_film", "equip_serie", 
+                                 "serie_stream_VOD", "serie_replay", "info_internet", "musee_art_12m", 
+                                 "galerie_12m", "freq_internet", "reseaux_sociaux", "culture_en_ligne", 
+                                 "tv_enfance", "audivisuel_nonFR"), modele = "match_r")
+
+list_var_match_nonrestreint <- tibble(var = c("stream_spe", "SEXE_r",
+                                              "AGE",
+                                              "DIPLOME_r",
+                                              "naiss_parents",
+                                              "music_amateur",
+                                              "freq_tv",
+                                              "equip_tv",
+                                              "clip_tv",
+                                              "freq_film",
+                                              "film_stream_VOD",
+                                              "film_stream_autre",
+                                              "nbr_genre_film",
+                                              "equip_serie",
+                                              "serie_stream_VOD",
+                                              "serie_replay",
+                                              "info_internet",
+                                              "musee_art_12m",
+                                              "galerie_12m",
+                                              "freq_internet",
+                                              "reseaux_sociaux",
+                                              "culture_en_ligne",
+                                              "tv_enfance",
+                                              "cinema_enfance",
+                                              "audivisuel_nonFR"), modele= "match_nr")
+
+bind_rows(list_var_all, list_var_match, list_var_match_nonrestreint) %>% 
+  mutate(value = 1) %>% 
+  pivot_wider(names_from = modele, values_from = value, values_fill = 0) %>% 
+  print(n=100)
+
+
+
 ##################################################
 #### méthode exhaustive prenant trop de temps ####
 ##################################################
