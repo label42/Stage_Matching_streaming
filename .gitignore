@@ -3,4 +3,5 @@
 .RData
 .Ruserdata
 01_data/*
+05_archives/*
 *.html
