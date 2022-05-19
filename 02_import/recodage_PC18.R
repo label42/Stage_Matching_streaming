@@ -687,6 +687,20 @@ PC18$music_12m <- fct_recode(PC18$music_12m,
                           NULL = "8"
 )
 
+## Recodage de PC18$E7 en PC18$music_TLJ
+PC18$music_TLJ <- as.character(PC18$E7)
+PC18$music_TLJ <- fct_recode(PC18$music_TLJ,
+  "0" = "2",
+  "0" = "3",
+  "0" = "4",
+  "0" = "5",
+  "0" = "6",
+  NULL = "7",
+  NULL = "8"
+)
+PC18$music_TLJ <- as.numeric(as.character(PC18$music_TLJ))
+
+
 
 
 ## Recodage de PC18$E83 en PC18$stream_spe

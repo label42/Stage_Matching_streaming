@@ -5,7 +5,7 @@ source(here("03_scripts", "gestion_NA_matching.R"))
 
 # liste de toutes les variables identifiées comme candidat potentielles
 list_var_all <- c("SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere",
-  "sorties_ami", 
+  "sorties_ami", "VITENCOUPLE_r", "logement",
   "music_amateur", 
   "freq_jv", 
   "freq_tv", "equip_tv", "clip_tv",
@@ -20,7 +20,7 @@ list_var_all <- c("SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_sema
 
 # liste de variable choisi grce à une regression stepwise
 list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "DIPLOME_r", 
-                    "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere", 
+                    "naiss_parents", "DIPLOME_pere", "DIPLOME_mere", "VITENCOUPLE_r", 
                     "music_amateur", "freq_tv", "equip_tv", "clip_tv", "freq_film", 
                     "film_stream_VOD", "film_stream_autre", "nbr_genre_film", "equip_serie", 
                     "serie_stream_VOD", "serie_replay", "info_internet", "musee_art_12m", 
@@ -29,13 +29,18 @@ list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE",
 
 PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
 
-model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
-    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
-    music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
-    film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
-    serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
-    galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
-    tv_enfance + audivisuel_nonFR")
+covar_formula <- "SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR"
+
+model_matching <- as.formula(paste("stream_spe", covar_formula, sep = " ~ "))
+
+
+
 
 #Le matching retenu ici est avec replacement (5 réutilisation du même individus max). Ratio 1:1. Caliper 2 sur l'age. Supression 
 # des individus traités hors du support commun (n = 25).
@@ -46,7 +51,7 @@ res_match_1to1_re5max_cali <- matchit(model_matching
 
 res_match_1to1_re5max_cali <- add_s.weights(res_match_1to1_re5max_cali, s.weights = "POND")
 
-PC18_m <- match.data(res_match_1to1_re5max_cali)
+PC18_m <- match.data(res_match_1to1_re5max_cali, weights = "POND_m")
 
 # Pour obtenir la pondération post-matching, on multipli la pondération propre au matching, avec la pondération
 # officiel PC18
