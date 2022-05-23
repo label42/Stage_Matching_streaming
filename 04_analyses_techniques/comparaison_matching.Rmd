@@ -15,6 +15,7 @@ library(here)
 library(MatchIt)
 library(cobalt)
 library(ggplot2)
+library(pwr)
 
 
 source(here("02_import", "import_bases.R"))
@@ -271,19 +272,19 @@ fct_nbr_remise(res_match_5to1_re_cali, PC18_to_m, list_var_match)
 
 On voit que certains individus sont réutilisés jusqu'à 40 fois, sachant qu'ils sont toujours accompagnés de 4 autres individus. Je ne sais pas estimer à quel point cela est un problème.
 
-On peut essayer de mettre en oeuvre une stratégie de matching différente qui limiterai le nombre de réutilisation. Par exemple en faisant un matching 2:1 et en authorisant un replacement de 5 maximum. Essayons et testons la qualité de l'équilibrage.
+On peut essayer de mettre en oeuvre une stratégie de matching différente qui limiterai le nombre de réutilisation. Par exemple en faisant un matching 5:1 et en authorisant un replacement de 15 maximum. Essayons et testons la qualité de l'équilibrage.
 
 ```{r}
-res_match_2to1_re5max_cali <- matchit(model_matching
+res_match_5to1_re15max_cali <- matchit(model_matching
                       , data = PC18_to_m, 
                       method = "nearest", distance = "glm", replace = T,
-                      ratio = 2, caliper = c("AGE" = 2), std.caliper = F, discard = "treated", reuse.max = 5
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated", reuse.max = 15
 
 )
 
-bal.tab(res_match_2to1_re5max_cali, binary = "std", thresholds = c(m = 0.05))
+bal.tab(res_match_5to1_re15max_cali, binary = "std", thresholds = c(m = 0.05))
 
-love.plot(res_match_2to1_re5max_cali, 
+love.plot(res_match_5to1_re15max_cali, 
           drop.distance = TRUE, 
           var.order = "adjusted",
           abs = TRUE,
@@ -291,11 +292,12 @@ love.plot(res_match_2to1_re5max_cali,
           binary = "std",
           continuous = "std")
 
-fct_nbr_remise(res_match_2to1_re5max_cali, PC18_to_m, list_var_match)
+fct_nbr_remise(res_match_5to1_re15max_cali, PC18_to_m, list_var_match)
 
 ```
 
-Des problèmes importants d'équlibrage apparaissent, notamment sur des variables concernant les pratiques culturelles qu'on considère comme centrale pour eviter les biais de selection (musee_art_12m, audiovisuel_nonFR, nbr_genre_film, etc.)
+Des problèmes importants d'équlibrage apparaissent, notamment sur des variables concernant les pratiques culturelles qu'on considère comme centrale pour eviter les biais de selection (musee_art_12m, audiovisuel_nonFR, etc.)
+L'ESS n'est pas meilleur. Peu d'interet.
 
 
 Avec un ratio de 1:1
@@ -408,3 +410,146 @@ Le choix semble devoir se faire entre :
  - matching 1:1, avec réutilisation (max 5), avec caliper sur l'âge
  
 Voir conseil stack exchange pour prise de décision.
+
+On peut d'abord effectuer un test de puissance pour savoir si l'ESS obtenu suffit à estimer l'effet qu'on envisage de mesurer.
+
+On peut faire ce test pour un écart de proportion entre deux groupes.
+
+Ici, on cherche a savoir combien d'individu faudrait-il dans un groupe controle pour observer une différence de proportion pour une variable qualitative (pour nous, la proportion d'individu écoutant tel style de musique vs n'écoute pas), à partir d'un groupe traité de taille connu, pour un effet d'une taille de 0.2 (d de cohen > 0.2 au moins), pour une P value d'au moins 0.01 et avec une probabilité de 0.95 de mesurer l'effet.
+
+On connait bien la taille de notre groupe traité (n = 2245, les streameurs). 
+
+```{r}
+
+pwr.2p2n.test(h = 0.2, n1 = 2245, power = 0.95, sig.level = 0.01)
+```
+
+On obtient n2 = 556. Cela signifie qu'il faudrait 556 individu dans le groupe controle pour avoir 95% de chance mesurer un effet de taille d de cohen = 0,2 avec p value = 0.01, pour un echantillion traité de 2245. Les deux methode de matching dépasse largement cette ESS pour le groupe contrôle.
+
+On peut faire un test similaire pour une différence de moyenne (moyenne de nombre de styles écouté chez nous).
+
+```{r}
+pwr.t2n.test(n1 = 2245, d = 0.2, power = 0.95)
+```
+A nouveau, pour observer une différence de moyenne entre les deux groupe (groupe traité n = 2245), avec un effet de taille t-test > 0.2 et une puissance de 0.95, il faudrait 380 individus dans le groupe contrôle minimum. 
+
+On peut aussi le faire pour un modèle de regression
+
+Dans cette fonction, u represent le nombre de coefficient dans la regression servant à estimer l'effet du stream sur une variable, f2 le R² du modèle, sig.level la précision à laquelle on veut estimer l'effet (p value), et power la probabilité qu'on à lquelle on souhaite pouvoir mesurer un effet, ici 95%.
+
+```{r}
+pwr.f2.test(u = 80, f2 = 0.3/(1 - 0.3), sig.level = 0.01, power = 0.95)
+```
+
+On obtient en v = 132. Cela signifit qu'il faut un effectif de 132 individus minimum pour avoir 95% de chances de mesurer l'effet d'une variables (avec une précision de P = 0.01) dans un modèle à 80 variables avc un r² de 0.3.
+
+Prenant en considération ces tests de puissance, les deux méthodes de matching candidates sont susceptibles de contenire assez d'information pour estimer des effets de tail considéré comme faibles, du streaming sur nos variables d'interet. 
+
+## Template matching
+
+Une autre solution proposé par Noah (createur du package MatchIt) sur Cross validated peu être d'utiliser de Template matching, qui va maximiser le nombre d'individus dans le groupe contrôle sous certaines contrainte d'equilibrage.
+
+```{r}
+library(Rglpk)
+library(gurobi)
+
+res_match_template <- matchit(model_matching,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none", 
+                  tols = c(0.05), std.tols = c(T), solver = "gurobi", time = 300)
+
+
+bal.tab(res_match_template, binary = "std", thresholds = c(m = 0.05))
+
+bal.plot(res_match_template, var.name = "AGE")
+
+```
+
+Cette méthode permet en effet d'obtenir 1415 individus dans l'echantillion, ce qui est supérieure de 300 à ce qu'on obtenait en utilisant le matching par propensity score avec remise 5:1. En revanche l'equilibrage de l'age est ici très problématique. On ne peut aps utiliser de caliper dans cette méthode. ON peut faire soit un matching exacte sur l'age, soit mettre une STD mean dif plus faible.
+
+```{r}
+
+res_match_template <- matchit(model_matching,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none", exact = "AGE", 
+                  tols = c(0.05), std.tols = c(T), solver = "gurobi", time = 300)
+
+
+```
+
+Malheureusement il n'existe pas de solution qui satisface nos conditions d'age exacte et de std mean diff < 0.05 sur toutes les autres cov.
+
+```{r}
+
+
+
+tols_all_var = c(0.05, 0.01, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template <- matchit(model_matching,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 300)
+
+bal.tab(res_match_template, binary = "std", thresholds = c(m = 0.05))
+
+bal.plot(res_match_template, var.name = "AGE")
+
+```
+
+Indiquer une STD mean dif plus faible pour l'age ne regle en rien le problème des écarts à certains endroit de la distribution. Une solution peut être de récouper l'age en tranche, a s'assure ainsi un équilibre dans chanque tranche
+
+```{r}
+
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 300)
+
+bal.tab(res_match_template, binary = "std", thresholds = c(m = 0.05))
+
+bal.plot(res_match_template, var.name = "AGE_5_r")
+
+```
+De cette manière on peut obtenir une balance de l'age tout à fait similaire à ce qu'on obtenait avec un caliper de 2 sur l'age. 
+
+Le resultats du matching est très bon, part construction tous les std mean dif sont en dessous de 0.05. Cela étant, on obtient une taille de groupe contrôle de 1214, ce qui est a peine mieux que ce qu'on obtenait avec les méthodes 5:1 avec replacement. A mon avis, on arrive aux limitte de notre échantillion, on peut surement pas faire beaucoup mieux que cela en terme de taille effective du groupe contrôle, 1200 environ. Cette taille est acceptable si on considère les tests de puissance effectué plus haut.
+
+## Full matching
+
+```{r}
+library(optmatch)
+
+res_match_full <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "full", distance = "glm",
+                      caliper = c("AGE" = 2), std.caliper = F, discard = "treated", 
+                      s.weights = PC18_to_m$POND)
+
+                      
+bal.tab(res_match_full, binary = "std", thresholds = c(m = 0.05))
+
+bal.plot(res_match_full, var.name = "AGE_5_r")
+
+```
+
+ESS de 859, et balance mauvaise. Probablement pas approprié.
