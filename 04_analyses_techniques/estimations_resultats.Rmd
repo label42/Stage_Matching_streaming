@@ -28,7 +28,6 @@ PC18_to_m_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m, weights =
 
 PC18_m_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m, weights = PC18_m$POND_m)
 
-
 ```
  Ce document consiste en une compilation d'estimation d'effet en mobilisant systématiquement une comparaison avant/après matching.
  
@@ -40,21 +39,29 @@ L'estimation la plus simple pour estimer l'effet du streaming sur la diversité 
 
 ```{r}
 
-mean_bfm_nostrm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 0], PC18_to_m$POND[PC18_to_m$stream_spe == 0])
-mean_bfm_strm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 1], PC18_to_m$POND[PC18_to_m$stream_spe == 1])
+#Moyenne non matché
+mean_bfm_nostrm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 0], 
+                                 PC18_to_m$POND[PC18_to_m$stream_spe == 0])
+mean_bfm_strm <- weighted.mean(PC18_to_m$nbr_genre_music[PC18_to_m$stream_spe == 1], 
+                               PC18_to_m$POND[PC18_to_m$stream_spe == 1])
 
-mean_afm_nostrm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 0], PC18_m$POND_m[PC18_m$stream_spe == 0])
-mean_afm_strm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 1], PC18_m$POND_m[PC18_m$stream_spe == 1])
+# Moyenne matché, matching template
+mean_afm_nostrm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 0], 
+                                 PC18_m$POND_m[PC18_m$stream_spe == 0])
+mean_afm_strm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 1], 
+                               PC18_m$POND_m[PC18_m$stream_spe == 1])
 
-means <- data.frame(`Non streamer` = c(mean_bfm_nostrm, mean_afm_nostrm), Streamer = c(mean_bfm_strm, mean_afm_strm))
+
+
+means <- data.frame(non_streameur = c(mean_bfm_nostrm, mean_afm_nostrm), streameur = c(mean_bfm_strm, mean_afm_strm))
 means <- mutate(means, across(everything(), round, 2))
 
-rownames(means) <- c("Avant matching","Après matching")
+rownames(means) <- c("Avant matching","Après matching template")
 
 kableExtra::kable(means)
 ```
 
-On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (moins de 0,2). 
+On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (moins de 0,1). En revanche, dans l'échantillion matché avec la méthode cardinality, on retrouve un écart à 0.4 environ entre échantillion.
 
 ## Regression sans prise en compte des covariables
 
@@ -112,6 +119,18 @@ summary(lm_nbr_genre_afm)$adj.r.squared
 
 ```
 
+**Après matching cardinality**
+
+```{r}
+lm_nbr_genre_afmcard <- lm(formula_nbr_genre, PC18_m_card)
+
+coeftest(lm_nbr_genre_afmcard, vcov. = vcovHC)
+
+summary(lm_nbr_genre_afmcard)$adj.r.squared
+
+```
+
+
 ### Avec interaction
 
 Il peut être interessant d'ajouter des interaction dans les modèles ainsi obtenues.
@@ -146,6 +165,18 @@ coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
 summary(lm_nbr_genre_afm)$adj.r.squared
 
 ```
+
+**Après matching cardinality**
+
+```{r}
+lm_nbr_genre_afmcard <- lm(formula_nbr_genre, PC18_m_card)
+
+coeftest(lm_nbr_genre_afmcard, vcov. = vcovHC)
+
+summary(lm_nbr_genre_afmcard)$adj.r.squared
+
+```
+
 Globalement l'ajout d'interaction entre l'age et le stream ne donne rien de significatif, hormis pour les 46 - 55 ans dans la population matché, fait difficilement interprétable. 
 
 # Effet du streaming sur l'intensité des pratiques d'écoute
@@ -231,6 +262,18 @@ coeftest(glm_music_TLJ, vcov. = vcovHC)
 formula_music_TLJ <- as.formula("music_TLJ ~ stream_spe")
 
 glm_music_TLJ <- glm(formula_music_TLJ, PC18_m, weights = POND_m, family = "binomial")
+
+coeftest(glm_music_TLJ, vcov. = vcovHC)
+
+```
+
+
+**Après matching cardinality**
+
+```{r}
+formula_music_TLJ <- as.formula("music_TLJ ~ stream_spe")
+
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_m_card, family = "binomial")
 
 coeftest(glm_music_TLJ, vcov. = vcovHC)
 

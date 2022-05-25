@@ -27,6 +27,9 @@ clear_NA_to_m = function(d_NA, list_var){
   )
   
   d_NA <- d_NA[complete.cases(d_NA[list_var]), ]
+  
+  tmp <- sum(d_NA$POND)/nrow(d_NA) 
+  d_NA$POND <- d_NA$POND/tmp
 
   return(d_NA)
 }

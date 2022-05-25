@@ -1,0 +1,151 @@
+---
+title: "Evaluation matching final"
+author: "Abel AUSSANT"
+date: "25/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(MatchIt)
+library(cobalt)
+library(ggplot2)
+library(pwr)
+library(gtsummary)
+library(gt)
+library(survey)
+
+
+source(here("02_import", "import_bases.R"))
+
+source(here("03_scripts", "gestion_NA_matching.R"))
+
+list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "DIPLOME_r", 
+                    "naiss_parents", "DIPLOME_pere", "DIPLOME_mere", "VITENCOUPLE_r", 
+                    "music_amateur", "freq_tv", "equip_tv", "clip_tv", "freq_film", 
+                    "film_stream_VOD", "film_stream_autre", "nbr_genre_film", "equip_serie", 
+                    "serie_stream_VOD", "serie_replay", "info_internet", "musee_art_12m", 
+                    "galerie_12m", "freq_internet", "reseaux_sociaux", "culture_en_ligne", 
+                    "tv_enfance", "audivisuel_nonFR")
+
+PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
+
+model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR")
+
+fct_nbr_remise <- function(matching, d, var_match){
+  match_matrix <- as.data.frame(matching$match.matrix) %>%
+  mutate(across(everything(),as.numeric))
+match_count <- as.data.frame(table(unlist(match_matrix)))
+match_count <- match_count[order(match_count$Freq, decreasing = T),]
+
+
+match_count[1:100,]
+
+plot_nbr_remise <- ggplot(match_count, aes(reorder(Var1, Freq), y = Freq)) +
+    geom_jitter()
+
+most_matched <- as.character(match_count$Var1[1:10])
+
+print(d[most_matched, var_match])
+
+return(plot_nbr_remise)
+}
+
+
+```
+
+## Matching template
+
+```{r}
+tols_all_var = c(0.05, 0.02, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template_w_before <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, s.weights = PC18_to_m$POND, 
+                  method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 60)
+
+
+
+res_match_template_w_before
+
+PC18_m_temp <- match.data(res_match_template_w_before, weights = "POND_m")
+
+tmp <- sum(PC18_m_temp$POND_m)/nrow(PC18_m_temp) 
+PC18_m_temp$POND_m <- PC18_m_temp$POND_m/tmp
+
+PC18_m_temp_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_temp, weights = PC18_m_temp$POND_m)
+
+
+```
+
+
+
+```{r}
+bal.tab(res_match_template_w_before, binary = "std", thresholds = c(m = 0.05))
+
+love.plot(res_match_template_w_before, 
+          drop.distance = TRUE, 
+          var.order = "adjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std")
+
+```
+
+On constate 1533 individu dans le groupe controle, pour 2270 individus traités. 
+
+Par construction, l'ensemble des variables présentent des SMD < 0.05 et < 0.02 pour l'age.
+
+Pour l'age, on peut observer si il y a des déséqulibre à certaines endroit de la distribution
+
+**Avant matching (pondéré)**
+```{r}
+ggplot(PC18_to_m) + 
+    aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_to_m$POND) + 
+    geom_density(alpha = 5/10)
+```
+
+
+**Après matching (pondéré)**
+```{r}
+ggplot(PC18_m_temp) + 
+    aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_m_temp$POND_m) + 
+    geom_density(alpha = 5/10)
+```
+
+
+**Après matching (non pondéré)**
+```{r}
+ggplot(PC18_m_temp) + 
+    aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe)) + 
+    geom_density(alpha = 5/10)
+
+```
+
+Globalement la densité après matching est proches entre les deux groupes, cependant on constate une légère sur représentation des moins de 25 ans dans le groupe traité. Cela n'est pas de nature a nous inquiéter outre mesure. D'autant qu'on ajoutera toutes les covariables dans les modèles d'estimations des données, ce qui devrait encore corriger des problèmes d'équilibrage résiduels.
+On est globalement bien au dessus des standards de la littérature. De nombreux papiers de références d'hésites pas à utlisé des enchantillion matché avec des écart proche de 0.1 (standardized mean diff) voir 0.2. 

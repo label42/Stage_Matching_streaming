@@ -16,6 +16,8 @@ library(MatchIt)
 library(cobalt)
 library(ggplot2)
 library(pwr)
+library(gtsummary)
+library(gt)
 
 
 source(here("02_import", "import_bases.R"))
@@ -207,6 +209,7 @@ res_match_5to1_re_cali <- matchit(model_matching
                       ratio = 5, caliper = c("AGE" = 2),std.caliper = F, discard = "treated"
 )
 
+
 bal.plot(res_match_5to1_re_cali, var.name = "AGE")
 
 love.plot(res_match_5to1_re_cali, 
@@ -217,7 +220,7 @@ love.plot(res_match_5to1_re_cali,
           binary = "std",
           continuous = "std")
 
-bal.tab(res_match_5to1_re_cali)
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
 
 ```
 
@@ -226,7 +229,7 @@ Si on veut essayer d'obtenir une meilleure qualité d'équilibrage sur l'ensembl
 
 ```{r}
 res_match_5to1_re_cali <- matchit(model_matching
-                      , data = PC18_to_m, 
+                      , data = PC18_to_m,
                       method = "nearest", distance = "glm", replace = T,
                       ratio = 5, caliper = c(0.01,"AGE" = 2), std.caliper = F, discard = "treated"
 )
@@ -534,6 +537,90 @@ De cette manière on peut obtenir une balance de l'age tout à fait similaire à
 
 Le resultats du matching est très bon, part construction tous les std mean dif sont en dessous de 0.05. Cela étant, on obtient une taille de groupe contrôle de 1214, ce qui est a peine mieux que ce qu'on obtenait avec les méthodes 5:1 avec replacement. A mon avis, on arrive aux limitte de notre échantillion, on peut surement pas faire beaucoup mieux que cela en terme de taille effective du groupe contrôle, 1200 environ. Cette taille est acceptable si on considère les tests de puissance effectué plus haut.
 
+On peut tout de même essayer avec la méthode cardinality, qui va effectuer un matching 1:1 sans remise, en maximisant les nombre d'individu contrôle et traité sous contrainte de std min diff définit. On risque néamoins de perdre pas mal d'individus traité. Voyons :
+
+```{r}
+
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_card <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = 1,
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 900)
+
+bal.tab(res_match_card, binary = "std", thresholds = c(m = 0.05))
+
+```
+
+On ne perd que 332 individu traité, pour gagner 1938 individu contrôle, matching 1:1 sans remise. L'équilibrage est par construction excellent. C'est peut-être la meilleure solution à envisager.
+
+Essayons d'observer les caractéristiques de ces individus traité non matché.
+
+```{r}
+PC18_unmatched <- match.data(res_match_card)
+PC18_unmatched <- filter(PC18_unmatched, PC18_unmatched$stream_spe == 1)
+PC18_streameur <- filter(PC18_to_m, PC18_to_m$stream_spe == 1)
+PC18_unmatched <- filter(PC18_streameur, !PC18_streameur$IDENT18 %in% PC18_unmatched$IDENT18)
+
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+
+PC18_unmatched_s <- survey::svydesign(id = ~IDENT18, data = PC18_unmatched, weights = PC18_unmatched$POND)
+PC18_streameur_s <- survey::svydesign(id = ~IDENT18, data = PC18_streameur, weights = PC18_streameur$POND)
+
+
+tbl_unmatched <- PC18_unmatched_s %>%
+  tbl_svysummary(
+    include = c("SEXE_r", "AGE_5_r", "DIPLOME_r", "PCS_MENAGE",  "music_12m", "nbr_genre_music"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(SEXE_r ~ "Sexe",
+                 AGE_5_r ~ "Age",
+                 DIPLOME_r ~ "Niveau de diplome"),
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}",
+                     all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_header(label = "**Variables**", stat_0 ~ "**N = {N_unweighted}**")
+
+ 
+tbl_streameur <-  PC18_streameur_s %>%
+  tbl_svysummary(
+    include = c("SEXE_r", "AGE_5_r", "DIPLOME_r", "PCS_MENAGE",  "music_12m", "nbr_genre_music"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(SEXE_r ~ "Sexe",
+                 AGE_5_r ~ "Age",
+                 DIPLOME_r ~ "Niveau de diplome"),
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} % N = {n_unweighted}",
+                     all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_header(label = "**Variables**", stat_0 ~ "**N = {N_unweighted}**")
+
+tbl_comp_unmatched <-
+  tbl_merge(
+    tbls = list(tbl_unmatched, tbl_streameur),
+    tab_spanner = c("**Echantillon streameurs non matché**", "**Echantillon streameurs**")
+  )
+
+tbl_comp_unmatched
+
+```
+
+
+
 ## Full matching
 
 ```{r}
@@ -553,3 +640,146 @@ bal.plot(res_match_full, var.name = "AGE_5_r")
 ```
 
 ESS de 859, et balance mauvaise. Probablement pas approprié.
+
+# Comparaison matching candidat, avec et sans poids de sondage
+
+## Matching 5:1 replacement illimité, caliper
+
+### Sans aucun poids de sondage pris en compte
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage ajouté après calcul du propensity score
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali <- add_s.weights(res_match_5to1_re_cali, s.weights = "POND")
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage pris en compte dans le calcule du propensity score
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, s.weights = PC18_to_m$POND,
+                      method = "nearest", distance = "glm", replace = T, 
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+## Matching template
+
+### Matching sans aucune prise en compte des poids de sondages
+
+```{r}
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template_no_w <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 300)
+
+res_match_template_no_w
+
+bal.tab(res_match_template_no_w, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Matching prise en compte des poids de sondages après matching
+
+```{r}
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template_w_after <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 300)
+
+res_match_template_w_after <- add_s.weights(res_match_template_w_after, s.weights = "POND")
+
+
+res_match_template_w_after
+
+
+bal.tab(res_match_template_w_after, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Matching prise en compte des poids de sondages avant matching
+
+SMD = 0.05
+
+```{r}
+tols_all_var = c(0.05, 0.02, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T, T, T,
+  T, T, T, T, T, T, T, T)
+
+res_match_template_w_before <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
+                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
+                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
+                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
+                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
+                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
+                         tv_enfance + audivisuel_nonFR,
+                  data = PC18_to_m, s.weights = PC18_to_m$POND, 
+                  method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 300)
+
+
+
+res_match_template_w_before
+
+
+bal.tab(res_match_template_w_before, binary = "std", thresholds = c(m = 0.05))
+```
+
+
