@@ -25,23 +25,40 @@ source(here("02_import", "import_bases.R"))
 
 source(here("03_scripts", "gestion_NA_matching.R"))
 
-list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "DIPLOME_r", 
-                    "naiss_parents", "DIPLOME_pere", "DIPLOME_mere", "VITENCOUPLE_r", 
-                    "music_amateur", "freq_tv", "equip_tv", "clip_tv", "freq_film", 
-                    "film_stream_VOD", "film_stream_autre", "nbr_genre_film", "equip_serie", 
-                    "serie_stream_VOD", "serie_replay", "info_internet", "musee_art_12m", 
-                    "galerie_12m", "freq_internet", "reseaux_sociaux", "culture_en_ligne", 
-                    "tv_enfance", "audivisuel_nonFR")
+list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
+                    "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "sorties_ami", "VITENCOUPLE_r", 
+                    "logement", "music_amateur", "freq_jv", "freq_tv", "equip_tv", "clip_tv", "equip_film", "film_stream_VOD", 
+                    "film_stream_autre", "film_DVD", "film_num", "nbr_genre_film", "freq_serie", "equip_serie", 
+                    "serie_stream_VOD", "serie_stream_autre", "nbr_genre_serie", "info_internet", "freq_lecture", 
+                    "equip_lecture", "nbr_genre_film_cine", "musee_art_12m", "galerie_12m", "acces_internet", 
+                    "freq_internet", "reseaux_sociaux", "culture_en_ligne", "musique_enfance", "cinema_enfance", 
+                    "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance", "audivisuel_nonFR", "autre_langue")
 
 PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
 
-model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
-                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
-                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
-                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
-                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
-                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
-                         tv_enfance + audivisuel_nonFR")
+model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue")
+
+model_matching_age_5 <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue")
 
 fct_nbr_remise <- function(matching, d, var_match){
   match_matrix <- as.data.frame(matching$match.matrix) %>%
@@ -68,25 +85,17 @@ return(plot_nbr_remise)
 ## Matching template
 
 ```{r}
-tols_all_var = c(0.05, 0.02, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
-  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05)
 
-std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
-  T, T, T, T, T, T, T, T, T, T,
-  T, T, T, T, T, T, T, T)
-
-res_match_template_w_before <- matchit(stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
-                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
-                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
-                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
-                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
-                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
-                         tv_enfance + audivisuel_nonFR,
+res_match_template_w_before <- matchit(model_matching_age_5,
                   data = PC18_to_m, s.weights = PC18_to_m$POND, 
                   method = "cardinality",
                   estimand = "ATT", ratio = NA, discard = "none",  
-                  tols = tols_all_var, std.tols = std.tols_all_var, solver = "gurobi", time = 60)
+                  tols = tols_all_var, std.tols = T, solver = "gurobi", time = 60)
 
 
 
@@ -117,9 +126,9 @@ love.plot(res_match_template_w_before,
 
 ```
 
-On constate 1533 individu dans le groupe controle, pour 2270 individus traités. 
+On constate 1462 individu dans le groupe controle, pour 2270 individus traités. 
 
-Par construction, l'ensemble des variables présentent des SMD < 0.05 et < 0.02 pour l'age.
+Par construction, l'ensemble des variables présentent des SMD < 0.05 et < 0.005 pour l'age.
 
 Pour l'age, on peut observer si il y a des déséqulibre à certaines endroit de la distribution
 

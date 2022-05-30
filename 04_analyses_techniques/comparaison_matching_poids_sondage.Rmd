@@ -1,0 +1,326 @@
+---
+title: "Comparaison matching avec poids de sondage"
+author: "Abel AUSSANT"
+date: "26/05/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(MatchIt)
+library(cobalt)
+library(ggplot2)
+library(pwr)
+library(gtsummary)
+library(gt)
+
+
+source(here("02_import", "import_bases.R"))
+
+source(here("03_scripts", "gestion_NA_matching.R"))
+
+list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
+                    "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "sorties_ami", "VITENCOUPLE_r", 
+                    "logement", "music_amateur", "freq_jv", "freq_tv", "equip_tv", "clip_tv", "equip_film", "film_stream_VOD", 
+                    "film_stream_autre", "film_DVD", "film_num", "nbr_genre_film", "freq_serie", "equip_serie", 
+                    "serie_stream_VOD", "serie_stream_autre", "nbr_genre_serie", "info_internet", "freq_lecture", 
+                    "equip_lecture", "nbr_genre_film_cine", "musee_art_12m", "galerie_12m", "acces_internet", 
+                    "freq_internet", "reseaux_sociaux", "culture_en_ligne", "musique_enfance", "cinema_enfance", 
+                    "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance", "audivisuel_nonFR", "autre_langue")
+
+PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
+
+model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue")
+
+model_matching_age_5 <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
+    DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue")
+
+fct_nbr_remise <- function(matching, d, var_match){
+  match_matrix <- as.data.frame(matching$match.matrix) %>%
+  mutate(across(everything(),as.numeric))
+match_count <- as.data.frame(table(unlist(match_matrix)))
+match_count <- match_count[order(match_count$Freq, decreasing = T),]
+
+
+match_count[1:100,]
+
+plot_nbr_remise <- ggplot(match_count, aes(reorder(Var1, Freq), y = Freq)) +
+    geom_jitter()
+
+most_matched <- as.character(match_count$Var1[1:10])
+
+print(d[most_matched, var_match])
+
+return(plot_nbr_remise)
+}
+
+
+```
+
+# Comparaison matching candidat, avec et sans poids de sondage
+
+## Matching 5:1 replacement illimité, caliper
+
+### Sans aucun poids de sondage pris en compte
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage ajouté après calcul du propensity score
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali <- add_s.weights(res_match_5to1_re_cali, s.weights = "POND")
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage pris en compte dans le calcule du propensity score
+
+```{r}
+res_match_5to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, s.weights = PC18_to_m$POND,
+                      method = "nearest", distance = "glm", replace = T, 
+                      ratio = 5, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_5to1_re_cali
+
+bal.tab(res_match_5to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+
+#Poid de sondage des individus à propensity score élevé
+
+PC18_m_eval <- match.data(res_match_5to1_re_cali, drop.unmatched = F)
+
+ggplot(PC18_m_eval) +
+  aes(reorder(IDENT18, distance), y = distance) +
+    geom_jitter()
+
+
+ggplot(PC18_m_eval) +
+  aes(distance) +
+    geom_density()
+
+
+summary(PC18_m_eval$POND[PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 0])
+
+summary(PC18_m_eval$POND[PC18_m_eval$distance < 0.25 & PC18_m_eval$stream_spe == 0])
+
+
+summary(PC18_m_eval$POND[PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 1])
+
+summary(PC18_m_eval$POND[PC18_m_eval$distance < 0.25 & PC18_m_eval$stream_spe == 1])
+
+```
+
+Evaluation du support commun avec et sans pondération
+
+```{r}
+
+## plot des propensity score entre streameur et non streameur
+# pondéré
+ggplot(PC18_m_eval) + 
+    aes(x = distance, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_m_eval$POND) + 
+    geom_density(alpha = 5/10) +
+    scale_y_continuous(breaks = seq(0, 4.3, by = 0.2), limits = c(0, 4.3)) +
+    theme(panel.grid.major.y = element_line(color = "red",
+                                          size = 0.5,
+                                          linetype = 2)) +
+    ggtitle("Support commun avec pondération")
+
+# non pondéré
+ggplot(PC18_m_eval) + 
+    aes(x = distance, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe)) + 
+    geom_density(alpha = 5/10) +
+    scale_y_continuous(breaks = seq(0, 4.3, by = 0.2), limits = c(0, 4.3)) +
+    theme(panel.grid.major.y = element_line(color = "red",
+                                          size = 0.5,
+                                          linetype = 2)) +
+    ggtitle("Support commun sans pondération")
+
+## rapport entre nbr de streameur et non streameur dans la région des propensity score > 0.6
+
+#pondéré
+nbr_strm_w <- sum(PC18_m_eval$POND[PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 1])
+
+nbr_nostrm_w <-sum(PC18_m_eval$POND[PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 0])
+
+rapport_w <- nbr_strm_w / nbr_nostrm_w
+
+sprintf("Dans l'échantillion pondéré, il y'a %.f individus streameur ayant un propensity score estimé > 0.6", nbr_strm_w)
+sprintf("Il y'a %.f individus nonstreameur ayant un propensity score estimé > 0.6", nbr_nostrm_w)
+sprintf("Quand on prend en compte la pondération, il y a %.2f fois plus de streameur que de non streameur ayant un propensity > 0.6", rapport_w)
+
+# non pondéré
+nbr_strm_unw <- nrow(filter(PC18_m_eval, PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 1))
+
+nbr_nostrm_unw <- nrow(filter(PC18_m_eval, PC18_m_eval$distance > 0.6 & PC18_m_eval$stream_spe == 0))
+
+rapport_unw <- nbr_strm_unw / nbr_nostrm_unw
+
+sprintf("Dans l'échantillion non pondéré, il y'a %.f individus streameur ayant un propensity score estimé > 0.6", nbr_strm_unw)
+sprintf("Il y'a %.f individus nonstreameur ayant un propensity score estimé > 0.6", nbr_nostrm_unw)
+sprintf("Quand on ne prend pas en compte la pondération, il y a %.2f fois plus de streameur que de non streameur ayant un propensity > 0.6", rapport_unw)
+
+# Augmentation du rapport en %
+augmentation_rapport <- ((rapport_w/ rapport_unw) - 1) * 100
+
+sprintf("Ainsi, la prise en compte de la pondération revient à augmenter de %.2f pourcent de rapport entre streameur et non streameur dans la région des propensity score > 0.6", augmentation_rapport)
+
+```
+
+## Matching 1:1 replacement illimité, caliper
+
+### Sans aucun poids de sondage pris en compte
+
+```{r}
+res_match_1to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 1, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_1to1_re_cali
+
+bal.tab(res_match_1to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage ajouté après calcul du propensity score
+
+```{r}
+res_match_1to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, 
+                      method = "nearest", distance = "glm", replace = T,
+                      ratio = 1, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_1to1_re_cali <- add_s.weights(res_match_1to1_re_cali, s.weights = "POND")
+
+res_match_1to1_re_cali
+
+bal.tab(res_match_1to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Avec poids de sondage pris en compte dans le calcule du propensity score
+
+```{r}
+res_match_1to1_re_cali <- matchit(model_matching
+                      , data = PC18_to_m, s.weights = PC18_to_m$POND,
+                      method = "nearest", distance = "glm", replace = T, 
+                      ratio = 1, caliper = c("AGE" = 2), std.caliper = F, discard = "treated"
+)
+
+res_match_1to1_re_cali
+
+bal.tab(res_match_1to1_re_cali, binary = "std", thresholds = c(m = 0.05))
+```
+
+## Matching template
+
+### Matching sans aucune prise en compte des poids de sondages
+
+```{r}
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05)
+
+res_match_template_no_w <- matchit(model_matching_age_5,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = T, solver = "gurobi", time = 60)
+
+res_match_template_no_w
+
+bal.tab(res_match_template_no_w, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Matching prise en compte des poids de sondages après matching
+
+```{r}
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05)
+
+
+res_match_template_w_after <- matchit(model_matching_age_5,
+                  data = PC18_to_m, method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = T, solver = "gurobi", time = 60)
+
+res_match_template_w_after <- add_s.weights(res_match_template_w_after, s.weights = "POND")
+
+
+res_match_template_w_after
+
+
+bal.tab(res_match_template_w_after, binary = "std", thresholds = c(m = 0.05))
+```
+
+### Matching prise en compte des poids de sondages avant matching
+
+SMD = 0.05
+
+```{r}
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+  0.05, 0.05, 0.05, 0.05, 0.05)
+
+res_match_template_w_before <- matchit(model_matching_age_5,
+                  data = PC18_to_m, s.weights = PC18_to_m$POND, 
+                  method = "cardinality",
+                  estimand = "ATT", ratio = NA, discard = "none",  
+                  tols = tols_all_var, std.tols = T, solver = "gurobi", time = 30)
+
+
+
+res_match_template_w_before
+
+
+bal.tab(res_match_template_w_before, binary = "std", thresholds = c(m = 0.05))
+```

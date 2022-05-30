@@ -22,11 +22,25 @@ source(here("02_import", "import_bases.R"))
 
 source(here("03_scripts", "matching_final.R"))
 
+covar_formula <- "SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + DIPLOME_r + 
+    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue"
+
 theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 
 PC18_to_m_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m, weights = PC18_to_m$POND)
 
 PC18_m_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m, weights = PC18_m$POND_m)
+
+PC18_m_1to1_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_1to1, weights = PC18_m_1to1$POND_m)
 
 ```
  Ce document consiste en une compilation d'estimation d'effet en mobilisant systématiquement une comparaison avant/après matching.
@@ -51,17 +65,21 @@ mean_afm_nostrm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 0],
 mean_afm_strm <- weighted.mean(PC18_m$nbr_genre_music[PC18_m$stream_spe == 1], 
                                PC18_m$POND_m[PC18_m$stream_spe == 1])
 
+# Moyenne matché, matching template
+mean_afm1to1_nostrm <- weighted.mean(PC18_m_1to1$nbr_genre_music[PC18_m_1to1$stream_spe == 0], 
+                                 PC18_m_1to1$POND_m[PC18_m_1to1$stream_spe == 0])
+mean_afm1to1_strm <- weighted.mean(PC18_m_1to1$nbr_genre_music[PC18_m_1to1$stream_spe == 1], 
+                               PC18_m_1to1$POND_m[PC18_m_1to1$stream_spe == 1])
 
-
-means <- data.frame(non_streameur = c(mean_bfm_nostrm, mean_afm_nostrm), streameur = c(mean_bfm_strm, mean_afm_strm))
+means <- data.frame(non_streameur = c(mean_bfm_nostrm, mean_afm_nostrm, mean_afm1to1_nostrm), streameur = c(mean_bfm_strm, mean_afm_strm, mean_afm1to1_strm))
 means <- mutate(means, across(everything(), round, 2))
 
-rownames(means) <- c("Avant matching","Après matching template")
+rownames(means) <- c("Avant matching","Après matching template", "Après matching 1 pour 1")
 
 kableExtra::kable(means)
 ```
 
-On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (moins de 0,1). En revanche, dans l'échantillion matché avec la méthode cardinality, on retrouve un écart à 0.4 environ entre échantillion.
+On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (environ 0,2). Peu de différence entre les méthodes template et propensity score 5 to 1.
 
 ## Regression sans prise en compte des covariables
 
@@ -76,12 +94,22 @@ coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
 
 ```
 
-**Après matching**
+**Après matching template**
 
 ```{r}
 lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe, PC18_m, weights = POND_m)
 
 coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+
+
+```
+
+**Après matching 1 pour 1**
+
+```{r}
+lm_nbr_genre_afm_1to1 <- lm(nbr_genre_music ~ stream_spe, PC18_m_1to1, weights = POND_m)
+
+coeftest(lm_nbr_genre_afm_1to1, vcov. = vcovHC)
 
 
 ```
@@ -119,14 +147,14 @@ summary(lm_nbr_genre_afm)$adj.r.squared
 
 ```
 
-**Après matching cardinality**
+**Après matching 1 pour 1**
 
 ```{r}
-lm_nbr_genre_afmcard <- lm(formula_nbr_genre, PC18_m_card)
+lm_nbr_genre_afm_1to1 <- lm(formula_nbr_genre, PC18_m_1to1, weights = POND_m)
 
-coeftest(lm_nbr_genre_afmcard, vcov. = vcovHC)
+coeftest(lm_nbr_genre_afm_1to1, vcov. = vcovHC)
 
-summary(lm_nbr_genre_afmcard)$adj.r.squared
+summary(lm_nbr_genre_afm_1to1)$adj.r.squared
 
 ```
 
@@ -135,18 +163,22 @@ summary(lm_nbr_genre_afmcard)$adj.r.squared
 
 Il peut être interessant d'ajouter des interaction dans les modèles ainsi obtenues.
 
-Par ailleurs on peut penser que l'age n'a pas un effet linéaire dans notre cas, catégorisé peut être une solution pour observer un effet spécifique du streaming chez certaines tranche d'age.
+Par ailleurs on peut penser que le stream a un effet différent selon l'age dans notre cas, catégorisé peut être une solution pour observer un effet spécifique du streaming chez certaines tranche d'age.
 
 ```{r}
-formula_nbr_genre <- as.formula("nbr_genre_music ~ stream_spe + SEXE_r + AGE_r + CRITREVENU_r + PCS_MENAGE + DIPLOME_r + 
-                         naiss_parents + DIPLOME_pere + DIPLOME_mere + VITENCOUPLE_r + 
-                         music_amateur + freq_tv + equip_tv + clip_tv + freq_film + 
-                         film_stream_VOD + film_stream_autre + nbr_genre_film + equip_serie + 
-                         serie_stream_VOD + serie_replay + info_internet + musee_art_12m + 
-                         galerie_12m + freq_internet + reseaux_sociaux + culture_en_ligne + 
-                         tv_enfance + audivisuel_nonFR + stream_spe:AGE_r")
+formula_nbr_genre_inter <- as.formula("nbr_genre_music ~ stream_spe + SEXE_r + AGE_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + DIPLOME_r + 
+    naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
+    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
+    film_stream_autre + film_DVD + film_num + nbr_genre_film + 
+    freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
+    nbr_genre_serie + info_internet + freq_lecture + equip_lecture + 
+    nbr_genre_film_cine + musee_art_12m + galerie_12m + acces_internet + 
+    freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + 
+    cinema_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + 
+    audivisuel_nonFR + autre_langue + stream_spe:AGE_r")
 
-lm_nbr_genre_bfm <- lm(formula_nbr_genre, PC18_to_m, weights = POND)
+lm_nbr_genre_bfm <- lm(formula_nbr_genre_inter, PC18_to_m, weights = POND)
 
 coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
 
@@ -158,7 +190,7 @@ summary(lm_nbr_genre_bfm)$adj.r.squared
 **Après matching**
 
 ```{r}
-lm_nbr_genre_afm <- lm(formula_nbr_genre, PC18_m, weights = POND_m)
+lm_nbr_genre_afm <- lm(formula_nbr_genre_inter, PC18_m, weights = POND_m)
 
 coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
 
@@ -166,21 +198,53 @@ summary(lm_nbr_genre_afm)$adj.r.squared
 
 ```
 
-**Après matching cardinality**
+**Après matching 1 pour 1**
 
 ```{r}
-lm_nbr_genre_afmcard <- lm(formula_nbr_genre, PC18_m_card)
+lm_nbr_genre_afm_1to1 <- lm(formula_nbr_genre_inter, PC18_m_1to1)
 
-coeftest(lm_nbr_genre_afmcard, vcov. = vcovHC)
+coeftest(lm_nbr_genre_afm_1to1, vcov. = vcovHC)
 
-summary(lm_nbr_genre_afmcard)$adj.r.squared
+summary(lm_nbr_genre_afm_1to1)$adj.r.squared
 
 ```
 
 Globalement l'ajout d'interaction entre l'age et le stream ne donne rien de significatif, hormis pour les 46 - 55 ans dans la population matché, fait difficilement interprétable. 
 
-# Effet du streaming sur l'intensité des pratiques d'écoute
+# Effet sur le nombre d'artistes déjà écoutés dans une liste
 
+## Différence de moyennes simple
+
+```{r}
+
+#Moyenne non matché
+mean_bfm_nostrm <- weighted.mean(PC18_to_m$nbr_artiste_ecoute[PC18_to_m$stream_spe == 0], 
+                                 PC18_to_m$POND[PC18_to_m$stream_spe == 0])
+mean_bfm_strm <- weighted.mean(PC18_to_m$nbr_artiste_ecoute[PC18_to_m$stream_spe == 1], 
+                               PC18_to_m$POND[PC18_to_m$stream_spe == 1])
+
+# Moyenne matché, matching template
+mean_afm_nostrm <- weighted.mean(PC18_m$nbr_artiste_ecoute[PC18_m$stream_spe == 0], 
+                                 PC18_m$POND_m[PC18_m$stream_spe == 0])
+mean_afm_strm <- weighted.mean(PC18_m$nbr_artiste_ecoute[PC18_m$stream_spe == 1], 
+                               PC18_m$POND_m[PC18_m$stream_spe == 1])
+
+# Moyenne matché, matching template
+mean_afm1to1_nostrm <- weighted.mean(PC18_m_1to1$nbr_artiste_ecoute[PC18_m_1to1$stream_spe == 0], 
+                                 PC18_m_1to1$POND_m[PC18_m_1to1$stream_spe == 0])
+mean_afm1to1_strm <- weighted.mean(PC18_m_1to1$nbr_artiste_ecoute[PC18_m_1to1$stream_spe == 1], 
+                               PC18_m_1to1$POND_m[PC18_m_1to1$stream_spe == 1])
+
+means <- data.frame(non_streameur = c(mean_bfm_nostrm, mean_afm_nostrm, mean_afm1to1_nostrm), streameur = c(mean_bfm_strm, mean_afm_strm, mean_afm1to1_strm))
+means <- mutate(means, across(everything(), round, 2))
+
+rownames(means) <- c("Avant matching","Après matching template", "Après matching 1 pour 1")
+
+kableExtra::kable(means)
+```
+
+
+# Effet du streaming sur l'intensité des pratiques d'écoute
 
 ## tableau croisé simple
 
@@ -215,7 +279,7 @@ PC18_to_m_survey %>%
 
 ```
 
-**Après matching**
+**Après matching template**
 
 ```{r}
 PC18_m_survey %>%
@@ -243,37 +307,66 @@ PC18_m_survey %>%
 
 ```
 
+**Après matching 1 pour 1**
+
+```{r}
+PC18_m_1to1_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "music_12m"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(stream_spe ~ "Ecoute de la musique sur une plate forme de streaming"),
+    by = music_12m, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Données pondérées pour les pourcentages.
+                                     <br> Champ : Français agés de plus de 15 et plus.
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de musique sur au moins une plateforme de streaming par fréquence d'écoute de musique") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+```
+
 ## Regression logistique sans covariable
 
 On peut utliser une regression pour modéliser la probabilité d'écouter de la musique tous les jours par la pratique du streaming
+**Avant matching**
 
 ```{r}
 formula_music_TLJ <- as.formula("music_TLJ ~ stream_spe")
 
-glm_music_TLJ <- glm(formula_music_TLJ, PC18_to_m, weights = POND, family = "binomial")
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_to_m, weights = POND, family = "quasibinomial")
 
 coeftest(glm_music_TLJ, vcov. = vcovHC)
 
 ```
 
-**Après matching**
+**Après matching template**
 
 ```{r}
 formula_music_TLJ <- as.formula("music_TLJ ~ stream_spe")
 
-glm_music_TLJ <- glm(formula_music_TLJ, PC18_m, weights = POND_m, family = "binomial")
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_m, weights = POND_m, family = "quasibinomial")
 
 coeftest(glm_music_TLJ, vcov. = vcovHC)
 
 ```
 
 
-**Après matching cardinality**
+**Après matching 1 pour 1**
 
 ```{r}
 formula_music_TLJ <- as.formula("music_TLJ ~ stream_spe")
 
-glm_music_TLJ <- glm(formula_music_TLJ, PC18_m_card, family = "binomial")
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_m_1to1, family = "quasibinomial")
 
 coeftest(glm_music_TLJ, vcov. = vcovHC)
 
@@ -282,6 +375,8 @@ coeftest(glm_music_TLJ, vcov. = vcovHC)
 ## Regression logistique avec covariables
 
 Il est sans doute plus interessant d'ajouter les covariables, mais c'est un peu plus compliqué d'estimer les erreurs standars dans la population matché. 
+
+**Avant matching**
 
 ```{r}
 formula_music_TLJ <- as.formula(paste("music_TLJ ~ stream_spe", covar_formula, sep = " + "))
@@ -292,41 +387,314 @@ coeftest(glm_music_TLJ, vcov. = vcovHC)
 
 ```
 
+**Après matching template**
+
 ```{r}
+formula_music_TLJ <- as.formula(paste("music_TLJ ~ stream_spe", covar_formula, sep = " + "))
 
-glm_music_TLJ <- glm(formula_music_TLJ, PC18_m, weights = POND_m, family = quasibinomial(link = "logit"))
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_m, weights = POND_m, family = "binomial")
 
-est_fun <- function(PC18_to_m_boot, i) {
-  
-  res_match_1to1_re5max_cali_boot <- matchit(model_matching
-                                  , data = PC18_to_m_boot[i,], 
-                                  method = "nearest", distance = "glm", replace = T, reuse.max = 5,
-                                  ratio = 1, caliper = c("AGE" = 2), std.caliper = F, discard = "treated")
-
-  res_match_1to1_re5max_cali_boot <- add_s.weights(res_match_1to1_re5max_cali_boot, s.weights = "POND", data = PC18_to_m_boot)
-
-  PC18_m_boot <- match.data(res_match_1to1_re5max_cali_boot, weights = "POND_m")
-  
-  glm_music_TLJ_boot <- glm(formula_music_TLJ, PC18_m_boot, weights = POND_m, family = quasibinomial(link = "logit"))
-  
-  PC18_m_boot$stream_spe <- 0  
-  P0 <- weighted.mean(predict(glm_music_TLJ, PC18_m_boot, type = "response"),
-                      w = PC18_m_boot$POND_m)
-  Odds0 <- P0 / (1 - P0)
-  
-  PC18_m_boot$stream_spe <- 1
-  P1 <- weighted.mean(predict(glm_music_TLJ, PC18_m_boot, type = "response"),
-                      w = PC18_m_boot$POND_m)
-  Odds1 <- P1 / (1 - P1)
-
-  #Return marginal odds ratio
-  
-  print(Odds1 / Odds0)
-  return(Odds1 / Odds0)
-}
-
-boot_est <- boot(PC18_to_m, est_fun, R = 4999)
-boot_est
-boot.ci(boot_est, type = "bca")
+coeftest(glm_music_TLJ, vcov. = vcovHC)
 ```
 
+**Après matching 1 pour1**
+
+```{r}
+formula_music_TLJ <- as.formula(paste("music_TLJ ~ stream_spe", covar_formula, sep = " + "))
+
+glm_music_TLJ <- glm(formula_music_TLJ, PC18_m_1to1, weights = POND_m, family = "binomial")
+
+coeftest(glm_music_TLJ, vcov. = vcovHC)
+```
+
+# Effet du streaming sur l'écoute de rap, de variété internationnal et de musique classique
+
+## Tableau croisé
+
+**Avant matching**
+```{r}
+PC18_to_m_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "ecoute_variet_inter", "ecoute_rap", "ecoute_classiq"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(ecoute_variet_inter ~ "Ecoute de la varieté internationnale",
+                 ecoute_rap ~ "Ecoute du rap/hip hop",
+                 ecoute_classiq ~"Ecoute de la musique classique"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Données pondérées pour les pourcentages.
+                                     <br> Champ : Français agés de plus de 15 et plus.
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de differents styles musicaux par utilisation des plateformes de streaming") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+```
+
+**Après matching template**
+
+```{r}
+PC18_m_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "ecoute_variet_inter", "ecoute_rap", "ecoute_classiq"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(ecoute_variet_inter ~ "Ecoute de la varieté internationnale",
+                 ecoute_rap ~ "Ecoute du rap/hip hop",
+                 ecoute_classiq ~"Ecoute de la musique classique"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Données pondérées pour les pourcentages.
+                                     <br> Champ : Français agés de plus de 15 et plus.
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de differents styles musicaux par utilisation des plateformes de streaming") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+```
+
+**Après matching 1 pour 1**
+
+```{r}
+PC18_m_1to1_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "ecoute_variet_inter", "ecoute_rap", "ecoute_classiq"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(ecoute_variet_inter ~ "Ecoute de la varieté internationnale",
+                 ecoute_rap ~ "Ecoute du rap/hip hop",
+                 ecoute_classiq ~"Ecoute de la musique classique"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(1,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = everything() ~ "svy.chisq.test") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Données pondérées pour les pourcentages.
+                                     <br> Champ : Français agés de plus de 15 et plus.
+                                     <br>Lecture : ")) %>%
+  tab_header(title = "Ecoute de differents styles musicaux par utilisation des plateformes de streaming") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+```
+
+## Regression logistique sans covariables
+
+Variété internationnal
+
+**Avant matching**
+
+```{r}
+formula_variet <- as.formula("ecoute_variet_inter ~ stream_spe")
+
+glm_variet <- glm(formula_variet, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_variet <- as.formula("ecoute_variet_inter ~ stream_spe")
+
+glm_variet <- glm(formula_variet, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_variet <- as.formula("ecoute_variet_inter ~ stream_spe")
+
+glm_variet <- glm(formula_variet, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+```
+
+Rap/hip-hop
+
+**Avant matching**
+
+```{r}
+formula_rap <- as.formula("ecoute_rap ~ stream_spe")
+
+glm_rap <- glm(formula_rap, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_rap <- as.formula("ecoute_rap ~ stream_spe")
+
+glm_rap <- glm(formula_rap, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_rap <- as.formula("ecoute_rap ~ stream_spe")
+
+glm_rap <- glm(formula_rap, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+```
+
+Musique classique
+
+**Avant matching**
+
+```{r}
+formula_classiq <- as.formula("ecoute_classiq ~ stream_spe")
+
+glm_classiq <- glm(formula_classiq, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_classiq <- as.formula("ecoute_classiq ~ stream_spe")
+
+glm_classiq <- glm(formula_classiq, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_classiq <- as.formula("ecoute_classiq ~ stream_spe")
+
+glm_classiq <- glm(formula_classiq, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+```
+
+## Regression logistique avec covariables
+
+Variété internationnal
+
+**Avant matching**
+
+```{r}
+formula_variet <- as.formula(paste("ecoute_variet_inter ~ stream_spe", covar_formula, sep = " + "))
+
+glm_variet <- glm(formula_variet, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_variet <- as.formula(paste("ecoute_variet_inter ~ stream_spe", covar_formula, sep = " + "))
+
+glm_variet <- glm(formula_variet, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_variet <- as.formula(paste("ecoute_variet_inter ~ stream_spe", covar_formula, sep = " + "))
+
+glm_variet <- glm(formula_variet, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_variet, vcov. = vcovHC)
+```
+
+Rap/Hip-hop
+
+**Avant matching**
+
+```{r}
+formula_rap <- as.formula(paste("ecoute_rap ~ stream_spe", covar_formula, sep = " + "))
+
+glm_rap <- glm(formula_rap, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_rap <- as.formula(paste("ecoute_rap ~ stream_spe", covar_formula, sep = " + "))
+
+glm_rap <- glm(formula_rap, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_rap <- as.formula(paste("ecoute_rap ~ stream_spe", covar_formula, sep = " + "))
+
+glm_rap <- glm(formula_rap, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_rap, vcov. = vcovHC)
+```
+
+Musique classique
+
+**Avant matching**
+
+```{r}
+formula_classiq <- as.formula(paste("ecoute_classiq ~ stream_spe", covar_formula, sep = " + "))
+
+glm_classiq <- glm(formula_classiq, PC18_to_m, weights = POND, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+
+```
+
+**Après matching template**
+
+```{r}
+formula_classiq <- as.formula(paste("ecoute_classiq ~ stream_spe", covar_formula, sep = " + "))
+
+glm_classiq <- glm(formula_classiq, PC18_m, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+```
+
+**Après matching 1 pour1**
+
+```{r}
+formula_classiq <- as.formula(paste("ecoute_classiq ~ stream_spe", covar_formula, sep = " + "))
+
+glm_classiq <- glm(formula_classiq, PC18_m_1to1, weights = POND_m, family = "quasibinomial")
+
+coeftest(glm_classiq, vcov. = vcovHC)
+```

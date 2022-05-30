@@ -715,6 +715,18 @@ PC18$nbr_genre_music <- rowSums(PC18[,list])
 PC18$nbr_genre_music[is.na(PC18$nbr_genre_music)] <- 0
 
 
+PC18$ecoute_variet_inter <- PC18$E1004
 
+PC18$ecoute_rap <- PC18$E1007
+
+PC18$ecoute_classiq <- PC18$E1012
+
+# Variable synthétique nombre d'artiste déjà écouté parmis la liste
+
+list <- c("E1401", "E1402", "E1403", "E1404", "E1405", "E1406", "E1407", 
+          "E1408", "E1409", "E1410", "E1411", "E1412", "E1413", "E1414", "E1415")
+
+PC18$nbr_artiste_ecoute <- rowSums(PC18[,list])
+PC18$nbr_artiste_ecoute[is.na(PC18$nbr_artiste_ecoute)] <- 0
 
 
