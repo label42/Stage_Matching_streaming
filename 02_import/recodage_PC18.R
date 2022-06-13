@@ -76,11 +76,19 @@ PC18$PCS_MENAGE <- fct_recode(PC18$G_PCS_MENAGE_,
                            NULL = "2001",
                            "Dominante cadre" = "I",
                            "Dominante intermédiaire" = "II",
-                           "Dominante employée" = "III",
                            "Dominante indépendante" = "IV",
+                           "Dominante employée" = "III",
                            "Dominante ouvrière" = "V",
                            "Un employé ou ouvrier" = "VI",
                            "Inactifs (hors retraités)" = "VII"
+)
+
+## Réordonnancement de PC18$PCS_MENAGE
+PC18$PCS_MENAGE <- fct_relevel(
+  PC18$PCS_MENAGE,
+  "Dominante cadre", "Dominante intermédiaire", "Dominante indépendante",
+  "Dominante employée", "Dominante ouvrière", "Un employé ou ouvrier",
+  "Inactifs (hors retraités)"
 )
 
 #renome h de travail par semaine. 4812 NA, pour les gens qui ne travail pas.
@@ -122,6 +130,12 @@ PC18 <- PC18 %>% mutate(
     DIPLOM == 13 ~ "Doctorat"
   ))
 PC18$DIPLOME_r <- as.factor(PC18$DIPLOME_r)
+
+## Réordonnancement de PC18$DIPLOME_r
+PC18$DIPLOME_r <- fct_relevel(
+  PC18$DIPLOME_r,
+  "Inf. Bac", "Bac", "Bac +2/3", "Bac +5", "Doctorat"
+)
 
 #GranPC18 domaine d'étude du diplome le plus haut obtenu
 
@@ -702,9 +716,33 @@ PC18$music_TLJ <- as.numeric(as.character(PC18$music_TLJ))
 
 
 
+### Modes d'écoute
+
+PC18$cd_ou_cass <- PC18$E81
+
+PC18$vinyle <- PC18$E82
 
 ## Recodage de PC18$E83 en PC18$stream_spe
 PC18$stream_spe <- PC18$E83
+
+PC18$stream_autre <- PC18$E84
+
+PC18$fichier_num <- PC18$E85
+
+PC18$radio <- PC18$E86
+
+PC18$tv <- PC18$E87
+
+
+# type de plateforme
+PC18 <- PC18 %>% mutate(    
+  type_plateforme_stream = case_when(
+    stream_spe == 1 & stream_autre == 1 ~ "Spécialisées et non-spécialisées",
+    stream_spe == 1  ~  "Spécialisées uniquement",
+    stream_autre == 1 ~ "Non-spécialisées uniquement",
+  ))
+PC18$type_plateforme_stream <- as.factor(PC18$type_plateforme_stream)
+
 
 #Variable synthétique nbr styles écoutés
 
@@ -728,5 +766,225 @@ list <- c("E1401", "E1402", "E1403", "E1404", "E1405", "E1406", "E1407",
 
 PC18$nbr_artiste_ecoute <- rowSums(PC18[,list])
 PC18$nbr_artiste_ecoute[is.na(PC18$nbr_artiste_ecoute)] <- 0
+
+
+##################################
+#### Cr?ation univers de gout ####
+##################################
+
+#### Recodage pour création univers de gouts ####
+
+# Ecoute simple
+
+#Ecoute vari?t? fran?aise
+PC18$ecout_vf_f <- PC18$E1001
+PC18$ecout_vf_f[!is.na(PC18$ecout_vf_f)] <- paste0("ecout_vf", sep = ".", PC18$ecout_vf_f[!is.na(PC18$ecout_vf_f)])
+
+#Ecoute musique du monde
+PC18$ecout_monde_f <- PC18$E1002
+PC18$ecout_monde_f[!is.na(PC18$ecout_monde_f)] <- paste0("ecout_monde", sep = ".", PC18$ecout_monde_f[!is.na(PC18$ecout_monde_f)])
+
+#Ecoute musique traditionnelle
+PC18$ecout_tradi_f <- PC18$E1003
+PC18$ecout_tradi_f[!is.na(PC18$ecout_tradi_f)] <- paste0("ecout_tradi", sep = ".", PC18$ecout_tradi_f[!is.na(PC18$ecout_tradi_f)])
+
+#Ecoute vari?t? internationales
+PC18$ecout_vInter_f <- PC18$E1004
+PC18$ecout_vInter_f[!is.na(PC18$ecout_vInter_f)] <- paste0("ecout_vInter", sep = ".", PC18$ecout_vInter_f[!is.na(PC18$ecout_vInter_f)])
+
+#Ecoute RnB
+PC18$ecout_rnb_f <- PC18$E1005
+PC18$ecout_rnb_f[!is.na(PC18$ecout_rnb_f)] <- paste0("ecout_rnb", sep = ".", PC18$ecout_rnb_f[!is.na(PC18$ecout_rnb_f)])
+
+#Ecoute Musique electro techno
+PC18$ecout_elec_f <- PC18$E1006
+PC18$ecout_elec_f[!is.na(PC18$ecout_elec_f)] <- paste0("ecout_elec", sep = ".", PC18$ecout_elec_f[!is.na(PC18$ecout_elec_f)])
+
+#Ecoute hip hop rap
+PC18$ecout_rap_f <- PC18$E1007
+PC18$ecout_rap_f[!is.na(PC18$ecout_rap_f)] <- paste0("ecout_rap", sep = ".", PC18$ecout_rap_f[!is.na(PC18$ecout_rap_f)])
+
+#Ecoute Metal, metal rock
+PC18$ecout_metal_f <- PC18$E1008
+PC18$ecout_metal_f[!is.na(PC18$ecout_metal_f)] <- paste0("ecout_metal", sep = ".", PC18$ecout_metal_f[!is.na(PC18$ecout_metal_f)])
+
+#Ecoute Pop rock
+PC18$ecout_prock_f <- PC18$E1009
+PC18$ecout_prock_f[!is.na(PC18$ecout_prock_f)] <- paste0("ecout_prock", sep = ".", PC18$ecout_prock_f[!is.na(PC18$ecout_prock_f)])
+
+#Ecoute Jazz
+PC18$ecout_jaz_f <- PC18$E1010
+PC18$ecout_jaz_f[!is.na(PC18$ecout_jaz_f)] <- paste0("ecout_jaz", sep = ".", PC18$ecout_jaz_f[!is.na(PC18$ecout_jaz_f)])
+
+#Ecoute Op?ra
+PC18$ecout_op_f <- PC18$E1011
+PC18$ecout_op_f[!is.na(PC18$ecout_op_f)] <- paste0("ecout_op", sep = ".", PC18$ecout_op_f[!is.na(PC18$ecout_op_f)])
+
+#Ecoute musique classique
+PC18$ecout_clas_f <- PC18$E1012
+PC18$ecout_clas_f[!is.na(PC18$ecout_clas_f)] <- paste0("ecout_clas", sep = ".", PC18$ecout_clas_f[!is.na(PC18$ecout_clas_f)])
+
+#Ecoute musique Autre genre
+PC18$ecout_autr_f <- PC18$E1013
+PC18$ecout_autr_f[!is.na(PC18$ecout_autr_f)] <- paste0("ecout_autr", sep = ".", PC18$ecout_autr_f[!is.na(PC18$ecout_autr_f)])
+
+
+
+### genre particulièrement aimés
+
+PC18$aime_vf_f <- PC18$E1201
+PC18$aime_vf_f[!is.na(PC18$aime_vf_f)] <- paste0("aime_vf", sep = ".", PC18$aime_vf_f[!is.na(PC18$aime_vf_f)])
+
+
+PC18$aime_monde_f <- PC18$E1202
+PC18$aime_monde_f[!is.na(PC18$aime_monde_f)] <- paste0("aime_monde", sep = ".", PC18$aime_monde_f[!is.na(PC18$aime_monde_f)])
+
+PC18$aime_tradi_f <- PC18$E1203
+PC18$aime_tradi_f[!is.na(PC18$aime_tradi_f)] <- paste0("aime_tradi", sep = ".", PC18$aime_tradi_f[!is.na(PC18$aime_tradi_f)])
+
+PC18$aime_vInter_f <- PC18$E1204
+PC18$aime_vInter_f[!is.na(PC18$aime_vInter_f)] <- paste0("aime_vInter", sep = ".", PC18$aime_vInter_f[!is.na(PC18$aime_vInter_f)])
+
+PC18$aime_rnb_f <- PC18$E1205
+PC18$aime_rnb_f[!is.na(PC18$aime_rnb_f)] <- paste0("aime_rnb", sep = ".", PC18$aime_rnb_f[!is.na(PC18$aime_rnb_f)])
+
+PC18$aime_elec_f <- PC18$E1206
+PC18$aime_elec_f[!is.na(PC18$aime_elec_f)] <- paste0("aime_elec", sep = ".", PC18$aime_elec_f[!is.na(PC18$aime_elec_f)])
+
+PC18$aime_rap_f <- PC18$E1207
+PC18$aime_rap_f[!is.na(PC18$aime_rap_f)] <- paste0("aime_rap", sep = ".", PC18$aime_rap_f[!is.na(PC18$aime_rap_f)])
+
+PC18$aime_metal_f <- PC18$E1208
+PC18$aime_metal_f[!is.na(PC18$aime_metal_f)] <- paste0("aime_metal", sep = ".", PC18$aime_metal_f[!is.na(PC18$aime_metal_f)])
+
+PC18$aime_prock_f <- PC18$E1209
+PC18$aime_prock_f[!is.na(PC18$aime_prock_f)] <- paste0("aime_prock", sep = ".", PC18$aime_prock_f[!is.na(PC18$aime_prock_f)])
+
+PC18$aime_jaz_f <- PC18$E1210
+PC18$aime_jaz_f[!is.na(PC18$aime_jaz_f)] <- paste0("aime_jaz", sep = ".", PC18$aime_jaz_f[!is.na(PC18$aime_jaz_f)])
+
+PC18$aime_op_f <- PC18$E1211
+PC18$aime_op_f[!is.na(PC18$aime_op_f)] <- paste0("aime_op", sep = ".", PC18$aime_op_f[!is.na(PC18$aime_op_f)])
+
+PC18$aime_clas_f <- PC18$E1212
+PC18$aime_clas_f[!is.na(PC18$aime_clas_f)] <- paste0("aime_clas", sep = ".", PC18$aime_clas_f[!is.na(PC18$aime_clas_f)])
+
+PC18$aime_autr_f <- PC18$E1213
+PC18$aime_autr_f[!is.na(PC18$aime_autr_f)] <- paste0("aime_autr", sep = ".", PC18$aime_autr_f[!is.na(PC18$aime_autr_f)])
+
+
+
+### Genres détestés
+
+PC18$detest_vf_f <- PC18$E1301
+PC18$detest_vf_f[!is.na(PC18$detest_vf_f)] <- paste0("detest_vf", sep = ".", PC18$detest_vf_f[!is.na(PC18$detest_vf_f)])
+
+
+PC18$detest_monde_f <- PC18$E1302
+PC18$detest_monde_f[!is.na(PC18$detest_monde_f)] <- paste0("detest_monde", sep = ".", PC18$detest_monde_f[!is.na(PC18$detest_monde_f)])
+
+
+PC18$detest_tradi_f <- PC18$E1303
+PC18$detest_tradi_f[!is.na(PC18$detest_tradi_f)] <- paste0("detest_tradi", sep = ".", PC18$detest_tradi_f[!is.na(PC18$detest_tradi_f)])
+
+
+PC18$detest_vInter_f <- PC18$E1304
+PC18$detest_vInter_f[!is.na(PC18$detest_vInter_f)] <- paste0("detest_vInter", sep = ".", PC18$detest_vInter_f[!is.na(PC18$detest_vInter_f)])
+
+
+PC18$detest_rnb_f <- PC18$E1305
+PC18$detest_rnb_f[!is.na(PC18$detest_rnb_f)] <- paste0("detest_rnb", sep = ".", PC18$detest_rnb_f[!is.na(PC18$detest_rnb_f)])
+
+
+PC18$detest_elec_f <- PC18$E1306
+PC18$detest_elec_f[!is.na(PC18$detest_elec_f)] <- paste0("detest_elec", sep = ".", PC18$detest_elec_f[!is.na(PC18$detest_elec_f)])
+
+
+PC18$detest_rap_f <- PC18$E1307
+PC18$detest_rap_f[!is.na(PC18$detest_rap_f)] <- paste0("detest_rap", sep = ".", PC18$detest_rap_f[!is.na(PC18$detest_rap_f)])
+
+
+PC18$detest_metal_f <- PC18$E1308
+PC18$detest_metal_f[!is.na(PC18$detest_metal_f)] <- paste0("detest_metal", sep = ".", PC18$detest_metal_f[!is.na(PC18$detest_metalt_f)])
+
+
+PC18$detest_prock_f <- PC18$E1309
+PC18$detest_prock_f[!is.na(PC18$detest_prock_f)] <- paste0("detest_prock", sep = ".", PC18$detest_prock_f[!is.na(PC18$detest_prock_f)])
+
+
+PC18$detest_jaz_f <- PC18$E1310
+PC18$detest_jaz_f[!is.na(PC18$detest_jaz_f)] <- paste0("detest_jaz", sep = ".", PC18$detest_jaz_f[!is.na(PC18$detest_jaz_f)])
+
+
+PC18$detest_op_f <- PC18$E1311
+PC18$detest_op_f[!is.na(PC18$detest_op_f)] <- paste0("detest_op", sep = ".", PC18$detest_op_f[!is.na(PC18$detest_op_f)])
+
+
+PC18$detest_clas_f <- PC18$E1312
+PC18$detest_clas_f[!is.na(PC18$detest_clas_f)] <- paste0("detest_clas", sep = ".", PC18$detest_clas_f[!is.na(PC18$detest_clas_f)])
+
+
+PC18$detest_autr_f <- PC18$E1313
+PC18$detest_autr_f[!is.na(PC18$detest_autr_f)] <- paste0("detest_autr", sep = ".", PC18$detest_autr_f[!is.na(PC18$detest_autr_f)])
+
+
+##############
+
+
+
+
+library(FactoMineR)
+library(tidyverse)
+
+PC18_acm <- subset(PC18, !PC18$E7 %in% c(6,7,8))
+
+list <- c("ecout_vf_f", "ecout_monde_f", "ecout_tradi_f", "ecout_vInter_f", "ecout_rnb_f", "ecout_elec_f", "ecout_rap_f", "ecout_metal_f", "ecout_prock_f", "ecout_jaz_f", "ecout_op_f", "ecout_clas_f", "ecout_autr_f",
+          "aime_vf_f", "aime_monde_f", "aime_tradi_f", "aime_vInter_f", "aime_rnb_f", "aime_elec_f", "aime_rap_f", "aime_metal_f", "aime_prock_f", "aime_jaz_f", "aime_op_f", "aime_clas_f", "aime_autr_f",
+          "detest_vf_f", "detest_monde_f", "detest_tradi_f", "detest_vInter_f", "detest_rnb_f", "detest_elec_f", "detest_rap_f", "detest_metal_f", "detest_prock_f", "detest_jaz_f", "detest_op_f", "detest_clas_f", "detest_autr_f")
+
+var_activ <- select(PC18_acm, all_of(list))
+var_sup <- select(PC18_acm, all_of(c("SEXE_r", "AGE_r")))
+baseACM <- cbind.data.frame(var_activ,var_sup)
+#Factoshiny(baseACM)
+
+
+res.MCA<-MCA(baseACM,quali.sup=c(40,41),graph=FALSE)
+
+#HCPCshiny(res.MCA)
+
+res.HCPC<-HCPC(res.MCA,nb.clust=4,consol=TRUE,graph=FALSE)
+cluster.HCPC <- as.data.frame(res.HCPC[1])
+PC18_acm$cluster_gout_music <- cluster.HCPC[,42]
+
+PC18_acm <- PC18_acm %>% mutate(    
+  cluster_gout_music = case_when(
+    cluster_gout_music == 1 ~ "Etabli légitime",
+    cluster_gout_music == 2 ~ "Etabli populaire",
+    cluster_gout_music == 3 ~ "Emergeant légitime",
+    cluster_gout_music == 4 ~ "Emergeant populaire",
+  ))
+
+## R?ordonnancement de PC18_acm$cluster_gout_music
+PC18_acm$cluster_gout_music <- fct_relevel(
+  PC18_acm$cluster_gout_music,
+  "Etabli légitime", "Etabli populaire", "Emergeant légitime",
+  "Emergeant populaire"
+)
+
+
+
+PC18 <- merge(PC18, PC18_acm[, c("IDENT18", "cluster_gout_music")], by="IDENT18", all.x = T)
+
+PC18$etab_leg <- 0
+PC18$etab_leg[PC18$cluster_gout_music == "Etabli légitime"] <- 1 
+
+PC18$etab_pop <- 0
+PC18$etab_pop[PC18$cluster_gout_music == "Etabli populaire"] <- 1 
+
+PC18$emerg_leg <- 0
+PC18$emerg_leg[PC18$cluster_gout_music == "Emergeant légitime"] <- 1 
+
+PC18$emerg_pop <- 0
+PC18$emerg_pop[PC18$cluster_gout_music == "Emergeant populaire"] <- 1
 
 

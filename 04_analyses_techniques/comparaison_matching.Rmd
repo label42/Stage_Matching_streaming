@@ -26,7 +26,7 @@ source(here("03_scripts", "gestion_NA_matching.R"))
 
 list_var_match <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "sorties_ami", "VITENCOUPLE_r", 
-                    "logement", "music_amateur", "freq_jv", "freq_tv", "equip_tv", "clip_tv", "equip_film", "film_stream_VOD", 
+                    "logement", "freq_jv", "freq_tv", "equip_tv", "clip_tv", "equip_film", "film_stream_VOD", 
                     "film_stream_autre", "film_DVD", "film_num", "nbr_genre_film", "freq_serie", "equip_serie", 
                     "serie_stream_VOD", "serie_stream_autre", "nbr_genre_serie", "info_internet", "freq_lecture", 
                     "equip_lecture", "nbr_genre_film_cine", "musee_art_12m", "galerie_12m", "acces_internet", 
@@ -37,7 +37,7 @@ PC18_to_m <- clear_NA_to_m(PC18, list_var_match)
 
 model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
     DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
-    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    sorties_ami + VITENCOUPLE_r + logement +  
     freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
     film_stream_autre + film_DVD + film_num + nbr_genre_film + 
     freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
@@ -49,7 +49,7 @@ model_matching <- as.formula("stream_spe ~ SEXE_r + AGE + CRITREVENU_r + PCS_MEN
 
 model_matching_age_5 <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
     DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
-    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    sorties_ami + VITENCOUPLE_r + logement + 
     freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
     film_stream_autre + film_DVD + film_num + nbr_genre_film + 
     freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
@@ -503,11 +503,11 @@ Malheureusement il n'existe pas de solution qui satisface nos conditions d'age e
 
 
 
-tols_all_var = c(0.05, 0.01, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.01, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
-std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T)
 
@@ -526,11 +526,11 @@ Indiquer une STD mean dif plus faible pour l'age ne regle en rien le problème d
 
 ```{r}
 
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
-std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T)
 
@@ -558,11 +558,11 @@ On peut tout de même essayer avec la méthode cardinality, qui va effectuer un 
 
 ```{r}
 
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
-std.tols_all_var = c(T, T, T, T, T, T, T, T, T, T,
+std.tols_all_var = c(T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T, T, T,
   T, T, T, T, T, T, T, T)
 
@@ -793,7 +793,7 @@ sprintf("Ainsi, la prise en compte de la pondération revient à augmenter de %.
 ### Matching sans aucune prise en compte des poids de sondages
 
 ```{r}
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -812,7 +812,7 @@ bal.tab(res_match_template_no_w, binary = "std", thresholds = c(m = 0.05))
 ### Matching prise en compte des poids de sondages après matching
 
 ```{r}
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -838,7 +838,7 @@ bal.tab(res_match_template_w_after, binary = "std", thresholds = c(m = 0.05))
 SMD = 0.05
 
 ```{r}
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -863,7 +863,7 @@ bal.tab(res_match_template_w_before, binary = "std", thresholds = c(m = 0.05))
 ### Matching sans aucune prise en compte des poids de sondages
 
 ```{r}
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -882,7 +882,7 @@ bal.tab(res_match_card_no_w, binary = "std", thresholds = c(m = 0.05))
 ### Matching prise en compte des poids de sondages après matching
 
 ```{r}
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
   0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -908,7 +908,7 @@ bal.tab(res_match_card_w_after, binary = "std", thresholds = c(m = 0.05))
 SMD = 0.1
 
 ```{r}
-tols_all_var = c(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
+tols_all_var = c(0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
   0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
   0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,
   0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1,

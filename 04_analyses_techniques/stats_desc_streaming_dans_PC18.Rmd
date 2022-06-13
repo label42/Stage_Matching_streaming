@@ -1,0 +1,129 @@
+---
+title: "Le streaming des PC18"
+author: "Abel AUSSANT"
+date: "13/06/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(gt)
+library(gtsummary)
+
+
+source(here("02_import", "import_bases.R"))
+
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+
+PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND)
+```
+
+# Tri à plat modes d'écoute
+
+```{r}
+t_modes_ecoute <- PC18_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "stream_autre", "fichier_num", "cd_ou_cass", "vinyle", "radio", "tv"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(stream_spe ~ "Streaming sur une plateforme spécialisée (Spotify, Deezer, Qobuz, etc.)",
+                 stream_autre ~ "Streaming sur une autre plateforme",
+                 fichier_num ~ "Fichiers numériques (MP3 ou autre)",
+                 cd_ou_cass ~ "CD ou cassettes",
+                 vinyle ~ "Disques vinyles",
+                 radio ~ "Radio",
+                 tv ~ "Télévision"),
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1),
+                  all_categorical() ~ c(1,1))
+  ) %>%
+  bold_labels() %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Pourcentages pondérés. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_modes_ecoute
+```
+
+## Le streaming par type de plateformes
+
+# Croisement simples streaming et soc-dem
+
+```{r}
+t_stream_socdem <- PC18_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "AGE", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen",
+                SEXE_r ~ "Sexe",
+                 DIPLOME_r ~ "Niveau de diplôme",
+                 PCS_MENAGE ~ "PCS ménage"),
+    by = stream_spe,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                Chi² pour les variables catégorielles. Tests spécifiques aux données de sondage.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Pourcentages pondérés. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_socdem
+```
+
+#Croisement simples streaming et univers de goûts musicaux
+
+```{r}
+t_stream_gout <- PC18_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "cluster_gout_music"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(cluster_gout_music ~ "Univers de goûts"),
+    by = stream_spe,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                Chi² pour les variables catégorielles. Tests spécifiques aux données de sondage.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Pourcentages pondérés. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_gout
+```

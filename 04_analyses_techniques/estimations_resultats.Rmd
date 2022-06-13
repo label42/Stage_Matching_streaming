@@ -79,6 +79,84 @@ rownames(means) <- c("Avant matching","Après matching template", "Après matchi
 kableExtra::kable(means)
 ```
 
+```{r}
+ggplot(PC18_to_m) +
+  aes(x = recode_factor(as.factor(stream_spe),`0` = "Non",`1` = "Oui"), y = nbr_genre_music, weight = PC18_to_m$POND) +
+  geom_boxplot() +
+  stat_summary(fun.y=mean, geom="point", shape=20, size=5, color="red", fill="red") +
+  scale_y_continuous(breaks = seq(0, 12, by = 1), limits = c(0, 12)) +
+  ggtitle(html("Boites à moustaches représentant le nombre de style musicaux écouté dans les deux groupes
+               Population non matchée (pondérée)")) +
+  xlab("Ecoute de la musique sur une plateforme de streaming spécialisée (Spotify, Deezer, etc.)") +
+  ylab("Nombre de styles musicaux écoutés")
+
+ggplot(PC18_m) +
+  aes(x = recode_factor(as.factor(stream_spe),`0` = "Non",`1` = "Oui"), y = nbr_genre_music, weight = PC18_m$POND_m) +
+  geom_boxplot() +
+  stat_summary(fun.y=mean, geom="point", shape=20, size=5, color="red", fill="red") +
+  scale_y_continuous(breaks = seq(0, 12, by = 1), limits = c(0, 12)) +
+  ggtitle(html("Boites à moustaches représentant le nombre de style musicaux écouté dans les deux groupes
+               Population matchée (pondérée)")) +
+  xlab("Ecoute de la musique sur une plateforme de streaming spécialisée (Spotify, Deezer, etc.)") +
+  ylab("Nombre de styles musicaux écoutés")
+
+  
+```
+
+
+```{r}
+mean_genre_unm <- PC18_to_m_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_music", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
+                 nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student",
+                                all_stat_cols() ~ "Moyenne et écart type pondérés"))
+
+
+mean_genre_m <- PC18_m_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_music", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
+                 nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student",
+                                all_stat_cols() ~ "Moyenne et écart type pondérés"))
+
+t_comp_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  tab_header(title = "Comparaison du nombre de style musicaux écoutés entre streameurs et non streameurs") %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_m
+```
+
+
 On constate une différence importante avant matching (plus de 1,2), mais très faible après matching (environ 0,2). Peu de différence entre les méthodes template et propensity score 5 to 1.
 
 ## Regression sans prise en compte des covariables
