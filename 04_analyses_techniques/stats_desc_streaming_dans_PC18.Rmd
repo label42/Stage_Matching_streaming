@@ -13,6 +13,10 @@ library(tidyverse)
 library(here)
 library(gt)
 library(gtsummary)
+library(extrafont)
+library(ggpubr)
+loadfonts(device = "win")
+
 
 
 source(here("02_import", "import_bases.R"))
@@ -26,10 +30,12 @@ PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND
 
 ```{r}
 t_modes_ecoute <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
   tbl_svysummary(
-    include = c("stream_spe", "stream_autre", "fichier_num", "cd_ou_cass", "vinyle", "radio", "tv"), #L'ensemble des variables que l'on veut dans le tableau
+    include = c("stream_spe", "stream_autre", "stream_all", "fichier_num", "cd_ou_cass", "vinyle", "radio", "tv"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(stream_spe ~ "Streaming sur une plateforme spécialisée (Spotify, Deezer, Qobuz, etc.)",
                  stream_autre ~ "Streaming sur une autre plateforme",
+                 stream_all ~ "Streaming sur au moins un type de plateformes",
                  fichier_num ~ "Fichiers numériques (MP3 ou autre)",
                  cd_ou_cass ~ "CD ou cassettes",
                  vinyle ~ "Disques vinyles",
@@ -37,9 +43,9 @@ t_modes_ecoute <- PC18_survey %>%
                  tv ~ "Télévision"),
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ({sd})",
-                     all_categorical() ~ "{p} %"),
+                     all_categorical() ~ "{p} % N = {n_unweighted}"),
     digits = list(all_continuous() ~ c(1,1),
-                  all_categorical() ~ c(1,1))
+                  all_categorical() ~ c(1,0))
   ) %>%
   bold_labels() %>%
   modify_footnote(update = everything() ~ NA) %>%
@@ -57,21 +63,52 @@ t_modes_ecoute
 
 ## Le streaming par type de plateformes
 
+```{r}
+t_type_plateforme <- PC18_survey %>%
+  subset(!is.na(type_plateforme_stream)) %>%
+  tbl_svysummary(
+    include = c("type_plateforme_stream"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(type_plateforme_stream ~ "Type de plateforme mobilisée pour écouter de la musique en streaming"),
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1),
+                  all_categorical() ~ c(1,1))
+  ) %>%
+  bold_labels() %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Pourcentages pondérés. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_type_plateforme
+```
+
+
 # Croisement simples streaming et soc-dem
 
+
+## croisement écoute plateformes spé
 ```{r}
 t_stream_socdem <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
   tbl_svysummary(
-    include = c("stream_spe", "AGE", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(AGE ~ "Age moyen",
+    include = c("stream_spe", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen (écart-type)",
+                 AGE_r ~ "Age en tranche",
                 SEXE_r ~ "Sexe",
                  DIPLOME_r ~ "Niveau de diplôme",
                  PCS_MENAGE ~ "PCS ménage"),
     by = stream_spe,
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ({sd})",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
                      all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(1,1))
+    digits = list(all_continuous() ~ c(0,0))
   ) %>%
   add_overall() %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
@@ -94,10 +131,226 @@ t_stream_socdem <- PC18_survey %>%
 t_stream_socdem
 ```
 
+### Plot proportion de streameurs par classe d'âge
+
+```{r}
+subset(PC18, !is.na(stream_spe)) %>%
+  count(AGE_r, stream_spe, wt = POND) %>% 
+  group_by(AGE_r) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1) %>% 
+ggplot() + 
+    aes(x = AGE_r, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %")) +
+  xlab("Age en tranche") +
+  theme(text=element_text(size = 16, family="serif"),
+        axis.text.x = element_text(face="bold"))
+
+subset(PC18, stream_spe == 1) %>%
+ggplot() + 
+    aes(x = AGE,  weight = POND) + 
+    geom_density()
+
+
+subset(PC18, !is.na(stream_spe) & AGE <= 75) %>%
+  count(AGE, stream_spe, wt = POND) %>% 
+  group_by(AGE) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1) %>% 
+ggplot() + 
+    aes(x = AGE, y = f) + 
+    geom_point(color = "black", fill = "cornflowerblue") +
+  stat_smooth(method = "lm",
+              formula = y ~ x,
+              geom = "smooth") +
+  stat_cor(aes(label = ..rr.label.., label.y = 0.9)) +
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %")) +
+  xlab("Age") +
+  theme(text=element_text(size = 16, family="serif"),
+        axis.text.x = element_text(face="bold"))
+
+```
+
+
+### Plot proportion de streameurs par Diplome
+
+Chez tous les auditeurs de musique
+
+```{r}
+subset(PC18, !is.na(stream_spe)) %>%
+  count(DIPLOME_r, stream_spe, wt = POND) %>% 
+  group_by(DIPLOME_r) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1 & !is.na(DIPLOME_r)) %>% 
+ggplot() + 
+    aes(x = DIPLOME_r, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %")) +
+  xlab("Niveau de diplôme") +
+  theme(text=element_text(size = 16, family="serif"),
+        axis.text.x = element_text(face="bold"))
+
+```
+
+
+Chez les 25 - 60 uniquement
+
+```{r}
+subset(PC18, !is.na(stream_spe & AGE >= 25 & AGE <= 60)) %>%
+  count(DIPLOME_r, stream_spe, wt = POND) %>% 
+  group_by(DIPLOME_r) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1 & !is.na(DIPLOME_r)) %>% 
+ggplot() + 
+    aes(x = DIPLOME_r, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 1), breaks = seq(0, 1, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %", "80 %", "90 %", "100 %")) +
+  xlab("Niveau de diplôme") +
+  theme(text=element_text(size = 16, family="serif"),
+        axis.text.x = element_text(face="bold"))
+
+```
+
+
+
+
+### Plot proportion de streameurs par PCS menage
+
+Chez tous les auditeurs
+
+```{r}
+subset(PC18, !is.na(stream_spe)) %>%
+  count(PCS_MENAGE, stream_spe, wt = POND) %>% 
+  group_by(PCS_MENAGE) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1 & !is.na(PCS_MENAGE)) %>% 
+ggplot() + 
+    aes(x = PCS_MENAGE, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 0.7), breaks = seq(0, 0.7, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %")) +
+  scale_x_discrete(labels = c("Dominante\ncadre", "Dominante\nintermédiaire", "Dominante\nindépendante",
+                              "Dominante\nemployée", "Dominante\nouvrière", "Un employé\nou ouvrier", "Inactif\n(hors retraités)")) +
+  xlab("PCS ménage") +
+    theme(text = element_text(size = 16, family="serif"),
+          axis.text.x = element_text(face="bold", 
+                           size=10))
+
+
+```
+
+Chez les 25 - 60 uniquement
+
+```{r}
+subset(PC18, !is.na(stream_spe) & AGE >= 25 & AGE <= 60) %>%
+  count(PCS_MENAGE, stream_spe, wt = POND) %>% 
+  group_by(PCS_MENAGE) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1 & !is.na(PCS_MENAGE)) %>% 
+ggplot() + 
+    aes(x = PCS_MENAGE, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 0.7), breaks = seq(0, 0.7, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %")) +
+  scale_x_discrete(labels = c("Dominante\ncadre", "Dominante\nintermédiaire", "Dominante\nindépendante",
+                              "Dominante\nemployée", "Dominante\nouvrière", "Un employé\nou ouvrier", "Inactif\n(hors retraités)")) +
+  xlab("PCS ménage") +
+    theme(text = element_text(size = 16, family="serif"),
+          axis.text.x = element_text(face="bold", 
+                           size=10))
+
+
+```
+
+
+### Plot proportion de streameurs par sexe
+
+```{r}
+subset(PC18, !is.na(stream_spe)) %>%
+  count(SEXE_r, stream_spe, wt = POND) %>% 
+  group_by(SEXE_r) %>% 
+  mutate(f = n/sum(n)) %>% 
+  filter(stream_spe == 1 & !is.na(SEXE_r)) %>% 
+ggplot() + 
+    aes(x = SEXE_r, y = f) + 
+    geom_col(color = "black", fill = "cornflowerblue") +
+  geom_text(aes(label = round(f * 100)), vjust = - 0.5, colour = "black") +
+
+  scale_y_continuous(limits = c(0, 0.7), breaks = seq(0, 0.7, by = 0.1), name = "Proportion de streameurs", 
+                     labels = c("0 %", "10 %", "20 %", "30 %", "40 %", "50 %", "60 %", "70 %")) +
+  scale_x_discrete(labels = c("Femmes", "Hommes")) +
+  xlab("Sexe") +
+    theme(text = element_text(size = 16, family="serif"),
+          axis.text.x = element_text(face="bold", 
+                           size=10))
+
+
+```
+
+
+
+
+## Différents types de plateformes
+
+```{r}
+t_stream_socdem <- PC18_survey %>%
+  subset(!is.na(type_plateforme_stream)) %>%
+  tbl_svysummary(
+    include = c("type_plateforme_stream", "AGE", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen",
+                SEXE_r ~ "Sexe",
+                 DIPLOME_r ~ "Niveau de diplôme",
+                 PCS_MENAGE ~ "PCS ménage"),
+    by = type_plateforme_stream,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(stat_1 ~ html("**{level}**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**{level}**<br> N = {n_unweighted}"),
+                              stat_3 ~ html("**{level}**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                Chi² pour les variables catégorielles. Tests spécifiques aux données de sondage.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Pourcentages pondérés. Effectifs non pondérés.
+                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_socdem
+```
+
+
+
 #Croisement simples streaming et univers de goûts musicaux
 
 ```{r}
 t_stream_gout <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
   tbl_svysummary(
     include = c("stream_spe", "cluster_gout_music"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(cluster_gout_music ~ "Univers de goûts"),

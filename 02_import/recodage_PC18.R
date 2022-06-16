@@ -714,6 +714,27 @@ PC18$music_TLJ <- fct_recode(PC18$music_TLJ,
 )
 PC18$music_TLJ <- as.numeric(as.character(PC18$music_TLJ))
 
+## Recodage de PC18$E18 en PC18$E18_rec
+PC18$music_ellememe <- PC18$E18 %>%
+  as.character() %>%
+  fct_recode(
+    "Tous les jours" = "1",
+    "De temps en temps" = "2",
+    "Rarement" = "3",
+    "Jamais" = "4",
+    NULL = "5"
+  )
+
+## Recodage de PC18$E19 en PC18$E19_rec
+PC18$music_manque <- PC18$E19 %>%
+  as.character() %>%
+  fct_recode(
+    "Oui, beaucoup" = "1",
+    "Oui, un peu" = "2",
+    "Non" = "3",
+    "Non" = "4",
+    NULL = "5"
+  )
 
 
 ### Modes d'écoute
@@ -727,12 +748,17 @@ PC18$stream_spe <- PC18$E83
 
 PC18$stream_autre <- PC18$E84
 
+PC18 <- PC18 %>% mutate(    
+  stream_all = case_when(
+    stream_spe == 1 | stream_autre == 1 ~ 1,
+    stream_spe == 0 & stream_autre ==  0 ~  0
+  ))
+
 PC18$fichier_num <- PC18$E85
 
 PC18$radio <- PC18$E86
 
 PC18$tv <- PC18$E87
-
 
 # type de plateforme
 PC18 <- PC18 %>% mutate(    
@@ -742,6 +768,8 @@ PC18 <- PC18 %>% mutate(
     stream_autre == 1 ~ "Non-spécialisées uniquement",
   ))
 PC18$type_plateforme_stream <- as.factor(PC18$type_plateforme_stream)
+
+
 
 
 #Variable synthétique nbr styles écoutés
@@ -758,6 +786,21 @@ PC18$ecoute_variet_inter <- PC18$E1004
 PC18$ecoute_rap <- PC18$E1007
 
 PC18$ecoute_classiq <- PC18$E1012
+
+# variable synthétique nombre de genre aimé particulièrement
+list <- c("E1201", "E1202", "E1203", "E1204", "E1205", "E1206", "E1207", 
+          "E1208", "E1209", "E1210", "E1211", "E1212", "E1213")
+
+PC18$nbr_genre_aime <- rowSums(PC18[,list])
+PC18$nbr_genre_aime[is.na(PC18$nbr_genre_aime)] <- 0
+
+
+list <- c("E1301", "E1302", "E1303", "E1304", "E1305", "E1306", "E1307", 
+          "E1308", "E1309", "E1310", "E1311", "E1312", "E1313")
+
+PC18$nbr_genre_deteste <- rowSums(PC18[,list])
+PC18$nbr_genre_deteste[is.na(PC18$nbr_genre_deteste)] <- 0
+
 
 # Variable synthétique nombre d'artiste déjà écouté parmis la liste
 

@@ -16,7 +16,7 @@ library(sandwich)
 library(gt)
 library(gtsummary)
 library(boot)
-
+library(gurobi)
 
 source(here("02_import", "import_bases.R"))
 
@@ -24,7 +24,7 @@ source(here("03_scripts", "matching_final.R"))
 
 covar_formula <- "SEXE_r + AGE + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + DIPLOME_r + 
     naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + 
-    sorties_ami + VITENCOUPLE_r + logement + music_amateur + 
+    sorties_ami + VITENCOUPLE_r + logement +  
     freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
     film_stream_autre + film_DVD + film_num + nbr_genre_film + 
     freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
@@ -107,8 +107,10 @@ ggplot(PC18_m) +
 ```{r}
 mean_genre_unm <- PC18_to_m_survey %>%
   tbl_svysummary(
-    include = c("stream_spe", "nbr_genre_music", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
+    include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
+                 nbr_genre_aime ~ "Nombre de styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Nombre de styles detestés",
                  nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
@@ -125,8 +127,10 @@ mean_genre_unm <- PC18_to_m_survey %>%
 
 mean_genre_m <- PC18_m_survey %>%
   tbl_svysummary(
-    include = c("stream_spe", "nbr_genre_music", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
+    include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
+                 nbr_genre_aime ~ "Nombre de styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Nombre de styles detestés",
                  nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
