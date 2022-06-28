@@ -44,7 +44,7 @@ PC18_m_1to1_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_1to1, weigh
 
 ```
 
-#Diversité des goûts et dégoûts
+# Diversité des goûts et dégoûts
 
 ## Moyennes
 
@@ -52,49 +52,58 @@ PC18_m_1to1_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_1to1, weigh
 mean_genre_unm <- PC18_to_m_survey %>%
   tbl_svysummary(
     include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
-                 nbr_genre_aime ~ "Nombre de styles particulièrement aimés",
-                 nbr_genre_deteste ~ "Nombre de styles detestés",
-                 nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
+    label = list(nbr_genre_music ~ "Styles musicaux écoutés",
+                 nbr_genre_aime ~ "Styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Styles detestés",
+                 nbr_artiste_ecoute ~ "Artistes écoutés"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_continuous() ~ c(1,1))
   ) %>%
   add_p(test = everything() ~ "svy.t.test") %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student",
-                                all_stat_cols() ~ "Moyenne et écart type pondérés"))
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 
 mean_genre_m <- PC18_m_survey %>%
   tbl_svysummary(
     include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste", "nbr_artiste_ecoute"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(nbr_genre_music ~ "Nombre de styles musicaux écoutés",
-                 nbr_genre_aime ~ "Nombre de styles particulièrement aimés",
-                 nbr_genre_deteste ~ "Nombre de styles detestés",
-                 nbr_artiste_ecoute ~ "Nombre d'artistes écoutés"),
+    label = list(nbr_genre_music ~ "Styles musicaux écoutés",
+                 nbr_genre_aime ~ "Styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Styles detestés",
+                 nbr_artiste_ecoute ~ "Artistes écoutés"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ({sd})"),
     digits = list(all_continuous() ~ c(1,1))
   ) %>%
   add_p(test = everything() ~ "svy.t.test") %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student",
-                                all_stat_cols() ~ "Moyenne et écart type pondérés"))
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 t_comp_m <- tbl_merge(
     tbls = list(mean_genre_unm, mean_genre_m),
     tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
   ) %>% as_gt() %>%
-  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Effectifs non pondérés.
-                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
-  tab_header(title = "Comparaison diversité des goûts entre streameurs et non streameurs") %>%
+  tab_footnote(
+    footnote = "Moyenne et écart type pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que les non-utilisateurs de plateformes de streaming spécialisées écoutent en moyenne 3,8 (écart-type 2,2) genres musicaux différents. Ceux qui pratiquent l'écoute en streaming déclarent eux écouter 5 styles musicaux différents en moyenne (écart-type 2,5).
+                                     <br> Dans la population matchée en revanche, on observe des écarts beaucoup plus faibles. Ainsi, quand on raisonne toutes choses égales par ailleurs, les non-streameurs écoutent 4,8 styles musicaux différents en moyenne (écart-type 2,5), alors que les streameurs en écoutent 5 (écart-type 2,5).</p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -237,19 +246,19 @@ mean_genre_unm <- PC18_to_m_survey %>%
   tbl_svysummary(
         include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
                 "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "Ecoute variété française",
-                 E1002 ~ "Ecoute musique du monde",
-                 E1003 ~ "Ecoute musique traditionnelle",
-                 E1004 ~ "Ecoute variété internationnale",
-                 E1005 ~ "Ecoute RnB",
-                 E1006 ~ "Ecoute électro/techno",
-                 E1007 ~ "Ecoute hip hop/rap",
-                 E1008 ~ "Ecoute metal/Hard rock",
-                 E1009 ~ "Ecoute pop/rock",
-                 E1010 ~ "Ecoute jazz",
-                 E1011 ~ "Ecoute opera",
-                 E1012 ~ "Ecoute musique classique",
-                 E1013 ~ "Ecoute autre(s) genre(s) de musique"),
+    label = list(E1001 ~ "Variété française",
+                 E1002 ~ "Musique du monde",
+                 E1003 ~ "Musique traditionnelle",
+                 E1004 ~ "Variété internationnale",
+                 E1005 ~ "RnB",
+                 E1006 ~ "Electro/techno",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal/Hard rock",
+                 E1009 ~ "Pop/rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Musique classique",
+                 E1013 ~ "Autre(s) genre(s) de musique"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
         statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -258,51 +267,60 @@ mean_genre_unm <- PC18_to_m_survey %>%
   ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 
 mean_genre_m <- PC18_m_survey %>%
   tbl_svysummary(
         include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
                 "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "Ecoute variété française",
-                 E1002 ~ "Ecoute musique du monde",
-                 E1003 ~ "Ecoute musique traditionnelle",
-                 E1004 ~ "Ecoute variété internationnale",
-                 E1005 ~ "Ecoute RnB",
-                 E1006 ~ "Ecoute électro/techno",
-                 E1007 ~ "Ecoute hip hop/rap",
-                 E1008 ~ "Ecoute metal/Hard rock",
-                 E1009 ~ "Ecoute pop/rock",
-                 E1010 ~ "Ecoute jazz",
-                 E1011 ~ "Ecoute opera",
-                 E1012 ~ "Ecoute musique classique",
-                 E1013 ~ "Ecoute autre(s) genre(s) de musique"),
+    label = list(E1001 ~ "Variété française",
+                 E1002 ~ "Musique du monde",
+                 E1003 ~ "Musique traditionnelle",
+                 E1004 ~ "Variété internationnale",
+                 E1005 ~ "RnB",
+                 E1006 ~ "Electro/techno",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal/Hard rock",
+                 E1009 ~ "Pop/rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Musique classique",
+                 E1013 ~ "Autre(s) genre(s) de musique"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
                      all_categorical() ~ "{p} %"),
     digits = list(all_continuous() ~ c(0,0))
   ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 t_comp_genre_ecoute_m <- tbl_merge(
     tbls = list(mean_genre_unm, mean_genre_m),
     tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
   ) %>% as_gt() %>%
-  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Effectifs non pondérés.
-                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
-  tab_header(title = "Comparaison proportion écoute par genre entre streameurs et non streameurs") %>%
+  tab_footnote(
+    footnote = "Pourcentage pondéré.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que 82 % des non-utilisateurs de plateformes de streaming spécialisées écoutent de la variété française. 73 % de ceux qui pratiquent l'écoute en streaming déclarent en écouter.
+                                     <br> Dans la population matchée en revanche, on observe pas d'écart significatif entre les deux groupes. Ainsi, quand on raisonne toutes choses égales par ailleurs, 73 % des non-streameurs et des streameurs écoutent de la variété française.</p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -588,11 +606,12 @@ mean_classe_unm <- PC18_to_m_survey %>%
   ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Classe d'appartenance :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
   modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 
 mean_classe_m <- PC18_m_survey %>%
@@ -604,24 +623,33 @@ mean_classe_m <- PC18_m_survey %>%
                  emerg_pop ~ "Emergeant populaire"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
                      all_categorical() ~ "{p} %"),
     digits = list(all_continuous() ~ c(0,0))
   ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
-  modify_header(update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+  modify_header(label = "**Classe d'appartenance :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
   modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 t_comp_classe_m <- tbl_merge(
     tbls = list(mean_classe_unm, mean_classe_m),
     tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
   ) %>% as_gt() %>%
-  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Effectifs non pondérés.
-                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
+  tab_footnote(
+    footnote = "Pourcentage pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que 22 % des non-utilisateurs de plateformes de streaming spécialisées appartiennent à la classe d'univers de goût établi légitime. 10 % de ceux qui pratiquent l'écoute en streaming appartiennent à cette classe.
+                                     <br> Dans la population matchée en revanche, on observe des écarts beaucoup plus faibles. Ainsi, quand on raisonne toutes choses égales par ailleurs, 14 % des non-streameurs appartiennent à la classe établi légitime, alors que les streameurs sont 10 % à y appartenir.</p>")) %>%
   tab_header(title = "Comparaison proportion écoute par artiste entre streameurs et non streameurs") %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
@@ -653,7 +681,7 @@ mean_prat_unm <- PC18_to_m_survey %>%
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
   modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 
 mean_prat_m <- PC18_m_survey %>%
@@ -674,15 +702,22 @@ mean_prat_m <- PC18_m_survey %>%
                               stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
   modify_footnote(update = everything() ~ NA) %>%
   modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi²",
-                                all_stat_cols() ~ "Pourcentages pondérés"))
+                                all_stat_cols() ~ "Effectifs non pondérés."))
 
 t_comp_prat_m <- tbl_merge(
     tbls = list(mean_prat_unm, mean_prat_m),
     tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
   ) %>% as_gt() %>%
-  tab_source_note(source_note = html("Source : Enquête Pratique culturelles des français 2018. Effectifs non pondérés.
-                                     <br> Champ : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.")) %>%
-  tab_header(title = "Comparaison proportion pratique d'écoute entre streameurs et non streameurs") %>%
+  tab_footnote(
+    footnote = "Pourcentage pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que 63 % des non-utilisateurs de plateformes de streaming spécialisées écoutent de la musique tous les jours. 83 % de ceux qui pratiquent l'écoute en streaming déclarent eux écouter tous les jours.
+                                     <br> Dans la population matchée en revanche, on observe des écarts beaucoup plus faibles. Ainsi, quand on raisonne toutes choses égales par ailleurs, 78 % des non-streameurs écoutent de la musique tous les jours, alors que les streameurs sont 83 % à le faire.</p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
