@@ -5,7 +5,7 @@ library(tidyverse)
 # list_var = Variables ne devant plus contenir aucune NA
 clear_NA_to_m = function(d_NA, list_var){
   
-
+  
   # On voit que matière diplome contient 6000+ NA, surement pas utile de garder la variable.
   d_NA <- subset(d_NA, select = -c(matiere_diplome))
   
@@ -30,6 +30,6 @@ clear_NA_to_m = function(d_NA, list_var){
   
   tmp <- sum(d_NA$POND)/nrow(d_NA) 
   d_NA$POND <- d_NA$POND/tmp
-
+  
   return(d_NA)
 }

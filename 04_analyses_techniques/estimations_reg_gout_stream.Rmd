@@ -1,0 +1,261 @@
+---
+title: "estimations_reg_goût_stream"
+author: "Abel AUSSANT"
+date: '2022-06-28'
+output: html_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(gt)
+library(gtsummary)
+library(extrafont)
+library(ggpubr)
+loadfonts(device = "win")
+
+
+
+source(here("02_import", "import_bases.R"))
+
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+
+PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND)
+```
+
+# Croisement simple stream apartenance classe
+
+```{r}
+t_stream_classCAH <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
+  tbl_svysummary(
+    include = c("stream_spe", "cluster_gout_music"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(cluster_gout_music ~ "Classe d'univers de goûts"),
+    by = stream_spe,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(
+    stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
+  p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                khi-2 pour les variables catégorielles.")) %>% 
+  as_gt() %>%
+  tab_footnote(
+    footnote = "Pourcentage pondérés.",
+    locations = cells_body(columns = stat_0,
+                           rows = 1)) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br> <u>Lecture</u> : Parmi les utilisateurs de plateformes de streaming spécialisées, 32 % ont entre 15 et 25 ans. En revanche, dans la population totale des gens déclarant écouter de la musique, les 15 - 25 ans ne représentent que 16 % des individus.</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_classCAH
+```
+# Regression appartenance classe X stream
+
+```{r}
+reg_etabli_legitime <- lm(etab_leg ~ stream_spe,
+                             data = PC18, weights = POND)
+
+reg_etabli_populaire <- lm(etab_pop ~ stream_spe,
+                             data = PC18, weights = POND)
+
+reg_emergent_legitime <- lm(emerg_leg ~ stream_spe,
+                             data = PC18, weights = POND)
+
+reg_emergent_populaire <- lm(emerg_pop ~ stream_spe,
+                             data = PC18, weights = POND)
+
+tbl_reg_etabli_legitime <- reg_etabli_legitime %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées" 
+                              ),
+                 intercept = T,
+                 include = c("stream_spe")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+
+tbl_reg_etabli_populaire <- reg_etabli_populaire %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées" 
+                              ),
+                 intercept = T,
+                 include = c("stream_spe")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_emergent_legitime <- reg_emergent_legitime %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées" 
+                              ),
+                 intercept = T,
+                 include = c("stream_spe")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_emergent_populaire <- reg_emergent_populaire %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées" 
+                             ),
+                 intercept = T,
+                 include = c("stream_spe")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_cluster_gout <-
+  tbl_merge(
+    tbls = list(tbl_reg_etabli_legitime, tbl_reg_etabli_populaire, tbl_reg_emergent_legitime, tbl_reg_emergent_populaire),
+    tab_spanner = c("**Etabli légitime**", "**Etabli populaire**", "**Emergent légitime**", "**Emergent populaire**")
+  ) %>%
+  as_gt() %>%
+  # cols_label(
+  #   estimate = md("**Coef. de probabilit?**"),
+  #   ci = md("**IC 95%**")
+  # ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018. Données pondérées.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> :  Il s'agit de quatre modèles de probabilité linéaire présentés cote à cote. Les variations du coeficient beta correspondent à des variations dans la probabilité d'appartenir à une classe de goût plutôt qu'à n'importe quelle autre.
+                                     Une variation de 0,1 correspond donc à une augmentation de 10 % de la probabilité d'appartenir à une catégorie.
+                                     Ainsi, le fait de pratiquer le streaming réduit la probabilité d'appartenir à l'univers de goûts établit légitime de 11 %, mais
+                                     augmente la probabilité d'appartenir à l'univers de goûts émergent légitime de 17 %, toutes choses inégales par ailleurs .</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+
+tbl_reg_cluster_gout
+```
+
+# Regression appartenance classe, stream, age, sexe, diplome.
+
+```{r}
+reg_etabli_legitime <- lm(etab_leg ~ stream_spe + SEXE_r + AGE_r + DIPLOME_r,
+                             data = PC18, weights = POND)
+
+reg_etabli_populaire <- lm(etab_pop ~ stream_spe + SEXE_r + AGE_r + DIPLOME_r,
+                             data = PC18, weights = POND)
+
+reg_emergent_legitime <- lm(emerg_leg ~ stream_spe + SEXE_r + AGE_r + DIPLOME_r,
+                             data = PC18, weights = POND)
+
+reg_emergent_populaire <- lm(emerg_pop ~ stream_spe + SEXE_r + AGE_r + DIPLOME_r,
+                             data = PC18, weights = POND)
+
+tbl_reg_etabli_legitime <- reg_etabli_legitime %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées", 
+                              SEXE_r ~ "Sexe",
+                              AGE_r ~ "Age",
+                              DIPLOME_r ~ "Niveau de diplôme"),
+                 intercept = T,
+                 include = c("stream_spe", "AGE_r", "SEXE_r", "DIPLOME_r")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+
+tbl_reg_etabli_populaire <- reg_etabli_populaire %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées", 
+                              SEXE_r ~ "Sexe",
+                              AGE_r ~ "Age",
+                              DIPLOME_r ~ "Niveau de diplôme"),
+                 intercept = T,
+                 include = c("stream_spe", "AGE_r", "SEXE_r", "DIPLOME_r")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_emergent_legitime <- reg_emergent_legitime %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées", 
+                              SEXE_r ~ "Sexe",
+                              AGE_r ~ "Age",
+                              DIPLOME_r ~ "Niveau de diplôme"),
+                 intercept = T,
+                 include = c("stream_spe", "AGE_r", "SEXE_r", "DIPLOME_r")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_emergent_populaire <- reg_emergent_populaire %>%
+  tbl_regression(label = list(stream_spe ~ "Utlisation des plateformes de streaming spécialisées", 
+                              SEXE_r ~ "Sexe",
+                              AGE_r ~ "Age",
+                              DIPLOME_r ~ "Niveau de diplôme"),
+                 intercept = T,
+                 include = c("stream_spe", "AGE_r", "SEXE_r", "DIPLOME_r")) %>%
+  modify_footnote(update = list(estimate ~ NA
+  ),abbreviation = TRUE) %>%
+  modify_column_hide(ci) %>%
+  bold_p() %>%
+  bold_labels()
+
+
+tbl_reg_cluster_gout <-
+  tbl_merge(
+    tbls = list(tbl_reg_etabli_legitime, tbl_reg_etabli_populaire, tbl_reg_emergent_legitime, tbl_reg_emergent_populaire),
+    tab_spanner = c("**Etabli légitime**", "**Etabli populaire**", "**Emergent légitime**", "**Emergent populaire**")
+  ) %>%
+  as_gt() %>%
+  # cols_label(
+  #   estimate = md("**Coef. de probabilit?**"),
+  #   ci = md("**IC 95%**")
+  # ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018. Données pondérées.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> :  Il s'agit de quatre modèles de probabilité linéaire présentés cote à cote. Les variations du coeficient beta entre les 
+                                     modalités d'une variable correspondent à des variations dans la probabilité d'appartenir à une classe de goût plutôt qu'à n'importe quelle autre.
+                                     Une variation de 0,1 correspond donc à une augmentation de 10 % de la probabilité d'appartenir à une catégorie.
+                                     Ainsi, le fait d'être un homme plutôt qu'une femme, réduit la probabilité d'appartenir à l'univers de goûts établit légitime de 4 %, mais
+                                     augmente la probabilité d'appartenir à l'univers de goûts émergent légitime de 10 %, cela, à âge, diplôme et utilisation des plateformes égales.</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+
+tbl_reg_cluster_gout
+```
+

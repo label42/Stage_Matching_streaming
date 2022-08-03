@@ -26,7 +26,7 @@ theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
 PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND)
 ```
 
-# Tri à plat modes d'écoute
+# Tri à plat modes d'écoute musique
 
 ```{r}
 t_modes_ecoute <- PC18_survey %>%
@@ -52,7 +52,7 @@ modify_header(label = "**Ecoute de la musique via :**") %>%
   modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
     as_gt() %>%
  tab_source_note(source_note = html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
                                      <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
                                      <br><u>Lecture</u> : Dans la population totale des auditeurs de musique, 31 % déclarent utiliser les plateformes de streaming spécialisées (Spotify, Deezer, Qobuz, etc).</p>")) %>%
     tab_footnote(
@@ -151,7 +151,7 @@ t_type_plateforme
 ```
 
 
-# Croisement simples streaming et soc-dem
+# Croisement simples streaming musique et soc-dem
 
 
 ## croisement écoute plateformes spé

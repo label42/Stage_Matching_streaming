@@ -1,0 +1,152 @@
+---
+title: "Statisitiques descriptives goûts musicaux dans PC18"
+author: "Abel AUSSANT"
+date: '2022-07-07'
+output: html_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(gt)
+library(gtsummary)
+library(extrafont)
+library(ggpubr)
+loadfonts(device = "win")
+
+
+
+source(here("02_import", "import_bases.R"))
+
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+
+PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND)
+
+PC18_prat_survey <- subset(PC18_survey, music_12m != "Jamais")
+```
+
+# Tri à plat styles musicaux dans PC18
+
+## Ecoute simple
+
+```{r}
+tab_ecoute <- PC18_prat_survey %>%
+  tbl_svysummary(
+        include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
+                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Variété française",
+                 E1002 ~ "Musique du monde",
+                 E1003 ~ "Musique traditionnelle",
+                 E1004 ~ "Variété internationnale",
+                 E1005 ~ "RnB",
+                 E1006 ~ "Electro/techno",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal/Hard rock",
+                 E1009 ~ "Pop/rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Musique classique",
+                 E1013 ~ "Autre(s) genre(s) de musique"),
+missing = "ifany",
+        statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))) %>%
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_0 ~ html("N = {N_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(all_stat_cols() ~ "Effectifs non pondérés.")) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enqu?te pratique culturelles des fran?ais 2018. Donn?es pond?r?es pour les pourcentages.
+                                     <br>Champ : R?sidants en France ?g?s de plus de 15 ans d?clarant ?couter de la musique.
+                                     <br>Lecture : 80,6 % des enqu?t?s d?clarant ?couter de la musique ?coutent de la vari?t? fran?aise.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab_ecoute
+```
+
+## Amoure
+
+```{r}
+tab_aime <- PC18_prat_survey %>%
+  tbl_svysummary(
+            include = c("E1201", "E1202", "E1203", "E1204", "E1205", "E1206", "E1207", 
+                "E1208", "E1209", "E1210", "E1211", "E1212", "E1213"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1201 ~ "Variété française",
+                 E1202 ~ "Musique du monde",
+                 E1203 ~ "Musique traditionnelle",
+                 E1204 ~ "Variété internationnale",
+                 E1205 ~ "RnB",
+                 E1206 ~ "Electro/techno",
+                 E1207 ~ "Hip hop/rap",
+                 E1208 ~ "Metal/Hard rock",
+                 E1209 ~ "Pop/rock",
+                 E1210 ~ "Jazz",
+                 E1211 ~ "Opera",
+                 E1212 ~ "Musique classique",
+                 E1213 ~ "Autre(s) genre(s) de musique"),
+missing = "ifany",
+        statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))) %>%
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_0 ~ html("N = {N_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(all_stat_cols() ~ "Effectifs non pondérés.")) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enqu?te pratique culturelles des fran?ais 2018. Donn?es pond?r?es pour les pourcentages.
+                                     <br>Champ : R?sidants en France ?g?s de plus de 15 ans d?clarant ?couter de la musique.
+                                     <br>Lecture : 80,6 % des enqu?t?s d?clarant ?couter de la musique ?coutent de la vari?t? fran?aise.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab_aime
+```
+
+
+## Deteste
+
+```{r}
+tab_det <- PC18_prat_survey %>%
+  tbl_svysummary(
+    include = c("E1301", "E1302", "E1303", "E1304", "E1305", "E1306", "E1307", 
+                "E1308", "E1309", "E1310", "E1311", "E1312", "E1313"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1301 ~ "Variété française",
+                 E1302 ~ "Musique du monde",
+                 E1303 ~ "Musique traditionnelle",
+                 E1304 ~ "Variété internationnale",
+                 E1305 ~ "RnB",
+                 E1306 ~ "Electro/techno",
+                 E1307 ~ "Hip hop/rap",
+                 E1308 ~ "Metal/Hard rock",
+                 E1309 ~ "Pop/rock",
+                 E1310 ~ "Jazz",
+                 E1311 ~ "Opera",
+                 E1312 ~ "Classique",
+                 E1313 ~ "Autre(s) genre(s) de musique"),
+missing = "ifany",
+        statistic = list(all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))) %>%
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_0 ~ html("N = {N_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(all_stat_cols() ~ "Effectifs non pondérés.")) %>%
+  as_gt() %>%
+  tab_source_note(source_note = html("Source : Enqu?te pratique culturelles des fran?ais 2018. Donn?es pond?r?es pour les pourcentages.
+                                     <br>Champ : R?sidants en France ?g?s de plus de 15 ans d?clarant ?couter de la musique.
+                                     <br>Lecture : 80,6 % des enqu?t?s d?clarant ?couter de la musique ?coutent de la vari?t? fran?aise.")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+tab_det
+```

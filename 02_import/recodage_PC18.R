@@ -113,6 +113,12 @@ PC18 <- PC18 %>% mutate(
   ))
 PC18$diplome_3p <- as.factor(PC18$diplome_3p)
 
+## Réordonnancement de PC18$diplome_3p
+PC18$diplome_3p <- PC18$diplome_3p %>%
+  fct_relevel(
+    "Inf. Bac", "Bac", "Sup. Bac"
+  )
+
 PC18 <- PC18 %>% mutate(    
   DIPLOME_r = case_when(
     DIPLOM == 1 ~ "Inf. Bac",
@@ -403,6 +409,41 @@ list <- c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607",
 PC18$nbr_genre_film <- rowSums(PC18[,list])
 PC18$nbr_genre_film[is.na(PC18$nbr_genre_film)] <- 0
 
+#Nombre genre film aimés
+list <- c("C2701", "C2702", "C2703", "C2704", "C2705", "C2706", "C2707", 
+          "C2708", "C2709", "C2710", "C2711", "C2712", "C2713", "C2714", "C2715", "C2716")
+
+PC18$nbr_genre_film_aime <- rowSums(PC18[,list])
+PC18$nbr_genre_film_aime[is.na(PC18$nbr_genre_film_aime)] <- 0
+
+#Nombre genre film detestés
+list <- c("C2801", "C2802", "C2803", "C2804", "C2805", "C2806", "C2807", 
+          "C2808", "C2809", "C2810", "C2811", "C2812", "C2813", "C2814", "C2815", "C2816")
+
+PC18$nbr_genre_film_deteste <- rowSums(PC18[,list])
+PC18$nbr_genre_film_deteste[is.na(PC18$nbr_genre_film_deteste)] <- 0
+
+
+# nombre de film vue dans la liste
+
+list <- c("C2901", "C2902", "C2903", "C2904", "C2905", "C2906", "C2907", "C2908", "C2909", "C2910", 
+          "C2911", "C2912", "C2913", "C2914")
+
+PC18$nbr_film_vu <- rowSums(PC18[,list])
+PC18$nbr_film_vu[is.na(PC18$nbr_film_vu)] <- 0
+
+
+## Recodage de PC18$C30 en PC18$C30_rec
+PC18$film_manque <- PC18$C30 %>%
+  as.character() %>%
+  fct_recode(
+    "Beaucoup" = "1",
+    "Un peu" = "2",
+    "Pas tellement" = "3",
+    "Pas du tout" = "4",
+    NULL = "5"
+  )
+
 
 ##### Séries 
 
@@ -426,6 +467,17 @@ PC18 <- PC18 %>% mutate(
     is.na(C331) ~ "Ne regarde pas de serie"
   ))
 PC18$equip_serie <- as.factor(PC18$equip_serie)
+
+
+PC18$serie_manque <- PC18$C42 %>%
+  as.character() %>%
+  fct_recode(
+    "Beaucoup" = "1",
+    "Un peu" = "2",
+    "Pas tellement" = "3",
+    "Pas du tout" = "4",
+    NULL = "5"
+  )
 
 
 #Meme remarque que pour les films
@@ -462,6 +514,31 @@ list <- c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807",
 
 PC18$nbr_genre_serie <- rowSums(PC18[,list])
 PC18$nbr_genre_serie[is.na(PC18$nbr_genre_serie)] <- 0
+
+# nombre de genres particulièrement aimés
+
+list <- c("C3901", "C3902", "C3903", "C3904", "C3905", "C3906", "C3907", 
+          "C3908", "C3909", "C3910", "C3911", "C3912", "C3913", "C3914", "C3915", "C3916")
+
+PC18$nbr_genre_serie_aime <- rowSums(PC18[,list])
+PC18$nbr_genre_serie_aime[is.na(PC18$nbr_genre_serie_aime)] <- 0
+
+# nombre de genres detestés
+
+list <- c("C4001", "C4002", "C4003", "C4004", "C4005", "C4006", "C4007", 
+          "C4008", "C4009", "C4010", "C4011", "C4012", "C4013", "C4014", "C4015", "C4016")
+
+PC18$nbr_genre_serie_deteste <- rowSums(PC18[,list])
+PC18$nbr_genre_serie_deteste[is.na(PC18$nbr_genre_serie_deteste)] <- 0
+
+# nombre de série vu dans la liste
+
+list <- c("C4101", "C4102", "C4103", "C4104", "C4105", "C4106", "C4107", 
+          "C4108", "C4109", "C4110", "C4111", "C4112", "C4113", "C4114", "C4115")
+
+PC18$nbr_serie_vu <- rowSums(PC18[,list])
+PC18$nbr_serie_vu[is.na(PC18$nbr_serie_vu)] <- 0
+
 
 ###################################
 #### Information et actualité #####
@@ -660,6 +737,26 @@ PC18$nbr_genre_ecoute_enfance[PC18$M214 == 1] <- 0
 #########################
 #### Cosmopolitisme #####
 #########################
+
+## Recodage de PC18$C24 en PC18$film_nonFR
+PC18$film_nonFR <- PC18$C24 %>%
+  as.character() %>%
+  fct_recode(
+    "0" = "2",
+    "0" = "3"
+  ) %>%
+  as.character() %>%
+  as.numeric()
+
+
+PC18$serie_nonFR <- PC18$C36 %>%
+  as.character() %>%
+  fct_recode(
+    "0" = "2",
+    "0" = "3"
+  ) %>%
+  as.character() %>%
+  as.numeric()
 
 # Variable synthétique audiovisuel (tv, film série) en langue autre que FR
 
@@ -1003,15 +1100,15 @@ PC18_acm <- PC18_acm %>% mutate(
   cluster_gout_music = case_when(
     cluster_gout_music == 1 ~ "Etabli légitime",
     cluster_gout_music == 2 ~ "Etabli populaire",
-    cluster_gout_music == 3 ~ "Emergeant légitime",
-    cluster_gout_music == 4 ~ "Emergeant populaire",
+    cluster_gout_music == 3 ~ "Emergent légitime",
+    cluster_gout_music == 4 ~ "Emergent populaire",
   ))
 
 ## R?ordonnancement de PC18_acm$cluster_gout_music
 PC18_acm$cluster_gout_music <- fct_relevel(
   PC18_acm$cluster_gout_music,
-  "Etabli légitime", "Etabli populaire", "Emergeant légitime",
-  "Emergeant populaire"
+  "Etabli légitime", "Etabli populaire", "Emergent légitime",
+  "Emergent populaire"
 )
 
 
@@ -1025,9 +1122,9 @@ PC18$etab_pop <- 0
 PC18$etab_pop[PC18$cluster_gout_music == "Etabli populaire"] <- 1 
 
 PC18$emerg_leg <- 0
-PC18$emerg_leg[PC18$cluster_gout_music == "Emergeant légitime"] <- 1 
+PC18$emerg_leg[PC18$cluster_gout_music == "Emergent légitime"] <- 1 
 
 PC18$emerg_pop <- 0
-PC18$emerg_pop[PC18$cluster_gout_music == "Emergeant populaire"] <- 1
+PC18$emerg_pop[PC18$cluster_gout_music == "Emergent populaire"] <- 1
 
 

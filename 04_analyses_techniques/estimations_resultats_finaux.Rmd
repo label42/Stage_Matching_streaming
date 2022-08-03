@@ -726,3 +726,61 @@ t_comp_prat_m <- tbl_merge(
 
 t_comp_prat_m
 ```
+
+# Effet variable en fonction de certaines catégories d'individus
+
+## Interaction avec l'age
+
+### nombre de styles écoutés
+
+Avant matching
+
+
+```{r}
+lm_nbr_genre_bfm <- lm(nbr_genre_music ~ stream_spe + AGE + stream_spe * AGE, PC18_to_m, weights = POND)
+
+coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
+
+
+
+lm_nbr_genre_bfm <- lm(nbr_genre_music ~ stream_spe + AGE_r + stream_spe * AGE_r, PC18_to_m, weights = POND)
+
+coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
+
+```
+
+
+Après matching
+
+```{r}
+lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe + AGE + stream_spe * AGE, PC18_m, weights = POND_m)
+
+coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+
+
+lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe + AGE_r + stream_spe * AGE_r, PC18_m, weights = POND_m)
+
+coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+```
+
+
+## Interaction avec le diplome
+
+### nombre de styles écoutés
+
+Avant matching
+
+```{r}
+lm_nbr_genre_bfm <- lm(nbr_genre_music ~ stream_spe + DIPLOME_r + stream_spe * DIPLOME_r, PC18_to_m, weights = POND)
+
+coeftest(lm_nbr_genre_bfm, vcov. = vcovHC)
+
+```
+
+Après matching
+
+```{r}
+lm_nbr_genre_afm <- lm(nbr_genre_music ~ stream_spe + DIPLOME_r + stream_spe * DIPLOME_r, PC18_m, weights = POND_m)
+
+coeftest(lm_nbr_genre_afm, vcov. = vcovHC)
+```
