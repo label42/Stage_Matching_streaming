@@ -1,0 +1,984 @@
+---
+title: "Paper outputs"
+author: "Abel AUSSANT"
+date: '2022-06-16'
+output: html_document
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+
+library(tidyverse)
+library(here)
+library(lmtest)
+library(sandwich)
+library(gt)
+library(gtsummary)
+library(boot)
+library(gurobi)
+library(MatchIt)
+library(cobalt)
+library(ggplot2)
+library(pwr)
+library(survey)
+
+source(here("02_import", "import_bases.R"))
+```
+
+#Description of streaming users population
+
+
+```{r}
+theme_gtsummary_language("fr", decimal.mark = ",", big.mark = " ")
+
+PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND)
+```
+
+## Music streaming
+
+
+### Prevalence of music streaming practice
+
+```{r}
+t_modes_ecoute <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
+  tbl_svysummary(
+    include = c("stream_spe"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(stream_spe ~ "Streaming sur une plateforme spécialisée (Spotify, Deezer, Qobuz, etc.)"),
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1),
+                  all_categorical() ~ c(0,0))
+  ) %>%
+modify_header(label = "**Ecoute de la musique via :**") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
+    as_gt() %>%
+ tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
+    <br><u>Données</u> : Pourcentages pondérés.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans la population totale des auditeurs de musique, 31 % déclarent utiliser les plateformes de streaming spécialisées (Spotify, Deezer, Qobuz, etc).</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_modes_ecoute
+```
+
+
+### soc-dem char X streaming music
+```{r}
+t_stream_socdem <- PC18_survey %>%
+  subset(!is.na(stream_spe)) %>%
+  tbl_svysummary(
+    include = c("stream_spe", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen (écart-type)",
+                 AGE_r ~ "Age en tranche",
+                SEXE_r ~ "Sexe",
+                 DIPLOME_r ~ "Niveau de diplôme"),
+    by = stream_spe,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(
+    stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
+  p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                khi-2 pour les variables catégorielles.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
+                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br> <u>Lecture</u> : Parmi les utilisateurs de plateformes de streaming spécialisées, 32 % ont entre 15 et 25 ans. En revanche, dans la population totale des gens déclarant écouter de la musique, les 15 - 25 ans ne représentent que 16 % des individus.</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_socdem
+```
+
+## Film
+
+### prevalence of film streaming practice
+
+```{r}
+t_modes_ecoute <- PC18_survey %>%
+  subset(freq_film != "Jamais") %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(film_stream_VOD ~ "Streaming VOD sur une plateforme spécialisée (netflix, canalPlay, OCS)"),
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1),
+                  all_categorical() ~ c(0,0))
+  ) %>%
+modify_header(label = "**Regarde des films via :**") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
+    as_gt() %>%
+ tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
+    <br><u>Données</u> : Pourcentages pondérés.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des films.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_modes_ecoute
+```
+
+## soc-dem X watching film on streaming plateforme
+
+```{r}
+t_stream_socdem <- PC18_survey %>%
+  subset(freq_film != "Jamais") %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen (écart-type)",
+                 AGE_r ~ "Age en tranche",
+                SEXE_r ~ "Sexe",
+                 DIPLOME_r ~ "Niveau de diplôme"),
+    by = film_stream_VOD,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(
+    stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
+  p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                khi-2 pour les variables catégorielles.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
+                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des films.
+                                     <br> <u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_socdem
+```
+
+## Show
+
+## prevalence of show streaming practice
+
+```{r}
+t_modes_ecoute <- PC18_survey %>%
+  subset(freq_serie != "Jamais") %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(serie_stream_VOD ~ "Streaming VOD sur une plateforme spécialisée (netflix, canalPlay, OCS)"),
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1),
+                  all_categorical() ~ c(0,0))
+  ) %>%
+modify_header(label = "**Regarde des séries via :**") %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
+    as_gt() %>%
+ tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
+    <br><u>Données</u> : Pourcentages pondérés.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des séries.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_modes_ecoute
+```
+
+### soc-dem X watching show on streaming plateformes
+
+```{r}
+t_stream_socdem <- PC18_survey %>%
+  subset(freq_serie != "Jamais") %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age moyen (écart-type)",
+                 AGE_r ~ "Age en tranche",
+                SEXE_r ~ "Sexe",
+                 DIPLOME_r ~ "Niveau de diplôme"),
+    by = serie_stream_VOD,
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_overall() %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  bold_labels() %>%
+  modify_header(update = list(
+    stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
+  p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
+                                khi-2 pour les variables catégorielles.")) %>% 
+  as_gt() %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
+                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des séries.
+                                     <br> <u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_stream_socdem
+```
+
+
+# Performing matching
+
+```{r}
+source(here("03_scripts", "matching_music.R"))
+source(here("03_scripts", "matching_film.R"))
+source(here("03_scripts", "matching_serie.R"))
+
+# DB survey
+
+##music
+PC18_to_m_music_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m_music, weights = PC18_to_m_music$POND)
+
+PC18_m_music_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_music, weights = PC18_m_music$POND_m)
+
+## film
+PC18_m_film_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_film, weights = PC18_m_film$POND_m)
+
+PC18_to_m_film_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m_film, weights = PC18_to_m_film$POND)
+
+## Show
+PC18_m_serie_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_serie, weights = PC18_m_serie$POND_m)
+
+PC18_to_m_serie_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m_serie, weights = PC18_to_m_serie$POND)
+```
+
+
+#Evaluating quality of matching
+
+## Music
+
+```{r}
+tab_eval_music <- bal.tab(res_match_template_stream_music, binary = "std", thresholds = c(m = 0.05))
+
+tab_eval_music
+
+allvar_mod <- c("SEXE_r_Homme",
+"AGE_5_r_15 - 20",
+"AGE_5_r_21 - 25",
+"AGE_5_r_26 - 30",
+"AGE_5_r_31 - 35",
+"AGE_5_r_36 - 40",
+"AGE_5_r_41 - 45",
+"AGE_5_r_46 - 50",
+"AGE_5_r_51 - 55",
+"AGE_5_r_56 - 60",
+"AGE_5_r_61 - 65",
+"AGE_5_r_66 - 70",
+"AGE_5_r_71 - 75",
+"AGE_5_r_76 - 80",
+"AGE_5_r_81+",
+"CRITREVENU_r_6000 ou plus",
+"CRITREVENU_r_De 1000 à 1199",
+"CRITREVENU_r_De 1200 à 1499",
+"CRITREVENU_r_De 1500 à 1999",
+"CRITREVENU_r_De 2000 à 2499",
+"CRITREVENU_r_De 2500 à 2999",
+"CRITREVENU_r_De 3000 à 3999",
+"CRITREVENU_r_De 4000 à 5999",
+"CRITREVENU_r_De 800 à 999",
+"CRITREVENU_r_Moins de 800",
+"CRITREVENU_r_Manquant",
+"PCS_MENAGE_Dominante cadre",
+"PCS_MENAGE_Dominante intermédiaire",
+"PCS_MENAGE_Dominante indépendante",
+"PCS_MENAGE_Dominante employée",
+"PCS_MENAGE_Dominante ouvrière",
+"PCS_MENAGE_Un employé ou ouvrier",
+"PCS_MENAGE_Inactifs (hors retraités)",
+"h_travail_semaine",
+"DIPLOME_r_Inf. Bac",
+"DIPLOME_r_Bac",
+"DIPLOME_r_Bac +2/3",
+"DIPLOME_r_Bac +5",
+"DIPLOME_r_Doctorat",
+"naiss_parents_Deux parents nés à l'étranger",
+"naiss_parents_Deux parents nés en France",
+"naiss_parents_Un des deux parents né à l'étranger",
+"naiss_parents_Manquant",
+"DIPLOME_pere_Bac",
+"DIPLOME_pere_Inf. Bac",
+"DIPLOME_pere_Sup. Bac",
+"DIPLOME_pere_Manquant",
+"CS_pere_Agriculteur",
+"CS_pere_Artisant/commerçant",
+"CS_pere_Autres inactifs",
+"CS_pere_Cadre et prof. intel.",
+"CS_pere_Employé",
+"CS_pere_Ouvrier",
+"CS_pere_Prof. inter.",
+"DIPLOME_mere_Bac",
+"DIPLOME_mere_Inf. Bac",
+"DIPLOME_mere_Sup. Bac",
+"DIPLOME_mere_Manquant",
+"sorties_ami_Plusieurs fois/semaine",
+"sorties_ami_Plusieurs fois/mois",
+"sorties_ami_Une fois par mois",
+"sorties_ami_Rarement",
+"sorties_ami_Jamais",
+"VITENCOUPLE_r_Oui, vit dans logement",
+"VITENCOUPLE_r_Oui, vit pas dans logement",
+"VITENCOUPLE_r_Non",
+"logement_Propriétaire (crédit en cours)",
+"logement_Propriétaire (sans crédit)",
+"logement_Usufruitier",
+"logement_Locataire",
+"logement_A titre gratuit",
+"freq_jv_Tous les jours",
+"freq_jv_Une à plusieurs fois/semaine",
+"freq_jv_1 à 3 fois/mois",
+"freq_jv_Plus rarement",
+"freq_jv_Ne joue pas aux JV",
+"freq_tv_Tous les jours",
+"freq_tv_1 à 4 jours/semaine",
+"freq_tv_Plus rarement",
+"freq_tv_Jamais",
+"equip_tv_Mixte",
+"equip_tv_Uniquement écran de TV",
+"equip_tv_Uniquement numérique",
+"clip_tv",
+"equip_film_Mixte",
+"equip_film_Ne regarde pas de film",
+"equip_film_Uniquement écran de TV",
+"equip_film_Uniquement numérique",
+"film_stream_VOD",
+"film_stream_autre",
+"film_DVD",
+"film_num",
+"nbr_genre_film",
+"freq_serie_Tous les jours",
+"freq_serie_Une fois/semaine mini",
+"freq_serie_Une fois/mois mini",
+"freq_serie_Plus rarement",
+"freq_serie_Jamais",
+"equip_serie_Mixte",
+"equip_serie_Uniquement écran de TV",
+"equip_serie_Uniquement numérique",
+"serie_stream_VOD",
+"serie_stream_autre",
+"nbr_genre_serie",
+"info_internet_Ne s'informe pas en ligne",
+"info_internet_Ne suis pas l'actu",
+"info_internet_S'informe en ligne",
+"freq_lecture_Tous les jours",
+"freq_lecture_1/semaine au moins",
+"freq_lecture_1/mois au mois",
+"freq_lecture_Plus rarement",
+"freq_lecture_Ne lit pas",
+"equip_lecture_Mixte",
+"equip_lecture_Ne lit pas de livre",
+"equip_lecture_Uniquement livre papier",
+"equip_lecture_Uniquement numérique ou autre",
+"nbr_genre_film_cine",
+"musee_art_12m",
+"galerie_12m",
+"acces_internet",
+"freq_internet_Tous les jours",
+"freq_internet_Plusieurs fois/semaine",
+"freq_internet_Plus rarement",
+"freq_internet_Jamais",
+"reseaux_sociaux",
+"culture_en_ligne",
+"musique_enfance_Souvent",
+"musique_enfance_De temps en temps",
+"musique_enfance_Rarement",
+"musique_enfance_Jamais",
+"cinema_enfance_Souvent",
+"cinema_enfance_De temps en temps",
+"cinema_enfance_Rarement",
+"cinema_enfance_Jamais",
+"nbr_genre_parent_ecoute",
+"nbr_genre_ecoute_enfance",
+"audivisuel_nonFR",
+"autre_langue")
+
+love_part1 <- love.plot(res_match_template_stream_music, 
+          drop.distance = TRUE, 
+          var.order = "unadjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std",
+          sample.names = c("Non matché", "Matché"), 
+          title = NULL) +
+  xlim(c(0,1)) +
+  xlab("Différence de moyenne ou proportion standardisée") +
+  ylim(rev(allvar_mod[1:71])) + 
+  labs(color = "Echantillon", shape = "Echantillon", size = "Echantillon", group = "Echantillon", stroke = "Echantillon") +
+  theme(text = element_text(family = "serif"), axis.text.y = element_text(size = 10))
+  
+love_part1
+
+love_part2 <- love.plot(res_match_template_stream_music, 
+          drop.distance = TRUE, 
+          var.order = "unadjusted",
+          abs = TRUE,
+          thresholds = c(m = .05), 
+          binary = "std",
+          continuous = "std",
+          title = NULL) +
+  xlab("Différence de moyenne ou proportion standardisée") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[72:138]))+ 
+  labs(color = "Echantillon", shape = "Echantillon", size = "Echantillon", group = "Echantillon", stroke = "Echantillon")+
+  theme(text = element_text(family = "serif"), axis.text.y = element_text(size = 10))
+  
+love_part2
+
+```
+
+
+## Film
+
+```{r}
+tab_eval_film <- bal.tab(res_match_template_stream_film_VOD, binary = "std", thresholds = c(m = 0.05))
+
+tab_eval_film
+
+```
+
+## Show
+
+```{r}
+tab_eval_serie <- bal.tab(res_match_template_stream_serie_VOD, binary = "std", thresholds = c(m = 0.05))
+
+tab_eval_serie
+```
+
+# Outcomes
+
+## Music
+
+### Diversity of genre
+
+```{r}
+mean_genre_unm <- PC18_to_m_music_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Styles musicaux écoutés",
+                 nbr_genre_aime ~ "Styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Styles detestés"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_music_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_music", "nbr_genre_aime", "nbr_genre_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_music ~ "Styles musicaux écoutés",
+                 nbr_genre_aime ~ "Styles particulièrement aimés",
+                 nbr_genre_deteste ~ "Styles detestés"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Moyenne et écart type pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que les non-utilisateurs de plateformes de streaming spécialisées écoutent en moyenne 3,8 (écart-type 2,2) genres musicaux différents. Ceux qui pratiquent l'écoute en streaming déclarent eux écouter 5 styles musicaux différents en moyenne (écart-type 2,5).
+                                     <br> Dans la population matchée en revanche, on observe des écarts beaucoup plus faibles. Ainsi, quand on raisonne toutes choses égales par ailleurs, les non-streameurs écoutent 4,8 styles musicaux différents en moyenne (écart-type 2,5), alors que les streameurs en écoutent 5 (écart-type 2,5).</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_m
+```
+
+### Specific genre listened
+
+```{r}
+mean_genre_unm <- PC18_to_m_music_survey %>%
+  tbl_svysummary(
+        include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
+                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Variété française",
+                 E1002 ~ "Musique du monde",
+                 E1003 ~ "Musique traditionnelle",
+                 E1004 ~ "Variété internationnale",
+                 E1005 ~ "RnB",
+                 E1006 ~ "Electro/techno",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal/Hard rock",
+                 E1009 ~ "Pop/rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Musique classique",
+                 E1013 ~ "Autre(s) genre(s) de musique"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_music_survey %>%
+  tbl_svysummary(
+        include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
+                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Variété française",
+                 E1002 ~ "Musique du monde",
+                 E1003 ~ "Musique traditionnelle",
+                 E1004 ~ "Variété internationnale",
+                 E1005 ~ "RnB",
+                 E1006 ~ "Electro/techno",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal/Hard rock",
+                 E1009 ~ "Pop/rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Musique classique",
+                 E1013 ~ "Autre(s) genre(s) de musique"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Ecoute :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_genre_ecoute_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Pourcentage pondéré.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : Dans l'échantillon non matché, c'est-à-dire dans la population générale minorée des individus n'écoutant pas de musique, on observe que 82 % des non-utilisateurs de plateformes de streaming spécialisées écoutent de la variété française. 73 % de ceux qui pratiquent l'écoute en streaming déclarent en écouter.
+                                     <br> Dans la population matchée en revanche, on observe pas d'écart significatif entre les deux groupes. Ainsi, quand on raisonne toutes choses égales par ailleurs, 73 % des non-streameurs et des streameurs écoutent de la variété française.</p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_genre_ecoute_m
+```
+
+## Film
+
+### Diversity of genre
+
+```{r}
+mean_genre_unm <- PC18_to_m_film_survey %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD", "nbr_genre_film", "nbr_genre_film_aime", "nbr_genre_film_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_film ~ "Styles cinématographiques regardés",
+                 nbr_genre_film_aime ~ "Styles cinématographiques particulièrement aimés",
+                 nbr_genre_film_deteste ~ "Styles cinématographiques detestés"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_film_survey %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD", "nbr_genre_film", "nbr_genre_film_aime", "nbr_genre_film_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_film ~ "Styles cinématographiques regardés",
+                 nbr_genre_film_aime ~ "Styles cinématographiques particulièrement aimés",
+                 nbr_genre_film_deteste ~ "Styles cinématographiques detestés"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Moyenne et écart type pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_m
+```
+
+### Specific genre watched
+
+```{r}
+
+
+mean_genre_unm <- PC18_to_m_film_survey %>%
+  tbl_svysummary(
+        include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
+          "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C2601 ~ "Films comiques",
+                 C2602 ~ "Films d'action",
+                 C2603 ~ "Films historiques",
+                 C2604 ~ "Films thrillers/policier",
+                 C2605 ~ "Films d'aventure",
+                 C2606 ~ "Films comédies dramatiques",
+                 C2607 ~ "Films d'animations",
+                 C2608 ~ "Films d'horreur",
+                 C2609 ~ "Films d'auteur",
+                 C2610 ~ "Films documentaires",
+                 C2611 ~ "Films westerns",
+                 C2612 ~ "Films érotiques",
+                 C2613 ~ "Films science-fiction",
+                 C2614 ~ "Films sentimentaux",
+                 C2615 ~ "Films comédies musicales",
+                 C2616 ~ "Films politiques ou juridiques"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Regarde :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_film_survey %>%
+  tbl_svysummary(
+        include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
+          "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C2601 ~ "Films comiques",
+                 C2602 ~ "Films d'action",
+                 C2603 ~ "Films historiques",
+                 C2604 ~ "Films thrillers/policier",
+                 C2605 ~ "Films d'aventure",
+                 C2606 ~ "Films comédies dramatiques",
+                 C2607 ~ "Films d'animations",
+                 C2608 ~ "Films d'horreur",
+                 C2609 ~ "Films d'auteur",
+                 C2610 ~ "Films documentaires",
+                 C2611 ~ "Films westerns",
+                 C2612 ~ "Films érotiques",
+                 C2613 ~ "Films science-fiction",
+                 C2614 ~ "Films sentimentaux",
+                 C2615 ~ "Films comédies musicales",
+                 C2616 ~ "Films politiques ou juridiques"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Regarde :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_genre_film_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Pourcentage pondéré.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_genre_film_m
+```
+
+## Show
+
+###Diversity
+
+```{r}
+mean_genre_unm <- PC18_to_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD", "nbr_genre_serie", "nbr_genre_serie_aime", "nbr_genre_serie_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_serie ~ "Styles sériels regardés",
+                 nbr_genre_serie_aime ~ "Styles sériels particulièrement aimés",
+                 nbr_genre_serie_deteste ~ "Styles sériels detestés"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD", "nbr_genre_serie", "nbr_genre_serie_aime", "nbr_genre_serie_deteste"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(nbr_genre_serie ~ "Styles sériels regardés",
+                 nbr_genre_serie_aime ~ "Styles sériels particulièrement aimés",
+                 nbr_genre_serie_deteste ~ "Styles sériels detestés"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  add_p(test = everything() ~ "svy.t.test") %>%
+  modify_header(label = "**Nombre de :**",
+    update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Student.",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Moyenne et écart type pondérés.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_m
+```
+
+### Specific genre watched
+
+```{r}
+
+
+mean_genre_unm <- PC18_to_m_serie_survey %>%
+  tbl_svysummary(
+        include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
+          "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C3801 ~ "Series comiques",
+                 C3802 ~ "Series d'action",
+                 C3803 ~ "Series historiques",
+                 C3804 ~ "Series thrillers/policier",
+                 C3805 ~ "Series d'aventure",
+                 C3806 ~ "Series comédies dramatiques",
+                 C3807 ~ "Series d'animations",
+                 C3808 ~ "Series d'horreur",
+                 C3809 ~ "Series d'auteur",
+                 C3810 ~ "Series documentaires",
+                 C3811 ~ "Series westerns",
+                 C3812 ~ "Series érotiques",
+                 C3813 ~ "Series science-fiction",
+                 C3814 ~ "Series sentimentaux",
+                 C3815 ~ "Series comédies musicales",
+                 C3816 ~ "Series politiques ou juridiques"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Regarde :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+
+mean_genre_m <- PC18_m_serie_survey %>%
+  tbl_svysummary(
+        include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
+          "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C3801 ~ "Series comiques",
+                 C3802 ~ "Series d'action",
+                 C3803 ~ "Series historiques",
+                 C3804 ~ "Series thrillers/policier",
+                 C3805 ~ "Series d'aventure",
+                 C3806 ~ "Series comédies dramatiques",
+                 C3807 ~ "Series d'animations",
+                 C3808 ~ "Series d'horreur",
+                 C3809 ~ "Series d'auteur",
+                 C3810 ~ "Series documentaires",
+                 C3811 ~ "Series westerns",
+                 C3812 ~ "Series érotiques",
+                 C3813 ~ "Series science-fiction",
+                 C3814 ~ "Series sentimentaux",
+                 C3815 ~ "Series comédies musicales",
+                 C3816 ~ "Series politiques ou juridiques"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+        statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Regarde :**",
+                update = list(stat_1 ~ html("**Non streameur**<br> N = {n_unweighted}"),
+                              stat_2 ~ html("**Streameur**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculé à partir d'un test de Khi-2",
+                                all_stat_cols() ~ "Effectifs non pondérés."))
+
+t_comp_genre_ecoute_m <- tbl_merge(
+    tbls = list(mean_genre_unm, mean_genre_m),
+    tab_spanner = c("**Echantillon non matché**", "**Echantillon matché**")
+  ) %>% as_gt() %>%
+  tab_footnote(
+    footnote = "Pourcentage pondéré.",
+    locations = cells_body(columns = stat_1_1,
+                           rows = 1)
+  ) %>%
+  tab_source_note(source_note = html("<p align=\"justify\" style=\"
+    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
+                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
+                                     <br><u>Lecture</u> : </p>")) %>%
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+t_comp_genre_ecoute_m
+```
