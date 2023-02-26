@@ -5,14 +5,6 @@ library(tidyverse)
 # list_var = Variables ne devant plus contenir aucune NA
 clear_NA_to_m = function(d_NA, list_var){
   
-  
-  # On voit que matière diplome contient 6000+ NA, surement pas utile de garder la variable.
-  d_NA <- subset(d_NA, select = -c(matiere_diplome))
-  
-  
-  # Tous les NA de stream_spe correspondent aux gens qui n'écoutent pas de musique, on peut supprimer ces individus.
-  d_NA <- subset(d_NA, !is.na(stream_spe))
-  
   # Les na dans heures travail semaine correspondent aux gens qui ne travail pas, solution simple est de remplacer par 0. Sinon on supprime la variable.
   d_NA$h_travail_semaine[is.na(d_NA$h_travail_semaine)] <- 0
   

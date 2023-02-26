@@ -10,9 +10,9 @@ list_var_match_serie <- c("serie_stream_VOD", "SEXE_r", "AGE_5_r", "CRITREVENU_r
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere","sorties_ami", "VITENCOUPLE_r", 
                     "logement", "freq_jv", "clip_tv",
                     "music_amateur", "music_12m", "music_ellememe", "music_manque", "stream_spe", "cd_ou_cass",
-                    "radio", "nbr_genre_music", "nbr_artiste_ecoute", "aime_clas_f", "detest_clas_f",
+                    "radio", "nbr_genre_music", "nbr_artiste_ecoute", "aime_clas", "detest_clas",
                     "musee_art_12m", "galerie_12m", "acces_internet", "info_internet", "freq_info", "freq_lecture", 
-                    "equip_lecture", "lecture_nonFR","freq_internet", "reseaux_sociaux",
+                    "equip_lecture", "lecture_nonFR", "ordi", "freq_internet", "reseaux_sociaux",
                     "culture_en_ligne", "musique_enfance", "cinema_enfance", "tv_enfance",
                     "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance", "autre_langue")
 
@@ -22,7 +22,7 @@ PC18_to_m_serie <- subset(PC18_to_m_serie, PC18_to_m_serie$freq_serie != "Jamais
 
 PC18_to_m_serie <- droplevels(PC18_to_m_serie)
 
-model_matching_serie <- as.formula("serie_stream_VOD ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + sorties_ami + VITENCOUPLE_r + logement + freq_jv + clip_tv + music_amateur + music_12m + music_ellememe + music_manque + stream_spe + cd_ou_cass + radio + nbr_genre_music + nbr_artiste_ecoute + aime_clas_f + detest_clas_f + musee_art_12m + galerie_12m + acces_internet + info_internet + freq_info + freq_lecture + equip_lecture + lecture_nonFR + freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + cinema_enfance + tv_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + autre_langue")
+model_matching_serie <- as.formula("serie_stream_VOD ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + sorties_ami + VITENCOUPLE_r + logement + freq_jv + clip_tv + music_amateur + music_12m + music_ellememe + music_manque + stream_spe + cd_ou_cass + radio + nbr_genre_music + nbr_artiste_ecoute + aime_clas + detest_clas + musee_art_12m + galerie_12m + ordi + acces_internet + info_internet + freq_info + freq_lecture + equip_lecture + lecture_nonFR + freq_internet + reseaux_sociaux + culture_en_ligne + musique_enfance + cinema_enfance + tv_enfance + nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + autre_langue")
 
 
 
@@ -30,10 +30,10 @@ tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
-                 0.05, 0.05, 0.05, 0.05, 0.05)
+                 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
 
-
+# Laisser tourner une nuit pour voir. Poser question sur github matchit. 
 res_match_template_stream_serie_VOD <- matchit(model_matching_serie,
                                                data = PC18_to_m_serie, s.weights = PC18_to_m_serie$POND, 
                                                method = "cardinality",

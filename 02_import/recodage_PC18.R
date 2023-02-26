@@ -1006,8 +1006,12 @@ PC18$aime_jaz_f[!is.na(PC18$aime_jaz_f)] <- paste0("aime_jaz", sep = ".", PC18$a
 PC18$aime_op_f <- PC18$E1211
 PC18$aime_op_f[!is.na(PC18$aime_op_f)] <- paste0("aime_op", sep = ".", PC18$aime_op_f[!is.na(PC18$aime_op_f)])
 
+PC18$aime_clas <- PC18$E1212
 PC18$aime_clas_f <- PC18$E1212
 PC18$aime_clas_f[!is.na(PC18$aime_clas_f)] <- paste0("aime_clas", sep = ".", PC18$aime_clas_f[!is.na(PC18$aime_clas_f)])
+
+
+
 
 PC18$aime_autr_f <- PC18$E1213
 PC18$aime_autr_f[!is.na(PC18$aime_autr_f)] <- paste0("aime_autr", sep = ".", PC18$aime_autr_f[!is.na(PC18$aime_autr_f)])
@@ -1059,7 +1063,7 @@ PC18$detest_jaz_f[!is.na(PC18$detest_jaz_f)] <- paste0("detest_jaz", sep = ".", 
 PC18$detest_op_f <- PC18$E1311
 PC18$detest_op_f[!is.na(PC18$detest_op_f)] <- paste0("detest_op", sep = ".", PC18$detest_op_f[!is.na(PC18$detest_op_f)])
 
-
+PC18$detest_clas <- PC18$E1312
 PC18$detest_clas_f <- PC18$E1312
 PC18$detest_clas_f[!is.na(PC18$detest_clas_f)] <- paste0("detest_clas", sep = ".", PC18$detest_clas_f[!is.na(PC18$detest_clas_f)])
 
