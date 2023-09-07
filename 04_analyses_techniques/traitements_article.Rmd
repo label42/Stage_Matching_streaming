@@ -925,7 +925,7 @@ mean_genre_unm <- PC18_to_m_serie_survey %>%
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique TV show",
-                 C3813 ~ "Science-fiction",
+                 C3813 ~ "Science fiction",
                  C3814 ~ "Romance",
                  C3815 ~ "Musical",
                  C3816 ~ "Political TV show"),
@@ -960,7 +960,7 @@ mean_genre_m <- PC18_m_serie_survey %>%
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique TV show",
-                 C3813 ~ "Science-fiction",
+                 C3813 ~ "Science fiction",
                  C3814 ~ "Romance",
                  C3815 ~ "Musical",
                  C3816 ~ "Political TV show"),
@@ -981,7 +981,9 @@ mean_genre_m <- PC18_m_serie_survey %>%
 t_comp_genre_show_m <- tbl_merge(
   tbls = list(mean_genre_unm, mean_genre_m),
   tab_spanner = c("**Unmatched sample**", "**Matched sample**")) %>% 
-  modify_column_hide(columns = stat_2_1) %>% 
+  modify_column_hide(columns = stat_2_1) 
+
+t_comp_genre_show_m_gt <- t_comp_genre_show_m %>% 
   as_gt() %>%
   tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
     margin: 0;\"><u>Source</u> : Survey on cultural practices of the french 2018.
@@ -993,9 +995,9 @@ t_comp_genre_show_m <- tbl_merge(
               heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
               table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
 
-t_comp_genre_show_m
+t_comp_genre_show_m_gt
 
-gtsave(t_comp_genre_show_m,
+gtsave(t_comp_genre_show_m_gt,
        filename = "Proportion dif genres show.html",
        path = "traitements_article_files/figure-html")
 ```
@@ -1071,7 +1073,8 @@ plot <- result_to_plot %>%
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black'),
         legend.title = element_text(colour = 'black')) +
-  coord_flip() 
+  coord_flip() +
+  guides(color = guide_legend(reverse = T)) 
 
 plot
 
@@ -1087,7 +1090,7 @@ ggsave(filename = "nbr genre consumed.png",
 
 
 
-## Graphe détaillé 
+## Detailled means 
 
 ```{r}
 
@@ -1132,7 +1135,8 @@ plot <- result_to_plot %>%
         axis.text = element_text(colour = 'black', size = 14),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
-        )  
+  ) +
+  guides(color = guide_legend(reverse = T))
 
 plot
 
@@ -1145,6 +1149,656 @@ ggsave(filename = "SMD genre detailed.png",
        units = "cm")
 
 ```
+
+
+
+# Graph detailled genre 
+
+## Music
+
+```{r}
+music_genre_unm <- PC18_to_m_music_survey %>%
+  tbl_svysummary(
+    include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
+                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "French variety",
+                 E1002 ~ "World music",
+                 E1003 ~ "Traditional music",
+                 E1004 ~ "Pop",
+                 E1005 ~ "RnB",
+                 E1006 ~ "EDM",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal",
+                 E1009 ~ "Rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Classical music",
+                 E1013 ~ "Other"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 3)
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Listen to :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+
+music_genre_m <- PC18_m_music_survey %>%
+  tbl_svysummary(
+    include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
+                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "French variety",
+                 E1002 ~ "World music",
+                 E1003 ~ "Traditional music",
+                 E1004 ~ "Pop",
+                 E1005 ~ "RnB",
+                 E1006 ~ "EDM",
+                 E1007 ~ "Hip hop/rap",
+                 E1008 ~ "Metal",
+                 E1009 ~ "Rock",
+                 E1010 ~ "Jazz",
+                 E1011 ~ "Opera",
+                 E1012 ~ "Classical music",
+                 E1013 ~ "Other"),
+    by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 3)
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Listen to :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+music_detail <- tbl_merge(
+  tbls = list(
+    music_genre_unm, 
+    music_genre_m),
+  tab_spanner = c("**Unmatched sample**", "**Matched sample**")) 
+
+d_music_detail <- music_detail$table_body %>% 
+  select(label, stat_1_1, stat_1_2, stat_2_2) %>% 
+  rename(non_user_unm__v = stat_1_1,
+         non_user_m__v = stat_1_2,
+         user__v = stat_2_2,
+  ) %>%  
+  mutate_all(~gsub("%,", "/", .)) %>% 
+  mutate_all(~gsub("%", "", .)) %>% 
+  mutate_all(~gsub(",", ".", .)) %>% 
+  mutate(across(!label, as.numeric)) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("group", "valeur"), 
+    names_pattern = "(.*)__(.*)"
+  ) %>% 
+  pivot_wider(values_from = value,
+              names_from = valeur) %>% 
+  mutate(
+    n = case_when(group == "non_user_unm" ~ 6023,
+                  group == "non_user_m" ~ 1457,
+                  group == "user" ~ 2270),
+    p = v / 100,
+    ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
+    ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
+
+plot <- d_music_detail %>% 
+  mutate(group = factor(group, c("user", "non_user_m", "non_user_unm"), labels = c("Users",
+                                                                                   "Non-users matched", 
+                                                                                   "Non-users unmatched"))) %>% 
+  ggplot(aes(x = group, y = v, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = ci_down, 
+                    ymax = ci_up),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  coord_flip() +
+  facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
+  labs(color = "Groups", 
+       title = "Prevalence of consumption of musical genres in each group") +
+  guides(color = guide_legend(reverse = T)) +
+  xlab("") +
+  ylab("Proportion") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y.left = element_text(angle = 0)
+  )  
+
+plot
+
+ggsave(filename = "Proportion music genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+```
+### difference in proportion
+
+```{r}
+d_music_detail_diff <- d_music_detail %>% 
+  select(-v, -ci_up,-ci_down) %>% 
+  pivot_wider(names_from = "group",
+              values_from = c(n,p)) %>% 
+  mutate(diff_unm = p_user - p_non_user_unm,
+         diff_m = p_user - p_non_user_m,
+         ci_unm = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                                (p_non_user_unm * (1 - p_non_user_unm)) / n_non_user_unm),
+         ci_m = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                              (p_non_user_m * (1 - p_non_user_m)) / n_non_user_m)
+  ) %>% 
+  select(label, contains("diff"), contains("ci")) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("stat", "group"), 
+    names_pattern = "(.*)_(.*)"
+  ) %>% 
+  pivot_wider(names_from = "stat",
+              values_from = "value")
+
+plot <- d_music_detail_diff %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = diff - ci, 
+                    ymax = diff + ci),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  coord_flip() +
+  guides(color = guide_legend(reverse = T)) +
+  xlab("") +
+  ylab("Difference in proportion") +
+  labs(color="Sample",
+       title = "Difference in the prevalence of music genres consumed beetween users and non-users") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        strip.text.y = element_text(size = 14)
+  )
+
+plot
+
+ggsave(filename = "Diff in proportion music genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+```
+
+## Film
+
+```{r}
+film_genre_unm <- PC18_to_m_film_survey %>%
+  tbl_svysummary(
+    include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
+                "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C2601 ~ "Comedy",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
+                 C2604 ~ "Thrillers",
+                 C2605 ~ "Adventure",
+                 C2606 ~ "Drama",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Author's films",
+                 C2610 ~ "Documentary",
+                 C2611 ~ "Western",
+                 C2612 ~ "Erotic",
+                 C2613 ~ "Science fiction",
+                 C2614 ~ "Romance",
+                 C2615 ~ "Musicals",
+                 C2616 ~ "Political"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 3)
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Watch :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+
+film_genre_m <- PC18_m_film_survey %>%
+  tbl_svysummary(
+    include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
+                "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C2601 ~ "Comedy",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
+                 C2604 ~ "Thrillers",
+                 C2605 ~ "Adventure",
+                 C2606 ~ "Drama",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Author's films",
+                 C2610 ~ "Documentary",
+                 C2611 ~ "Western",
+                 C2612 ~ "Erotic",
+                 C2613 ~ "Science fiction",
+                 C2614 ~ "Romance",
+                 C2615 ~ "Musicals",
+                 C2616 ~ "Political"),
+    by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 3)
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Watch :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+film_detail <- tbl_merge(
+  tbls = list(
+    film_genre_unm, 
+    film_genre_m),
+  tab_spanner = c("**Unmatched sample**", "**Matched sample**")) 
+
+d_film_detail <- film_detail$table_body %>% 
+  select(label, stat_1_1, stat_1_2, stat_2_2) %>% 
+  rename(non_user_unm__v = stat_1_1,
+         non_user_m__v = stat_1_2,
+         user__v = stat_2_2,
+  ) %>%  
+  mutate_all(~gsub("%,", "/", .)) %>% 
+  mutate_all(~gsub("%", "", .)) %>% 
+  mutate_all(~gsub(",", ".", .)) %>% 
+  mutate(across(!label, as.numeric)) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("group", "valeur"), 
+    names_pattern = "(.*)__(.*)"
+  ) %>% 
+  pivot_wider(values_from = value,
+              names_from = valeur) %>% 
+  mutate(
+    n = case_when(group == "non_user_unm" ~ 6023,
+                  group == "non_user_m" ~ 1457,
+                  group == "user" ~ 2270),
+    p = v / 100,
+    ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
+    ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
+
+plot <- d_film_detail %>% 
+  mutate(group = factor(group, c("user", "non_user_m", "non_user_unm"), labels = c("Users",
+                                                                                   "Non-users matched", 
+                                                                                   "Non-users unmatched"))) %>% 
+  ggplot(aes(x = group, y = v, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = ci_down, 
+                    ymax = ci_up),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  coord_flip() +
+  facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
+  labs(color = "Groups",
+       title = "Prevalence of consumption of film genres in each group") +
+  guides(color = guide_legend(reverse = T)) +
+  xlab("") +
+  ylab("") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y.left = element_text(angle = 0)
+  )  
+
+plot
+
+ggsave(filename = "Proportion film genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+```
+
+```{r}
+d_film_detail_diff <- d_film_detail %>% 
+  select(-v, -ci_up,-ci_down) %>% 
+  pivot_wider(names_from = "group",
+              values_from = c(n,p)) %>% 
+  mutate(diff_unm = p_user - p_non_user_unm,
+         diff_m = p_user - p_non_user_m,
+         ci_unm = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                                (p_non_user_unm * (1 - p_non_user_unm)) / n_non_user_unm),
+         ci_m = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                              (p_non_user_m * (1 - p_non_user_m)) / n_non_user_m)
+  ) %>% 
+  select(label, contains("diff"), contains("ci")) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("stat", "group"), 
+    names_pattern = "(.*)_(.*)"
+  ) %>% 
+  pivot_wider(names_from = "stat",
+              values_from = "value")
+
+plot <- d_film_detail_diff %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = diff - ci, 
+                    ymax = diff + ci),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  coord_flip() +
+  xlab("") +
+  ylab("Difference in proportion") +
+  labs(color="Sample",
+       title = "Difference in the prevalence of film genres consumed beetween users and non-users") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        strip.text.y = element_text(size = 14)
+  )
+
+plot
+
+ggsave(filename = "Diff in proportion film genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+```
+
+
+## TV show
+
+### Proportion brut
+
+```{r}
+
+show_genre_unm <- PC18_to_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
+                "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C3801 ~ "Comedy",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
+                 C3804 ~ "Thrillers",
+                 C3805 ~ "Adventure",
+                 C3806 ~ "Drama",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Author",
+                 C3810 ~ "Documentary",
+                 C3811 ~ "Western",
+                 C3812 ~ "Erotique",
+                 C3813 ~ "Science fiction",
+                 C3814 ~ "Romance",
+                 C3815 ~ "Musical",
+                 C3816 ~ "Political"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(3))
+  ) %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Watch :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+
+show_genre_m <- PC18_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
+                "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(C3801 ~ "Comedy",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
+                 C3804 ~ "Thrillers",
+                 C3805 ~ "Adventure",
+                 C3806 ~ "Drama",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Author",
+                 C3810 ~ "Documentary",
+                 C3811 ~ "Western",
+                 C3812 ~ "Erotique",
+                 C3813 ~ "Science fiction",
+                 C3814 ~ "Romance",
+                 C3815 ~ "Musical",
+                 C3816 ~ "Political"),
+    by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
+    missing = "no",
+    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_categorical() ~ c(3))
+  )  %>%
+  add_p(test = list(all_continuous() ~ "svy.t.test",
+                    all_categorical() ~ "svy.chisq.test")) %>%
+  modify_header(label = "**Watch :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}"))) %>%
+  modify_footnote(update = everything() ~ NA) %>%
+  modify_footnote(update = list(p.value ~ "Calculated from a chi-square test"))
+
+show_detail <- tbl_merge(
+  tbls = list(
+    show_genre_unm, 
+    show_genre_m),
+  tab_spanner = c("**Unmatched sample**", "**Matched sample**")) 
+
+d_show_detail <- show_detail$table_body %>% 
+  select(label, stat_1_1, stat_1_2, stat_2_2) %>% 
+  rename(non_user_unm__v = stat_1_1,
+         non_user_m__v = stat_1_2,
+         user__v = stat_2_2,
+  ) %>%  
+  mutate_all(~gsub("%,", "/", .)) %>% 
+  mutate_all(~gsub("%", "", .)) %>% 
+  mutate_all(~gsub(",", ".", .)) %>% 
+  mutate(across(!label, as.numeric)) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("group", "valeur"), 
+    names_pattern = "(.*)__(.*)"
+  ) %>% 
+  pivot_wider(values_from = value,
+              names_from = valeur) %>% 
+  mutate(
+    n = case_when(group == "non_user_unm" ~ 6023,
+                  group == "non_user_m" ~ 1457,
+                  group == "user" ~ 2270),
+    p = v / 100,
+    ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
+    ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
+
+plot <- d_show_detail %>% 
+  mutate(group = factor(group, c("user", "non_user_m", "non_user_unm"), labels = c("Users",
+                                                                                   "Non-users matched", 
+                                                                                   "Non-users unmatched"))) %>% 
+  ggplot(aes(x = group, y = v, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = ci_down, 
+                    ymax = ci_up),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  coord_flip() +
+  facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
+  labs(color = "Groups",
+       title = "Prevalence of consumption of show genres in each group") +
+  guides(color = guide_legend(reverse = T)) +
+  xlab("") +
+  ylab("") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        strip.text.y.left = element_text(angle = 0)
+  )  
+
+plot
+
+ggsave(filename = "Proportion show genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+
+```
+### difference in proportion
+
+```{r}
+d_show_detail_diff <- d_show_detail %>% 
+  select(-v, -ci_up,-ci_down) %>% 
+  pivot_wider(names_from = "group",
+              values_from = c(n,p)) %>% 
+  mutate(diff_unm = p_user - p_non_user_unm,
+         diff_m = p_user - p_non_user_m,
+         ci_unm = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                                (p_non_user_unm * (1 - p_non_user_unm)) / n_non_user_unm),
+         ci_m = 1.96 * sqrt((p_user * (1 - p_user)) / n_user + 
+                              (p_non_user_m * (1 - p_non_user_m)) / n_non_user_m)
+  ) %>% 
+  select(label, contains("diff"), contains("ci")) %>% 
+  pivot_longer(
+    cols = !label,
+    names_to = c("stat", "group"), 
+    names_pattern = "(.*)_(.*)"
+  ) %>% 
+  pivot_wider(names_from = "stat",
+              values_from = "value")
+
+plot <- d_show_detail_diff %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = diff - ci, 
+                    ymax = diff + ci),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  guides(color = guide_legend(reverse = T)) +
+  coord_flip() +
+  xlab("") +
+  ylab("Difference in proportion") +
+  labs(color="Sample",
+       title = "Difference in the prevalence of show genres consumed beetween users and non-users") +
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        strip.text.y = element_text(size = 14)
+  )
+
+
+plot
+
+ggsave(filename = "Diff in proportion show genre detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+
+```
+## the three together
+
+```{r}
+d_three_diff <- dplyr::union(d_music_detail_diff %>% mutate(medium = "Music"),
+                             d_film_detail_diff %>% mutate(medium = "Film")) %>% 
+  dplyr::union(d_show_detail_diff %>% mutate(medium = "Show")) %>% 
+  mutate(medium = factor(medium, c("Music", "Film", "Show"), labels = c("Music", "Film", "Show")),
+         group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  group_by(medium) %>% 
+  filter(medium == "Music" & label %in% c("Pop", "EDM", "Rock") |
+           medium == "Film" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Horror", "Science fiction") |
+           medium == "Show" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Drama", "Animated", "Horror", "Author", "Documentary", "Western", "Science fiction")
+  )
+
+
+plot <- d_three_diff %>% 
+  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = diff - ci, 
+                    ymax = diff + ci),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  facet_grid(medium ~ ., scales = "free") +
+  guides(color = guide_legend(reverse = T)) +
+  coord_flip() +
+  xlab("") +
+  ylab("Difference in proportion") +
+  labs(color="Sample",
+       title = "Difference in the prevalence of genres consumed beetween users and non-users") +
+  
+  theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
+        axis.text = element_text(colour = 'black', size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        strip.text.y = element_text(size = 14)
+  )
+
+plot
+
+ggsave(filename = "Diff in proportion (signif genre only) detailed.png",
+       path = "traitements_article_files/plot png",
+       device = "png",
+       width = 22,
+       height = 23,
+       units = "cm")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
