@@ -36,7 +36,6 @@ model_matching_music <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r
 # ##################################
 
 
-# avec suppression d'une partie des traité
 tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,

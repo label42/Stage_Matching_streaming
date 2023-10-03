@@ -91,6 +91,16 @@ PC18$PCS_MENAGE <- fct_relevel(
   "Inactifs (hors retraités)"
 )
 
+PC18 <- PC18 %>% mutate(class = fct_recode(PCS_MENAGE,
+                                           "Upper class" = "Dominante cadre",
+                                           "Middle class" = "Dominante intermédiaire",
+                                           "Middle class" = "Dominante indépendante",
+                                           "Working class" = "Dominante employée",
+                                           "Working class" = "Dominante ouvrière",
+                                           "Working class" = "Un employé ou ouvrier",
+                                           "Working class" = "Inactifs (hors retraités)"))
+
+
 #renome h de travail par semaine. 4812 NA, pour les gens qui ne travail pas.
 PC18$h_travail_semaine <- PC18$S11_C_1
 
@@ -738,6 +748,17 @@ PC18$nbr_genre_ecoute_enfance[PC18$M214 == 1] <- 0
 #### Cosmopolitisme #####
 #########################
 
+
+PC18$music_nonFR <- PC18$E15 %>%
+  as.character() %>%
+  fct_recode(
+    "0" = "2",
+    "0" = "3"
+  ) %>%
+  as.character() %>%
+  as.numeric()
+
+
 ## Recodage de PC18$C24 en PC18$film_nonFR
 PC18$film_nonFR <- PC18$C24 %>%
   as.character() %>%
@@ -906,6 +927,10 @@ list <- c("E1401", "E1402", "E1403", "E1404", "E1405", "E1406", "E1407",
 
 PC18$nbr_artiste_ecoute <- rowSums(PC18[,list])
 PC18$nbr_artiste_ecoute[is.na(PC18$nbr_artiste_ecoute)] <- 0
+
+# music non fr
+
+PC18 <- PC18 %>% mutate()
 
 
 ##################################
