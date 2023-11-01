@@ -16,8 +16,10 @@ list_var_match_music <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_ME
 
 PC18_to_m_music <- subset(PC18, !is.na(stream_spe))
 
+# Clearning NA before matching
 PC18_to_m_music <- clear_NA_to_m(PC18, list_var_match_music)
 
+# Creating formula for matching
 model_matching_music <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
     DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
     sorties_ami + VITENCOUPLE_r + logement + 
@@ -31,17 +33,18 @@ model_matching_music <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r
     audivisuel_nonFR + autre_langue")
 
 
-##################################
-#### Matching par cardinality ####
-# ##################################
+###########################
+#### Template Matching ####
+###########################
 
-
+# Accepted SMD SPD for each covariate
 tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
+# Performing matching
 res_match_template_stream_music <- matchit(model_matching_music,
                                        data = PC18_to_m_music, s.weights = PC18_to_m_music$POND, 
                                        method = "cardinality",
@@ -53,7 +56,7 @@ res_match_template_stream_music <- matchit(model_matching_music,
 
 PC18_m_music <- match.data(res_match_template_stream_music, weights = "POND_m")
 
-# normalisation des poids pour que mean(POND) = 1
+# Normalizing weights
 tmp <- sum(PC18_m_music$POND_m)/nrow(PC18_m_music) 
 PC18_m_music$POND_m <- PC18_m_music$POND_m/tmp
 

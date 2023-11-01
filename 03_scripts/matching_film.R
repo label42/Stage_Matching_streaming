@@ -15,10 +15,12 @@ list_var_match_film <- c("film_stream_VOD", "SEXE_r", "AGE_5_r", "CRITREVENU_r",
                     "culture_en_ligne", "musique_enfance", "cinema_enfance", "tv_enfance",
                     "nbr_genre_parent_ecoute", "nbr_genre_ecoute_enfance", "autre_langue")
 
+# Clearning NA before matching
 PC18_to_m_film <- clear_NA_to_m(PC18, list_var_match_film)
 
 PC18_to_m_film <- subset(PC18_to_m_film, PC18_to_m_film$freq_film != "Jamais")
 
+# Creating formula for matching
 
 model_matching_film <- as.formula("film_stream_VOD ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + 
                                   h_travail_semaine + DIPLOME_r + naiss_parents + DIPLOME_pere + 
@@ -32,7 +34,11 @@ model_matching_film <- as.formula("film_stream_VOD ~ SEXE_r + AGE_5_r + CRITREVE
                                   musique_enfance + cinema_enfance + tv_enfance + 
                                   nbr_genre_parent_ecoute + nbr_genre_ecoute_enfance + autre_langue")
 
+###########################
+#### Template Matching ####
+###########################
 
+# Accepted SMD SPD for each covariate
 tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
@@ -41,6 +47,7 @@ tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
 
 PC18_to_m_film <- droplevels(PC18_to_m_film)
 
+# Performing matching
 res_match_template_stream_film_VOD <- matchit(model_matching_film,
                                               data = PC18_to_m_film, s.weights = PC18_to_m_film$POND, 
                                               method = "cardinality",
@@ -48,7 +55,7 @@ res_match_template_stream_film_VOD <- matchit(model_matching_film,
                                               tols = tols_all_var, std.tols = T, solver = "gurobi", time = 60)
 
 
-
+# Normalizing weights
 PC18_m_film <- match.data(res_match_template_stream_film_VOD, weights = "POND_m")
 
 tmp <- sum(PC18_m_film$POND_m)/nrow(PC18_m_film) 

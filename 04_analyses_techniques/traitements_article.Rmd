@@ -92,7 +92,7 @@ t_stream_socdem <- PC18_survey %>%
     digits = list(all_continuous() ~ c(0,0))
   ) %>%
   add_overall(last = T,
-              ) %>%
+  ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
   bold_labels() %>%
@@ -133,7 +133,7 @@ t_stream_cult <- PC18_survey %>%
     digits = list(all_continuous() ~ c(0,0))
   ) %>%
   add_overall(last = T,
-              ) %>%
+  ) %>%
   add_p(test = list(all_continuous() ~ "svy.t.test",
                     all_categorical() ~ "svy.chisq.test")) %>%
   bold_labels() %>%
@@ -419,6 +419,13 @@ allvar_mod <- c("SEXE_r_Homme",
                 "DIPLOME_mere_Inf. Bac",
                 "DIPLOME_mere_Sup. Bac",
                 "DIPLOME_mere_Manquant",
+                "CS_mere_Agriculteur",
+                "CS_mere_Artisant/commerçant",
+                "CS_mere_Autres inactifs",
+                "CS_mere_Cadre et prof. intel.",
+                "CS_mere_Employé",
+                "CS_mere_Ouvrier",
+                "CS_mere_Prof. inter.",
                 "sorties_ami_Plusieurs fois/semaine",
                 "sorties_ami_Plusieurs fois/mois",
                 "sorties_ami_Une fois par mois",
@@ -481,6 +488,7 @@ allvar_mod <- c("SEXE_r_Homme",
                 "musee_art_12m",
                 "galerie_12m",
                 "acces_internet",
+                "ordi",
                 "freq_internet_Tous les jours",
                 "freq_internet_Plusieurs fois/semaine",
                 "freq_internet_Plus rarement",
@@ -507,15 +515,21 @@ love_part1 <- love.plot(res_match_template_stream_music,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Non matché", "Matché"), 
+                        sample.names = c("Unmatched", "Matched"), 
                         title = NULL) +
   xlim(c(0,1)) +
-  xlab("Différence de moyenne ou proportion standardisée") +
-  ylim(rev(allvar_mod[1:71])) + 
-  labs(color = "Echantillon", shape = "Echantillon", size = "Echantillon", group = "Echantillon", stroke = "Echantillon") +
-  theme(text = element_text(family = "serif"), axis.text.y = element_text(size = 10))
+  xlab("Standardized Proportion Difference") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[1:70])) + 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
+  theme(axis.text.y = element_text(size = 10))
 
 love_part1
+
+ggsave("traitements_article_files/plot png/music_love_part1.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
+
 
 love_part2 <- love.plot(res_match_template_stream_music, 
                         drop.distance = TRUE, 
@@ -524,17 +538,55 @@ love_part2 <- love.plot(res_match_template_stream_music,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
+                        sample.names = c("Unmatched", "Matched"),
                         title = NULL) +
-  xlab("Différence de moyenne ou proportion standardisée") +
+  xlab("Standardized Proportion Difference") +
   scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
-  ylim(rev(allvar_mod[72:138]))+ 
-  labs(color = "Echantillon", shape = "Echantillon", size = "Echantillon", group = "Echantillon", stroke = "Echantillon")+
-  theme(text = element_text(family = "serif"), axis.text.y = element_text(size = 10))
+  ylim(rev(allvar_mod[71:146]))+ 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
+  theme(axis.text.y = element_text(size = 10))
 
 love_part2
 
+ggsave("traitements_article_files/plot png/music_love_part2.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
 ```
 
+### Age variable
+
+**Before matching**
+```{r}
+ggplot(PC18_to_m_music) + 
+  aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_to_m_music$POND) +
+  scale_color_discrete(labels = c("0" = "Not treated",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4")))) +
+  geom_density(alpha = 5/10) +
+  ylab("Density") +
+  xlab("Age")
+
+ggsave("traitements_article_files/plot png/music_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
+
+
+**After matching**
+```{r}
+ggplot(PC18_m_music) + 
+  aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_m_music$POND_m) + 
+  geom_density(alpha = 5/10) + 
+  ylab("Density") +
+  xlab("Age") +
+  scale_color_discrete(labels = c("0" = "Control",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4"))))
+
+ggsave("traitements_article_files/plot png/music_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
 
 ## Film
 
@@ -543,15 +595,466 @@ tab_eval_film <- bal.tab(res_match_template_stream_film_VOD, binary = "std", thr
 
 tab_eval_film
 
+allvar_mod <- c("SEXE_r_Homme",
+                "AGE_5_r_15 - 20",
+                "AGE_5_r_21 - 25",
+                "AGE_5_r_26 - 30",
+                "AGE_5_r_31 - 35",
+                "AGE_5_r_36 - 40",
+                "AGE_5_r_41 - 45",
+                "AGE_5_r_46 - 50",
+                "AGE_5_r_51 - 55",
+                "AGE_5_r_56 - 60",
+                "AGE_5_r_61 - 65",
+                "AGE_5_r_66 - 70",
+                "AGE_5_r_71 - 75",
+                "AGE_5_r_76 - 80",
+                "AGE_5_r_81+",
+                "CRITREVENU_r_6000 ou plus",
+                "CRITREVENU_r_De 1000 à 1199",
+                "CRITREVENU_r_De 1200 à 1499",
+                "CRITREVENU_r_De 1500 à 1999",
+                "CRITREVENU_r_De 2000 à 2499",
+                "CRITREVENU_r_De 2500 à 2999",
+                "CRITREVENU_r_De 3000 à 3999",
+                "CRITREVENU_r_De 4000 à 5999",
+                "CRITREVENU_r_De 800 à 999",
+                "CRITREVENU_r_Moins de 800",
+                "CRITREVENU_r_Manquant",
+                "PCS_MENAGE_Dominante cadre",
+                "PCS_MENAGE_Dominante intermédiaire",
+                "PCS_MENAGE_Dominante indépendante",
+                "PCS_MENAGE_Dominante employée",
+                "PCS_MENAGE_Dominante ouvrière",
+                "PCS_MENAGE_Un employé ou ouvrier",
+                "PCS_MENAGE_Inactifs (hors retraités)",
+                "h_travail_semaine",
+                "DIPLOME_r_Inf. Bac",
+                "DIPLOME_r_Bac",
+                "DIPLOME_r_Bac +2/3",
+                "DIPLOME_r_Bac +5",
+                "DIPLOME_r_Doctorat",
+                "naiss_parents_Deux parents nés à l'étranger",
+                "naiss_parents_Deux parents nés en France",
+                "naiss_parents_Un des deux parents né à l'étranger",
+                "naiss_parents_Manquant",
+                "DIPLOME_pere_Bac",
+                "DIPLOME_pere_Inf. Bac",
+                "DIPLOME_pere_Sup. Bac",
+                "DIPLOME_pere_Manquant",
+                "CS_pere_Agriculteur",
+                "CS_pere_Artisant/commerçant",
+                "CS_pere_Autres inactifs",
+                "CS_pere_Cadre et prof. intel.",
+                "CS_pere_Employé",
+                "CS_pere_Ouvrier",
+                "CS_pere_Prof. inter.",
+                "DIPLOME_mere_Bac",
+                "DIPLOME_mere_Inf. Bac",
+                "DIPLOME_mere_Sup. Bac",
+                "DIPLOME_mere_Manquant",
+                "CS_mere_Agriculteur",
+                "CS_mere_Artisant/commerçant",
+                "CS_mere_Autres inactifs",
+                "CS_mere_Cadre et prof. intel.",
+                "CS_mere_Employé",
+                "CS_mere_Ouvrier",
+                "CS_mere_Prof. inter.",
+                "sorties_ami_Plusieurs fois/semaine",
+                "sorties_ami_Plusieurs fois/mois",
+                "sorties_ami_Une fois par mois",
+                "sorties_ami_Rarement",
+                "sorties_ami_Jamais",
+                "VITENCOUPLE_r_Oui, vit dans logement",
+                "VITENCOUPLE_r_Oui, vit pas dans logement",
+                "VITENCOUPLE_r_Non",
+                "logement_Propriétaire (crédit en cours)",
+                "logement_Propriétaire (sans crédit)",
+                "logement_Usufruitier",
+                "logement_Locataire",
+                "logement_A titre gratuit",
+                "freq_jv_Tous les jours",
+                "freq_jv_Une à plusieurs fois/semaine",
+                "freq_jv_1 à 3 fois/mois",
+                "freq_jv_Plus rarement",
+                "freq_jv_Ne joue pas aux JV",
+                "clip_tv",
+                "music_amateur",                                     
+                "music_12m_Tous les jours",                           
+                "music_12m_Une à plusieurs fois/semaine",             
+                "music_12m_Rarement",                                
+                "music_ellememe_Tous les jours",                      
+                "music_ellememe_De temps en temps",                  
+                "music_ellememe_Rarement",                            
+                "music_ellememe_Jamais",                              
+                "music_manque_Oui, beaucoup",                        
+                "music_manque_Oui, un peu",                         
+                "music_manque_Non",                                
+                "stream_spe",                                         
+                "cd_ou_cass",                                         
+                "radio",                                             
+                "nbr_genre_music",                                 
+                "nbr_artiste_ecoute",                               
+                "aime_clas",                                         
+                "detest_clas",
+                "musee_art_12m",
+                "galerie_12m",
+                "ordi",
+                "acces_internet",
+                "info_internet_S'informe en ligne",
+                "freq_info_Tous les jours",
+                "freq_info_Une ou plusieurs/semaines",
+                "freq_info_Plus rarement",
+                "freq_lecture_Tous les jours",
+                "freq_lecture_1/semaine au moins",
+                "freq_lecture_1/mois au mois",
+                "freq_lecture_Plus rarement",
+                "freq_lecture_Ne lit pas",
+                "equip_lecture_Mixte",
+                "equip_lecture_Ne lit pas de livre",
+                "equip_lecture_Uniquement livre papier",
+                "equip_lecture_Uniquement numérique ou autre",
+                "lecture_nonFR_Oui",
+                "lecture_nonFR_Non",
+                "lecture_nonFR_Ne lit pas de livre",
+                "freq_internet_Tous les jours",
+                "freq_internet_Plusieurs fois/semaine",
+                "freq_internet_Plus rarement",
+                "freq_internet_Jamais",
+                "reseaux_sociaux",
+                "culture_en_ligne",
+                "musique_enfance_Souvent",
+                "musique_enfance_De temps en temps",
+                "musique_enfance_Rarement",
+                "musique_enfance_Jamais",
+                "cinema_enfance_Souvent",
+                "cinema_enfance_De temps en temps",
+                "cinema_enfance_Rarement",
+                "cinema_enfance_Jamais",
+                "tv_enfance_Souvent",
+                "tv_enfance_De temps en temps",
+                "tv_enfance_Rarement",
+                "tv_enfance_Jamais",
+                "nbr_genre_parent_ecoute",
+                "nbr_genre_ecoute_enfance",
+                "autre_langue")
+
+love_part1 <- love.plot(res_match_template_stream_film_VOD, 
+                        drop.distance = TRUE, 
+                        var.order = "unadjusted",
+                        abs = TRUE,
+                        thresholds = c(m = .05), 
+                        binary = "std",
+                        continuous = "std",
+                        sample.names = c("Unmatched", "Matched"), 
+                        title = NULL) +
+  xlim(c(0,1)) +
+  xlab("Standardized Proportion Difference") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[1:70])) + 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
+  theme(axis.text.y = element_text(size = 10))
+
+love_part1
+
+ggsave("traitements_article_files/plot png/film_love_part1.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
+
+
+love_part2 <- love.plot(res_match_template_stream_film_VOD, 
+                        drop.distance = TRUE, 
+                        var.order = "unadjusted",
+                        abs = TRUE,
+                        thresholds = c(m = .05), 
+                        binary = "std",
+                        continuous = "std",
+                        sample.names = c("Unmatched", "Matched"),
+                        title = NULL) +
+  xlab("Standardized Proportion Difference") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[71:143]))+ 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
+  theme(axis.text.y = element_text(size = 10))
+
+love_part2
+
+ggsave("traitements_article_files/plot png/film_love_part2.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
+
 ```
 
-## Show
+### Age variable
+
+**Before matching**
+```{r}
+ggplot(PC18_to_m_film) + 
+  aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = PC18_to_m_film$POND) +
+  scale_color_discrete(labels = c("0" = "Not treated",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4")))) +
+  geom_density(alpha = 5/10) +
+  ylab("Density") +
+  xlab("Age")
+
+ggsave("traitements_article_files/plot png/film_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
+
+
+**After matching**
+```{r}
+ggplot(PC18_m_film) + 
+  aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = PC18_m_film$POND_m) + 
+  geom_density(alpha = 5/10) + 
+  ylab("Density") +
+  xlab("Age") +
+  scale_color_discrete(labels = c("0" = "Control",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4"))))
+
+ggsave("traitements_article_files/plot png/film_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
+
+
+
+## TV Series
 
 ```{r}
 tab_eval_serie <- bal.tab(res_match_template_stream_serie_VOD, binary = "std", thresholds = c(m = 0.05))
 
 tab_eval_serie
+
+allvar_mod <- c("SEXE_r_Homme",
+                "AGE_5_r_15 - 20",
+                "AGE_5_r_21 - 25",
+                "AGE_5_r_26 - 30",
+                "AGE_5_r_31 - 35",
+                "AGE_5_r_36 - 40",
+                "AGE_5_r_41 - 45",
+                "AGE_5_r_46 - 50",
+                "AGE_5_r_51 - 55",
+                "AGE_5_r_56 - 60",
+                "AGE_5_r_61 - 65",
+                "AGE_5_r_66 - 70",
+                "AGE_5_r_71 - 75",
+                "AGE_5_r_76 - 80",
+                "AGE_5_r_81+",
+                "CRITREVENU_r_6000 ou plus",
+                "CRITREVENU_r_De 1000 à 1199",
+                "CRITREVENU_r_De 1200 à 1499",
+                "CRITREVENU_r_De 1500 à 1999",
+                "CRITREVENU_r_De 2000 à 2499",
+                "CRITREVENU_r_De 2500 à 2999",
+                "CRITREVENU_r_De 3000 à 3999",
+                "CRITREVENU_r_De 4000 à 5999",
+                "CRITREVENU_r_De 800 à 999",
+                "CRITREVENU_r_Moins de 800",
+                "CRITREVENU_r_Manquant",
+                "PCS_MENAGE_Dominante cadre",
+                "PCS_MENAGE_Dominante intermédiaire",
+                "PCS_MENAGE_Dominante indépendante",
+                "PCS_MENAGE_Dominante employée",
+                "PCS_MENAGE_Dominante ouvrière",
+                "PCS_MENAGE_Un employé ou ouvrier",
+                "PCS_MENAGE_Inactifs (hors retraités)",
+                "h_travail_semaine",
+                "DIPLOME_r_Inf. Bac",
+                "DIPLOME_r_Bac",
+                "DIPLOME_r_Bac +2/3",
+                "DIPLOME_r_Bac +5",
+                "DIPLOME_r_Doctorat",
+                "naiss_parents_Deux parents nés à l'étranger",
+                "naiss_parents_Deux parents nés en France",
+                "naiss_parents_Un des deux parents né à l'étranger",
+                "naiss_parents_Manquant",
+                "DIPLOME_pere_Bac",
+                "DIPLOME_pere_Inf. Bac",
+                "DIPLOME_pere_Sup. Bac",
+                "DIPLOME_pere_Manquant",
+                "CS_pere_Agriculteur",
+                "CS_pere_Artisant/commerçant",
+                "CS_pere_Autres inactifs",
+                "CS_pere_Cadre et prof. intel.",
+                "CS_pere_Employé",
+                "CS_pere_Ouvrier",
+                "CS_pere_Prof. inter.",
+                "DIPLOME_mere_Bac",
+                "DIPLOME_mere_Inf. Bac",
+                "DIPLOME_mere_Sup. Bac",
+                "DIPLOME_mere_Manquant",
+                "CS_mere_Agriculteur",
+                "CS_mere_Artisant/commerçant",
+                "CS_mere_Autres inactifs",
+                "CS_mere_Cadre et prof. intel.",
+                "CS_mere_Employé",
+                "CS_mere_Ouvrier",
+                "CS_mere_Prof. inter.",
+                "sorties_ami_Plusieurs fois/semaine",
+                "sorties_ami_Plusieurs fois/mois",
+                "sorties_ami_Une fois par mois",
+                "sorties_ami_Rarement",
+                "sorties_ami_Jamais",
+                "VITENCOUPLE_r_Oui, vit dans logement",
+                "VITENCOUPLE_r_Oui, vit pas dans logement",
+                "VITENCOUPLE_r_Non",
+                "logement_Propriétaire (crédit en cours)",
+                "logement_Propriétaire (sans crédit)",
+                "logement_Usufruitier",
+                "logement_Locataire",
+                "logement_A titre gratuit",
+                "freq_jv_Tous les jours",
+                "freq_jv_Une à plusieurs fois/semaine",
+                "freq_jv_1 à 3 fois/mois",
+                "freq_jv_Plus rarement",
+                "freq_jv_Ne joue pas aux JV",
+                "clip_tv",
+                "music_amateur",                                     
+                "music_12m_Tous les jours",                           
+                "music_12m_Une à plusieurs fois/semaine",             
+                "music_12m_Rarement",                                
+                "music_ellememe_Tous les jours",                      
+                "music_ellememe_De temps en temps",                  
+                "music_ellememe_Rarement",                            
+                "music_ellememe_Jamais",                              
+                "music_manque_Oui, beaucoup",                        
+                "music_manque_Oui, un peu",                         
+                "music_manque_Non",                                
+                "stream_spe",                                         
+                "cd_ou_cass",                                         
+                "radio",                                             
+                "nbr_genre_music",                                 
+                "nbr_artiste_ecoute",                               
+                "aime_clas",                                         
+                "detest_clas",
+                "musee_art_12m",
+                "galerie_12m",
+                "ordi",
+                "acces_internet",
+                "info_internet_S'informe en ligne",
+                "freq_info_Tous les jours",
+                "freq_info_Une ou plusieurs/semaines",
+                "freq_info_Plus rarement",
+                "freq_lecture_Tous les jours",
+                "freq_lecture_1/semaine au moins",
+                "freq_lecture_1/mois au mois",
+                "freq_lecture_Plus rarement",
+                "freq_lecture_Ne lit pas",
+                "equip_lecture_Mixte",
+                "equip_lecture_Ne lit pas de livre",
+                "equip_lecture_Uniquement livre papier",
+                "equip_lecture_Uniquement numérique ou autre",
+                "lecture_nonFR_Oui",
+                "lecture_nonFR_Non",
+                "lecture_nonFR_Ne lit pas de livre",
+                "freq_internet_Tous les jours",
+                "freq_internet_Plusieurs fois/semaine",
+                "freq_internet_Plus rarement",
+                "freq_internet_Jamais",
+                "reseaux_sociaux",
+                "culture_en_ligne",
+                "musique_enfance_Souvent",
+                "musique_enfance_De temps en temps",
+                "musique_enfance_Rarement",
+                "musique_enfance_Jamais",
+                "cinema_enfance_Souvent",
+                "cinema_enfance_De temps en temps",
+                "cinema_enfance_Rarement",
+                "cinema_enfance_Jamais",
+                "tv_enfance_Souvent",
+                "tv_enfance_De temps en temps",
+                "tv_enfance_Rarement",
+                "tv_enfance_Jamais",
+                "nbr_genre_parent_ecoute",
+                "nbr_genre_ecoute_enfance",
+                "autre_langue")
+
+love_part1 <- love.plot(res_match_template_stream_serie_VOD, 
+                        drop.distance = TRUE, 
+                        var.order = "unadjusted",
+                        abs = TRUE,
+                        thresholds = c(m = .05), 
+                        binary = "std",
+                        continuous = "std",
+                        sample.names = c("Unmatched", "Matched"), 
+                        title = NULL) +
+  xlim(c(0,1)) +
+  xlab("Standardized Proportion Difference") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[1:70])) + 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
+  theme(axis.text.y = element_text(size = 10))
+
+love_part1
+
+ggsave("traitements_article_files/plot png/serie_love_part1.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
+
+
+love_part2 <- love.plot(res_match_template_stream_serie_VOD, 
+                        drop.distance = TRUE, 
+                        var.order = "unadjusted",
+                        abs = TRUE,
+                        thresholds = c(m = .05), 
+                        binary = "std",
+                        continuous = "std",
+                        sample.names = c("Unmatched", "Matched"),
+                        title = NULL) +
+  xlab("Standardized Proportion Difference") +
+  scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
+  ylim(rev(allvar_mod[71:143]))+ 
+  labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
+  theme(axis.text.y = element_text(size = 10))
+
+love_part2
+
+ggsave("traitements_article_files/plot png/serie_love_part2.png", width = 21, height = 29.7, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+
+
 ```
+
+### Age variable
+
+**Before matching**
+```{r}
+ggplot(PC18_to_m_serie) + 
+  aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = PC18_to_m_serie$POND) +
+  scale_color_discrete(labels = c("0" = "Not treated",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4")))) +
+  geom_density(alpha = 5/10) +
+  ylab("Density") +
+  xlab("Age")
+
+ggsave("traitements_article_files/plot png/serie_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
+
+
+**After matching**
+```{r}
+ggplot(PC18_m_serie) + 
+  aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = PC18_m_serie$POND_m) + 
+  geom_density(alpha = 5/10) + 
+  ylab("Density") +
+  xlab("Age") +
+  scale_color_discrete(labels = c("0" = "Control",
+                                  "1" ="Treated"), name = "Group") +
+  scale_fill_discrete(guide="none")+
+  guides(color=guide_legend(override.aes=list(fill=c("#F8766D","#00BFC4"))))
+
+ggsave("traitements_article_files/plot png/serie_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+       bg = "white", device = "png")
+```
+
+
 
 # Outcomes
 
@@ -633,20 +1136,19 @@ t_comp_m
 mean_genre_unm <- PC18_to_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French variety",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
-                 E1003 ~ "Traditional music",
-                 E1004 ~ "International variety",
+                 E1003 ~ "Folk",
+                 E1004 ~ "Pop",
                  E1005 ~ "RnB",
-                 E1006 ~ "Electro/techno",
+                 E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
                  E1008 ~ "Metal/Hard rock",
-                 E1009 ~ "Pop/rock",
+                 E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical music"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -665,20 +1167,19 @@ mean_genre_unm <- PC18_to_m_music_survey %>%
 mean_genre_m <- PC18_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French variety",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
-                 E1003 ~ "Traditional music",
-                 E1004 ~ "International variety",
+                 E1003 ~ "Folk",
+                 E1004 ~ "Pop",
                  E1005 ~ "RnB",
-                 E1006 ~ "Electro/techno",
+                 E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
                  E1008 ~ "Metal/Hard rock",
-                 E1009 ~ "Pop/rock",
+                 E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical music"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -702,8 +1203,8 @@ t_comp_genre_ecoute_m <- tbl_merge(
   tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
     margin: 0;\"><u>Source</u> : Survey on cultural practices of the french 2018.
                                      <br><u>Scope</u> : Residents of France aged 15 years and over, declaring that they listen to music.
-                                     <br><u>Lecture</u> : In the non-matched sample, i.e. in the general population of individuals who do not listen to music, we observe that 82% of the non-users of streaming platforms listen to French variety music. 73% of those who use streaming platform declare to listen to it.
-                                     <br> In the matched population, however, there is no significant difference between the two groups. When all other things are equal, 73% of non-users and users listen to French variety music.</p>")) %>%
+                                     <br><u>Lecture</u> : In the non-matched sample, i.e. in the general population of individuals who do listen to music, we observe that 82% of the non-users of streaming platforms listen to chanson. 73% of those who use streaming platform declare to listen to it.
+                                     <br> In the matched population, however, there is no significant difference between the two groups. When all other things are equal, 73% of non-users and users listen to chanson.</p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -796,21 +1297,21 @@ mean_genre_unm <- PC18_to_m_film_survey %>%
     include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
                 "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C2601 ~ "Comedy",
-                 C2602 ~ "Action movies",
-                 C2603 ~ "Historical movies",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
                  C2604 ~ "Thrillers",
-                 C2605 ~ "Adventure movies",
+                 C2605 ~ "Adventure",
                  C2606 ~ "Drama",
-                 C2607 ~ "Animated movies",
-                 C2608 ~ "Horror movies",
-                 C2609 ~ "Author's films",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
-                 C2612 ~ "Erotic movies",
+                 C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals ",
-                 C2616 ~ "Political movies"),
+                 C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -831,21 +1332,21 @@ mean_genre_m <- PC18_m_film_survey %>%
     include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
                 "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C2601 ~ "Comedy",
-                 C2602 ~ "Action movies",
-                 C2603 ~ "Historical movies",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
                  C2604 ~ "Thrillers",
-                 C2605 ~ "Adventure movies",
+                 C2605 ~ "Adventure",
                  C2606 ~ "Drama",
-                 C2607 ~ "Animated movies",
-                 C2608 ~ "Horror movies",
-                 C2609 ~ "Author's films",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
-                 C2612 ~ "Erotic movies",
+                 C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals ",
-                 C2616 ~ "Political movies"),
+                 C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -884,7 +1385,7 @@ gtsave(t_comp_genre_film_m,
 
 ```
 
-## Show
+## TV series
 
 ###Diversity
 
@@ -964,21 +1465,21 @@ mean_genre_unm <- PC18_to_m_serie_survey %>%
     include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
                 "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C3801 ~ "Comedy",
-                 C3802 ~ "Action TV show",
-                 C3803 ~ "Historical TV show",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
                  C3804 ~ "Thrillers",
-                 C3805 ~ "Adventure TV show",
+                 C3805 ~ "Adventure",
                  C3806 ~ "Drama",
-                 C3807 ~ "Animated TV show",
-                 C3808 ~ "Horror TV show",
-                 C3809 ~ "Author TV show",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Serie d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
-                 C3812 ~ "Erotique TV show",
+                 C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
-                 C3816 ~ "Political TV show"),
+                 C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -999,21 +1500,21 @@ mean_genre_m <- PC18_m_serie_survey %>%
     include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
                 "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C3801 ~ "Comedy",
-                 C3802 ~ "Action TV show",
-                 C3803 ~ "Historical TV show",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
                  C3804 ~ "Thrillers",
-                 C3805 ~ "Adventure TV show",
+                 C3805 ~ "Adventure",
                  C3806 ~ "Drama",
-                 C3807 ~ "Animated TV show",
-                 C3808 ~ "Horror TV show",
-                 C3809 ~ "Author TV show",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Serie d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
-                 C3812 ~ "Erotique TV show",
+                 C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
-                 C3816 ~ "Political TV show"),
+                 C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1104,8 +1605,8 @@ plot <- result_to_plot %>%
   mutate(name = recode_factor(name, 
                               "nbr_genre_music" = "Music genre",
                               "nbr_genre_film" = "Film genre",
-                              "nbr_genre_serie" = "Serie genre"),
-         name = factor(name, c("Serie genre", "Film genre", "Music genre")),
+                              "nbr_genre_serie" = "Series genre"),
+         name = factor(name, c("Series genre", "Film genre", "Music genre")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -1149,23 +1650,23 @@ plot <- result_to_plot %>%
                              "nbr_genre_music" = "Music",
                              "nbr_genre_aime" = "Music",
                              "nbr_genre_deteste" = "Music",
-                             "nbr_genre_film" = "Film",
-                             "nbr_genre_film_aime" = "Film",
-                             "nbr_genre_film_deteste" = "Film",
-                             "nbr_genre_serie" = "TV Show",
-                             "nbr_genre_serie_aime" = "TV Show",
-                             "nbr_genre_serie_deteste" = "TV Show"),
+                             "nbr_genre_film" = "Movies",
+                             "nbr_genre_film_aime" = "Movies",
+                             "nbr_genre_film_deteste" = "Movies",
+                             "nbr_genre_serie" = "TV series",
+                             "nbr_genre_serie_aime" = "TV series",
+                             "nbr_genre_serie_deteste" = "TV series"),
          name = recode_factor(name, 
-                              "nbr_genre_music" = "Genre consumed",
-                              "nbr_genre_aime" = "Genre liked",
-                              "nbr_genre_deteste" = "Genre hated",
-                              "nbr_genre_film" = "Genre consumed",
-                              "nbr_genre_film_aime" = "Genre liked",
-                              "nbr_genre_film_deteste" = "Genre hated",
-                              "nbr_genre_serie" = "Genre consumed",
-                              "nbr_genre_serie_aime" = "Genre liked",
-                              "nbr_genre_serie_deteste" = "Genre hated"),
-         name = factor(name, c("Genre hated", "Genre liked", "Genre consumed")),
+                              "nbr_genre_music" = "Number of genres consumed",
+                              "nbr_genre_aime" = "Number of genres liked",
+                              "nbr_genre_deteste" = "Number of genres hated",
+                              "nbr_genre_film" = "Number of genres consumed",
+                              "nbr_genre_film_aime" = "Number of genres liked",
+                              "nbr_genre_film_deteste" = "Number of genres hated",
+                              "nbr_genre_serie" = "Number of genres consumed",
+                              "nbr_genre_serie_aime" = "Number of genres liked",
+                              "nbr_genre_serie_deteste" = "Number of genres hated"),
+         name = factor(name, c("Number of genres hated", "Number of genres liked", "Number of genres consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -1183,6 +1684,7 @@ plot <- result_to_plot %>%
   labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   ) +
@@ -1210,20 +1712,19 @@ ggsave(filename = "SMD genre detailed.png",
 music_genre_unm <- PC18_to_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French song",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
                  E1003 ~ "Folk",
                  E1004 ~ "Pop",
                  E1005 ~ "RnB",
                  E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
-                 E1008 ~ "Metal",
+                 E1008 ~ "Metal/hard rock",
                  E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1243,20 +1744,19 @@ music_genre_unm <- PC18_to_m_music_survey %>%
 music_genre_m <- PC18_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French song",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
                  E1003 ~ "Folk",
                  E1004 ~ "Pop",
                  E1005 ~ "RnB",
                  E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
-                 E1008 ~ "Metal",
+                 E1008 ~ "Metal/hard rock",
                  E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1316,8 +1816,7 @@ plot <- d_music_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups", 
-       title = "Prevalence of consumption of musical genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("Proportion") +
@@ -1375,10 +1874,10 @@ plot <- d_music_detail_diff %>%
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of music genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1409,12 +1908,12 @@ film_genre_unm <- PC18_to_m_film_survey %>%
                  C2606 ~ "Drama",
                  C2607 ~ "Animated",
                  C2608 ~ "Horror",
-                 C2609 ~ "Author's films",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
                  C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals",
                  C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1445,12 +1944,12 @@ film_genre_m <- PC18_m_film_survey %>%
                  C2606 ~ "Drama",
                  C2607 ~ "Animated",
                  C2608 ~ "Horror",
-                 C2609 ~ "Author's films",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
                  C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals",
                  C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1512,8 +2011,7 @@ plot <- d_film_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups",
-       title = "Prevalence of consumption of film genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("") +
@@ -1570,10 +2068,10 @@ plot <- d_film_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of film genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1590,7 +2088,7 @@ ggsave(filename = "Diff in proportion film genre detailed.png",
 ```
 
 
-## TV show
+## TV series
 
 ### Proportion brut
 
@@ -1608,12 +2106,12 @@ show_genre_unm <- PC18_to_m_serie_survey %>%
                  C3806 ~ "Drama",
                  C3807 ~ "Animated",
                  C3808 ~ "Horror",
-                 C3809 ~ "Author",
+                 C3809 ~ "Series d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
                  C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1643,12 +2141,12 @@ show_genre_m <- PC18_m_serie_survey %>%
                  C3806 ~ "Drama",
                  C3807 ~ "Animated",
                  C3808 ~ "Horror",
-                 C3809 ~ "Author",
+                 C3809 ~ "Series d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
                  C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1709,8 +2207,7 @@ plot <- d_show_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups",
-       title = "Prevalence of consumption of show genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("") +
@@ -1769,10 +2266,10 @@ plot <- d_show_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of show genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1948,7 +2445,7 @@ d_music_lang_diff <- d_music_lang %>%
 foreign_lang_film_unm <- PC18_to_m_film_survey %>%
   tbl_svysummary(
     include = c(film_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(film_nonFR ~ "Film"),
+    label = list(film_nonFR ~ "Movie"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1968,7 +2465,7 @@ foreign_lang_film_unm <- PC18_to_m_film_survey %>%
 foreign_lang_film_m <- PC18_m_film_survey %>%
   tbl_svysummary(
     include = c(film_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(film_nonFR ~ "Film"),
+    label = list(film_nonFR ~ "Movie"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2041,13 +2538,13 @@ d_film_lang_diff <- d_film_lang %>%
 
 ```
 
-## Show
+## TV Series
 
 ```{r}
 foreign_lang_show_unm <- PC18_to_m_serie_survey %>%
   tbl_svysummary(
     include = c(serie_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(serie_nonFR ~ "Show"),
+    label = list(serie_nonFR ~ "Series"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2067,7 +2564,7 @@ foreign_lang_show_unm <- PC18_to_m_serie_survey %>%
 foreign_lang_show_m <- PC18_m_serie_survey %>%
   tbl_svysummary(
     include = c(serie_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(serie_nonFR ~ "Show"),
+    label = list(serie_nonFR ~ "Series"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2148,9 +2645,9 @@ d_show_lang_diff <- d_show_lang %>%
 
 ```{r}
 d_three_diff <- dplyr::union(d_music_lang_diff %>% mutate(medium = "Music"),
-                             d_film_lang_diff %>% mutate(medium = "Film")) %>% 
-  dplyr::union(d_show_lang_diff %>% mutate(medium = "Show")) %>% 
-  mutate(medium = factor(medium, c("Show", "Film", "Music"), labels = c("Show", "Film", "Music")),
+                             d_film_lang_diff %>% mutate(medium = "Movie")) %>% 
+  dplyr::union(d_show_lang_diff %>% mutate(medium = "Series")) %>% 
+  mutate(medium = factor(medium, c("Series", "Movie", "Music"), labels = c("Series", "Movie", "Music")),
          group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) 
 
 plot <- d_three_diff %>% 
@@ -2165,9 +2662,7 @@ plot <- d_three_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of foreign language cultural consomption") +
-  
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0, colour = 'black', size = 9),
         axis.text = element_text(colour = 'black', size = 7),
         axis.title.x = element_text(size = 9),
