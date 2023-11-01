@@ -893,7 +893,7 @@ PC18$type_plateforme_stream <- as.factor(PC18$type_plateforme_stream)
 #Variable synthétique nbr styles écoutés
 
 list <- c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-          "E1008", "E1009", "E1010", "E1011", "E1012", "E1013")
+          "E1008", "E1009", "E1010", "E1011", "E1012")
 
 PC18$nbr_genre_music <- rowSums(PC18[,list])
 PC18$nbr_genre_music[is.na(PC18$nbr_genre_music)] <- 0
@@ -907,14 +907,14 @@ PC18$ecoute_classiq <- PC18$E1012
 
 # variable synthétique nombre de genre aimé particulièrement
 list <- c("E1201", "E1202", "E1203", "E1204", "E1205", "E1206", "E1207", 
-          "E1208", "E1209", "E1210", "E1211", "E1212", "E1213")
+          "E1208", "E1209", "E1210", "E1211", "E1212")
 
 PC18$nbr_genre_aime <- rowSums(PC18[,list])
 PC18$nbr_genre_aime[is.na(PC18$nbr_genre_aime)] <- 0
 
 
 list <- c("E1301", "E1302", "E1303", "E1304", "E1305", "E1306", "E1307", 
-          "E1308", "E1309", "E1310", "E1311", "E1312", "E1313")
+          "E1308", "E1309", "E1310", "E1311", "E1312")
 
 PC18$nbr_genre_deteste <- rowSums(PC18[,list])
 PC18$nbr_genre_deteste[is.na(PC18$nbr_genre_deteste)] <- 0

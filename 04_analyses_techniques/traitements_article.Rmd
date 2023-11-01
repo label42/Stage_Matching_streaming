@@ -633,20 +633,19 @@ t_comp_m
 mean_genre_unm <- PC18_to_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French variety",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
-                 E1003 ~ "Traditional music",
-                 E1004 ~ "International variety",
+                 E1003 ~ "Folk",
+                 E1004 ~ "Pop",
                  E1005 ~ "RnB",
-                 E1006 ~ "Electro/techno",
+                 E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
                  E1008 ~ "Metal/Hard rock",
-                 E1009 ~ "Pop/rock",
+                 E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical music"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -665,20 +664,19 @@ mean_genre_unm <- PC18_to_m_music_survey %>%
 mean_genre_m <- PC18_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French variety",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
-                 E1003 ~ "Traditional music",
-                 E1004 ~ "International variety",
+                 E1003 ~ "Folk",
+                 E1004 ~ "Pop",
                  E1005 ~ "RnB",
-                 E1006 ~ "Electro/techno",
+                 E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
                  E1008 ~ "Metal/Hard rock",
-                 E1009 ~ "Pop/rock",
+                 E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical music"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -702,8 +700,8 @@ t_comp_genre_ecoute_m <- tbl_merge(
   tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
     margin: 0;\"><u>Source</u> : Survey on cultural practices of the french 2018.
                                      <br><u>Scope</u> : Residents of France aged 15 years and over, declaring that they listen to music.
-                                     <br><u>Lecture</u> : In the non-matched sample, i.e. in the general population of individuals who do not listen to music, we observe that 82% of the non-users of streaming platforms listen to French variety music. 73% of those who use streaming platform declare to listen to it.
-                                     <br> In the matched population, however, there is no significant difference between the two groups. When all other things are equal, 73% of non-users and users listen to French variety music.</p>")) %>%
+                                     <br><u>Lecture</u> : In the non-matched sample, i.e. in the general population of individuals who do listen to music, we observe that 82% of the non-users of streaming platforms listen to chanson. 73% of those who use streaming platform declare to listen to it.
+                                     <br> In the matched population, however, there is no significant difference between the two groups. When all other things are equal, 73% of non-users and users listen to chanson.</p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
@@ -796,21 +794,21 @@ mean_genre_unm <- PC18_to_m_film_survey %>%
     include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
                 "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C2601 ~ "Comedy",
-                 C2602 ~ "Action movies",
-                 C2603 ~ "Historical movies",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
                  C2604 ~ "Thrillers",
-                 C2605 ~ "Adventure movies",
+                 C2605 ~ "Adventure",
                  C2606 ~ "Drama",
-                 C2607 ~ "Animated movies",
-                 C2608 ~ "Horror movies",
-                 C2609 ~ "Author's films",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
-                 C2612 ~ "Erotic movies",
+                 C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals ",
-                 C2616 ~ "Political movies"),
+                 C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -831,21 +829,21 @@ mean_genre_m <- PC18_m_film_survey %>%
     include = c("C2601", "C2602", "C2603", "C2604", "C2605", "C2606", "C2607", 
                 "C2608", "C2609", "C2610", "C2611", "C2612", "C2613", "C2614", "C2615", "C2616"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C2601 ~ "Comedy",
-                 C2602 ~ "Action movies",
-                 C2603 ~ "Historical movies",
+                 C2602 ~ "Action",
+                 C2603 ~ "Historical",
                  C2604 ~ "Thrillers",
-                 C2605 ~ "Adventure movies",
+                 C2605 ~ "Adventure",
                  C2606 ~ "Drama",
-                 C2607 ~ "Animated movies",
-                 C2608 ~ "Horror movies",
-                 C2609 ~ "Author's films",
+                 C2607 ~ "Animated",
+                 C2608 ~ "Horror",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
-                 C2612 ~ "Erotic movies",
+                 C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals ",
-                 C2616 ~ "Political movies"),
+                 C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -964,21 +962,21 @@ mean_genre_unm <- PC18_to_m_serie_survey %>%
     include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
                 "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C3801 ~ "Comedy",
-                 C3802 ~ "Action TV show",
-                 C3803 ~ "Historical TV show",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
                  C3804 ~ "Thrillers",
-                 C3805 ~ "Adventure TV show",
+                 C3805 ~ "Adventure",
                  C3806 ~ "Drama",
-                 C3807 ~ "Animated TV show",
-                 C3808 ~ "Horror TV show",
-                 C3809 ~ "Author TV show",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Serie d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
-                 C3812 ~ "Erotique TV show",
+                 C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
-                 C3816 ~ "Political TV show"),
+                 C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -999,21 +997,21 @@ mean_genre_m <- PC18_m_serie_survey %>%
     include = c("C3801", "C3802", "C3803", "C3804", "C3805", "C3806", "C3807", 
                 "C3808", "C3809", "C3810", "C3811", "C3812", "C3813", "C3814", "C3815", "C3816"), #L'ensemble des variables que l'on veut dans le tableau
     label = list(C3801 ~ "Comedy",
-                 C3802 ~ "Action TV show",
-                 C3803 ~ "Historical TV show",
+                 C3802 ~ "Action",
+                 C3803 ~ "Historical",
                  C3804 ~ "Thrillers",
-                 C3805 ~ "Adventure TV show",
+                 C3805 ~ "Adventure",
                  C3806 ~ "Drama",
-                 C3807 ~ "Animated TV show",
-                 C3808 ~ "Horror TV show",
-                 C3809 ~ "Author TV show",
+                 C3807 ~ "Animated",
+                 C3808 ~ "Horror",
+                 C3809 ~ "Serie d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
-                 C3812 ~ "Erotique TV show",
+                 C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
-                 C3816 ~ "Political TV show"),
+                 C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "no",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1104,8 +1102,8 @@ plot <- result_to_plot %>%
   mutate(name = recode_factor(name, 
                               "nbr_genre_music" = "Music genre",
                               "nbr_genre_film" = "Film genre",
-                              "nbr_genre_serie" = "Serie genre"),
-         name = factor(name, c("Serie genre", "Film genre", "Music genre")),
+                              "nbr_genre_serie" = "Series genre"),
+         name = factor(name, c("Series genre", "Film genre", "Music genre")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -1149,23 +1147,23 @@ plot <- result_to_plot %>%
                              "nbr_genre_music" = "Music",
                              "nbr_genre_aime" = "Music",
                              "nbr_genre_deteste" = "Music",
-                             "nbr_genre_film" = "Film",
-                             "nbr_genre_film_aime" = "Film",
-                             "nbr_genre_film_deteste" = "Film",
-                             "nbr_genre_serie" = "TV Show",
-                             "nbr_genre_serie_aime" = "TV Show",
-                             "nbr_genre_serie_deteste" = "TV Show"),
+                             "nbr_genre_film" = "Movies",
+                             "nbr_genre_film_aime" = "Movies",
+                             "nbr_genre_film_deteste" = "Movies",
+                             "nbr_genre_serie" = "TV series",
+                             "nbr_genre_serie_aime" = "TV series",
+                             "nbr_genre_serie_deteste" = "TV series"),
          name = recode_factor(name, 
-                              "nbr_genre_music" = "Genre consumed",
-                              "nbr_genre_aime" = "Genre liked",
-                              "nbr_genre_deteste" = "Genre hated",
-                              "nbr_genre_film" = "Genre consumed",
-                              "nbr_genre_film_aime" = "Genre liked",
-                              "nbr_genre_film_deteste" = "Genre hated",
-                              "nbr_genre_serie" = "Genre consumed",
-                              "nbr_genre_serie_aime" = "Genre liked",
-                              "nbr_genre_serie_deteste" = "Genre hated"),
-         name = factor(name, c("Genre hated", "Genre liked", "Genre consumed")),
+                              "nbr_genre_music" = "Number of genres consumed",
+                              "nbr_genre_aime" = "Number of genres liked",
+                              "nbr_genre_deteste" = "Number of genres hated",
+                              "nbr_genre_film" = "Number of genres consumed",
+                              "nbr_genre_film_aime" = "Number of genres liked",
+                              "nbr_genre_film_deteste" = "Number of genres hated",
+                              "nbr_genre_serie" = "Number of genres consumed",
+                              "nbr_genre_serie_aime" = "Number of genres liked",
+                              "nbr_genre_serie_deteste" = "Number of genres hated"),
+         name = factor(name, c("Number of genres hated", "Number of genres liked", "Number of genres consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -1183,6 +1181,7 @@ plot <- result_to_plot %>%
   labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   ) +
@@ -1210,20 +1209,19 @@ ggsave(filename = "SMD genre detailed.png",
 music_genre_unm <- PC18_to_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French song",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
                  E1003 ~ "Folk",
                  E1004 ~ "Pop",
                  E1005 ~ "RnB",
                  E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
-                 E1008 ~ "Metal",
+                 E1008 ~ "Metal/hard rock",
                  E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1243,20 +1241,19 @@ music_genre_unm <- PC18_to_m_music_survey %>%
 music_genre_m <- PC18_m_music_survey %>%
   tbl_svysummary(
     include = c("E1001", "E1002", "E1003", "E1004", "E1005", "E1006", "E1007", 
-                "E1008", "E1009", "E1010", "E1011", "E1012", "E1013"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(E1001 ~ "French song",
+                "E1008", "E1009", "E1010", "E1011", "E1012"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(E1001 ~ "Chanson",
                  E1002 ~ "World music",
                  E1003 ~ "Folk",
                  E1004 ~ "Pop",
                  E1005 ~ "RnB",
                  E1006 ~ "EDM",
                  E1007 ~ "Hip hop/rap",
-                 E1008 ~ "Metal",
+                 E1008 ~ "Metal/hard rock",
                  E1009 ~ "Rock",
                  E1010 ~ "Jazz",
                  E1011 ~ "Opera",
-                 E1012 ~ "Classical music",
-                 E1013 ~ "Other"),
+                 E1012 ~ "Classical"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1316,8 +1313,7 @@ plot <- d_music_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups", 
-       title = "Prevalence of consumption of musical genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("Proportion") +
@@ -1375,10 +1371,10 @@ plot <- d_music_detail_diff %>%
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of music genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1409,12 +1405,12 @@ film_genre_unm <- PC18_to_m_film_survey %>%
                  C2606 ~ "Drama",
                  C2607 ~ "Animated",
                  C2608 ~ "Horror",
-                 C2609 ~ "Author's films",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
                  C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals",
                  C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1445,12 +1441,12 @@ film_genre_m <- PC18_m_film_survey %>%
                  C2606 ~ "Drama",
                  C2607 ~ "Animated",
                  C2608 ~ "Horror",
-                 C2609 ~ "Author's films",
+                 C2609 ~ "Film d'auteur",
                  C2610 ~ "Documentary",
                  C2611 ~ "Western",
                  C2612 ~ "Erotic",
                  C2613 ~ "Science fiction",
-                 C2614 ~ "Romance",
+                 C2614 ~ "Romantic comedy",
                  C2615 ~ "Musicals",
                  C2616 ~ "Political"),
     by = film_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1512,8 +1508,7 @@ plot <- d_film_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups",
-       title = "Prevalence of consumption of film genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("") +
@@ -1570,10 +1565,10 @@ plot <- d_film_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of film genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1608,12 +1603,12 @@ show_genre_unm <- PC18_to_m_serie_survey %>%
                  C3806 ~ "Drama",
                  C3807 ~ "Animated",
                  C3808 ~ "Horror",
-                 C3809 ~ "Author",
+                 C3809 ~ "Series d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
                  C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1643,12 +1638,12 @@ show_genre_m <- PC18_m_serie_survey %>%
                  C3806 ~ "Drama",
                  C3807 ~ "Animated",
                  C3808 ~ "Horror",
-                 C3809 ~ "Author",
+                 C3809 ~ "Series d'auteur",
                  C3810 ~ "Documentary",
                  C3811 ~ "Western",
                  C3812 ~ "Erotique",
                  C3813 ~ "Science fiction",
-                 C3814 ~ "Romance",
+                 C3814 ~ "Romantic comedy",
                  C3815 ~ "Musical",
                  C3816 ~ "Political"),
     by = serie_stream_VOD, #La variale avec laquelle on croise les données qui ira en colonne
@@ -1709,8 +1704,7 @@ plot <- d_show_detail %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
-  labs(color = "Groups",
-       title = "Prevalence of consumption of show genres in each group") +
+  labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("") +
@@ -1769,10 +1763,10 @@ plot <- d_show_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of show genres consumed beetween users and non-users") +
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0.5, colour = 'black'),
         axis.text = element_text(colour = 'black', size = 14),
+        axis.title = element_text(size = 16),
         legend.title = element_text(colour = 'black', size = 14),
         strip.text.y = element_text(size = 14)
   )
@@ -1948,7 +1942,7 @@ d_music_lang_diff <- d_music_lang %>%
 foreign_lang_film_unm <- PC18_to_m_film_survey %>%
   tbl_svysummary(
     include = c(film_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(film_nonFR ~ "Film"),
+    label = list(film_nonFR ~ "Movie"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -1968,7 +1962,7 @@ foreign_lang_film_unm <- PC18_to_m_film_survey %>%
 foreign_lang_film_m <- PC18_m_film_survey %>%
   tbl_svysummary(
     include = c(film_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(film_nonFR ~ "Film"),
+    label = list(film_nonFR ~ "Movie"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2047,7 +2041,7 @@ d_film_lang_diff <- d_film_lang %>%
 foreign_lang_show_unm <- PC18_to_m_serie_survey %>%
   tbl_svysummary(
     include = c(serie_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(serie_nonFR ~ "Show"),
+    label = list(serie_nonFR ~ "Series"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2067,7 +2061,7 @@ foreign_lang_show_unm <- PC18_to_m_serie_survey %>%
 foreign_lang_show_m <- PC18_m_serie_survey %>%
   tbl_svysummary(
     include = c(serie_nonFR), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(serie_nonFR ~ "Show"),
+    label = list(serie_nonFR ~ "Series"),
     by = stream_spe, #La variale avec laquelle on croise les données qui ira en colonne
     missing = "ifany",
     statistic = list(all_continuous() ~ "{mean} ans ({sd})",
@@ -2148,9 +2142,9 @@ d_show_lang_diff <- d_show_lang %>%
 
 ```{r}
 d_three_diff <- dplyr::union(d_music_lang_diff %>% mutate(medium = "Music"),
-                             d_film_lang_diff %>% mutate(medium = "Film")) %>% 
-  dplyr::union(d_show_lang_diff %>% mutate(medium = "Show")) %>% 
-  mutate(medium = factor(medium, c("Show", "Film", "Music"), labels = c("Show", "Film", "Music")),
+                             d_film_lang_diff %>% mutate(medium = "Movie")) %>% 
+  dplyr::union(d_show_lang_diff %>% mutate(medium = "Series")) %>% 
+  mutate(medium = factor(medium, c("Series", "Movie", "Music"), labels = c("Series", "Movie", "Music")),
          group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) 
 
 plot <- d_three_diff %>% 
@@ -2165,9 +2159,7 @@ plot <- d_three_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample",
-       title = "Difference in the prevalence of foreign language cultural consomption") +
-  
+  labs(color="Sample") +
   theme(plot.title = element_text(hjust = 0, colour = 'black', size = 9),
         axis.text = element_text(colour = 'black', size = 7),
         axis.title.x = element_text(size = 9),
