@@ -3,16 +3,14 @@
 library(tidyverse)
 library(questionr)
 
-####################
+#------------------#
 #### Socio démo ####
-####################
+#------------------#
 
-# on supprime les individus sans pondération
 PC18 <- subset(PC18, !is.na(PC18$POND))
 
 
-#pour que la pop total soit égale au nombre de ligne dans la base 
-#(on divise la pondération par la somme de toutes les pondérations divisées par le nombre d'individus)
+# Scaling pond
 tmp <- sum(PC18$POND)/nrow(PC18) 
 PC18$POND <- PC18$POND/tmp
 
@@ -275,9 +273,9 @@ PC18$logement <- fct_recode(PC18$logement,
                          "A titre gratuit" = "5"
 )
 
-#########################################
+#---------------------------------------#
 #### Sorties (hors culture legitime) ####
-#########################################
+#---------------------------------------#
 
 
 ## Recodage de PC18$A8 en PC18$sorties_ami
@@ -304,15 +302,15 @@ PC18 <- PC18 %>% mutate(
 
 
 
-############################
+#--------------------------#
 #### Pratiques amateurs ####
-############################
+#--------------------------#
 
 PC18$music_amateur <- PC18$A1901
 
-######################
+#--------------------#
 #### Jeux vidéos #####
-######################
+#--------------------#
 
 ## Recodage de PC18$B2 en PC18$freq_jv
 PC18$freq_jv <- as.character(PC18$B2)
@@ -328,9 +326,9 @@ PC18$freq_jv <- fct_recode(PC18$freq_jv,
 )
 PC18$freq_jv <- fct_explicit_na(PC18$freq_jv, "Ne joue pas aux JV")
 
-######################
+#--------------------#
 #### Audiovisuel #####
-######################
+#--------------------#
 
 ## Recodage de PC18$C1 en PC18$freq_tv
 PC18$freq_tv <- as.character(PC18$C1)
@@ -550,9 +548,9 @@ PC18$nbr_serie_vu <- rowSums(PC18[,list])
 PC18$nbr_serie_vu[is.na(PC18$nbr_serie_vu)] <- 0
 
 
-###################################
+##--------------------------------#
 #### Information et actualité #####
-###################################
+#---------------------------------#
 
 # varaible synthétique moyen d'information internet
 
@@ -577,9 +575,9 @@ PC18$freq_info <- fct_recode(PC18$freq_info,
 
 
 
-##################
+##---------------#
 #### Lecture #####
-##################
+##---------------#
 
 PC18$autojuge_lecture <- as.character(PC18$F5)
 PC18$autojuge_lecture <- fct_recode(PC18$autojuge_lecture,
@@ -624,9 +622,9 @@ PC18$lecture_nonFR <- fct_recode(PC18$lecture_nonFR,
 )
 PC18$lecture_nonFR <- fct_explicit_na(PC18$lecture_nonFR, na_level = "Ne lit pas de livre")
 
-#######################################
+#-------------------------------------#
 #### Sortie culturelles legitimes #####
-#######################################
+#------------------------------------#
 
 # Nombre de genre cinématographiques vue au cinéma. Les gens qui ne vont pas au cinéma 0.
 list <- c("G701", "G702", "G703", "G704", "G705", "G706", "G707", 
@@ -649,9 +647,9 @@ PC18 <- PC18 %>% mutate(
 # galerie d'art au cours des 12 mois
 PC18$galerie_12m <- PC18$H206
 
-###############################
+#-----------------------------#
 #### Equipement multimédia ####
-###############################
+#-----------------------------#
 
 # foyer avec un ordinateur ou une tablette
 
@@ -694,9 +692,9 @@ PC18 <- PC18 %>% mutate(
     is.na(I72) ~ 0
   ))
 
-###########################
+#-------------------------#
 #### Situation enfance ####
-###########################
+#-------------------------#
 
 
 PC18$tv_enfance <- as.character(PC18$M1_SQ1)
@@ -744,9 +742,9 @@ list <- c("M201", "M202", "M203", "M204", "M205", "M206", "M207",
 PC18$nbr_genre_ecoute_enfance <- rowSums(PC18[,list])
 PC18$nbr_genre_ecoute_enfance[PC18$M214 == 1] <- 0
 
-#########################
+#-----------------------#
 #### Cosmopolitisme #####
-#########################
+#-----------------------#
 
 
 PC18$music_nonFR <- PC18$E15 %>%
@@ -802,9 +800,9 @@ PC18$info_nonFR <- fct_explicit_na(PC18$info_nonFR, na_level = "Ne s'informe pas
 
 
 
-##################
+#----------------#
 #### Musique #####
-##################
+#----------------#
 
 ## Fréquence d'écoute de musique
 PC18$music_12m <- as.character(PC18$E7)
