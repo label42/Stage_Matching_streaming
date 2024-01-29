@@ -22,6 +22,12 @@ PC18 <- PC18 %>% mutate(
 PC18$SEXE_r <- as.factor(PC18$SEXE_r)
 
 PC18 <- PC18 %>% mutate(    
+  SEXE_femme = case_when(
+    SEXE == 1 ~ 0,
+    SEXE == 2 ~ 1
+  ))
+
+PC18 <- PC18 %>% mutate(    
   AGE_r = case_when(
     AGE >= 15 & AGE <= 25 ~ "15 - 25",
     AGE > 25 & AGE <= 35 ~ "26 - 35",
@@ -141,15 +147,40 @@ PC18 <- PC18 %>% mutate(
     DIPLOM == 10 ~ "Bac +2/3",
     DIPLOM == 11 ~ "Bac +2/3",
     DIPLOM == 12 ~ "Bac +5",
-    DIPLOM == 13 ~ "Doctorat"
+    DIPLOM == 13 ~ "Bac +5"
   ))
 PC18$DIPLOME_r <- as.factor(PC18$DIPLOME_r)
 
 ## Réordonnancement de PC18$DIPLOME_r
 PC18$DIPLOME_r <- fct_relevel(
   PC18$DIPLOME_r,
-  "Inf. Bac", "Bac", "Bac +2/3", "Bac +5", "Doctorat"
+  "Inf. Bac", "Bac", "Bac +2/3", "Bac +5"
 )
+
+PC18 <- PC18 %>% mutate(    
+  DIPLOME_eng = case_when(
+    DIPLOM == 1 ~ "Less than High School",
+    DIPLOM == 2 ~ "Less than High School",
+    DIPLOM == 3 ~ "Less than High School",
+    DIPLOM == 4 ~ "Less than High School",
+    DIPLOM == 5 ~ "Less than High School",
+    DIPLOM == 6 ~ "Less than High School",
+    DIPLOM == 7 ~ "High School",
+    DIPLOM == 8 ~ "High School",
+    DIPLOM == 9 ~ "High School",
+    DIPLOM == 10 ~ "Some college, bachelor degree",
+    DIPLOM == 11 ~ "Some college, bachelor degree",
+    DIPLOM == 12 ~ "Graduate education",
+    DIPLOM == 13 ~ "Graduate education"
+  ))
+PC18$DIPLOME_eng <- as.factor(PC18$DIPLOME_eng)
+
+## Réordonnancement de PC18$DIPLOME_r
+PC18$DIPLOME_eng <- fct_relevel(
+  PC18$DIPLOME_eng,
+  "Less than High School", "High School", "Some college, bachelor degree", "Graduate education"
+)
+
 
 #GranPC18 domaine d'étude du diplome le plus haut obtenu
 

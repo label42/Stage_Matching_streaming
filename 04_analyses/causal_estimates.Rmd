@@ -28,6 +28,8 @@ library(ggthemes)
 
 
 source(here("02_import", "import_bases.R"))
+
+PC18 <- PC18 %>% filter(AGE > 20)
 ```
 
 # Performing matching
@@ -108,7 +110,6 @@ allvar_mod <- c("SEXE_r_Homme",
                 "DIPLOME_r_Bac",
                 "DIPLOME_r_Bac +2/3",
                 "DIPLOME_r_Bac +5",
-                "DIPLOME_r_Doctorat",
                 "naiss_parents_Deux parents nés à l'étranger",
                 "naiss_parents_Deux parents nés en France",
                 "naiss_parents_Un des deux parents né à l'étranger",
@@ -268,43 +269,30 @@ ggsave("traitements_article_files/plot png/music_love_part2.png", width = 21, he
 
 ### Age variable
 
-**Before matching**
 ```{r}
-ggplot(PC18_to_m_music) + 
-  aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_to_m_music$POND) +
+bind_rows(
+  PC18_to_m_music %>% select(AGE, stream_spe, POND) %>% 
+  mutate(matching_status = "Before matching"),
+  PC18_m_music %>% select(AGE, stream_spe, POND) %>% 
+  mutate(matching_status = "After matching")) %>% 
+  mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
+  ggplot() + 
+  aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = POND) +
   scale_color_manual(values=c("#d7191c", "#1a9641"),
                      labels = c("0" = "Not treated",
                                   "1" ="Treated"), name = "Group") +
   scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
   guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
   geom_density(alpha = 5/10) +
+  facet_grid( ~ matching_status) +
   ylab("Density") +
   xlab("Age") +
   theme_bw()
 
-
-ggsave("traitements_article_files/plot png/music_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+ggsave("traitements_article_files/plot png/music_age.png", width = 18, height = 10, units = "cm", dpi = 300,
        bg = "white", device = "png")
 ```
 
-
-**After matching**
-```{r}
-ggplot(PC18_m_music) + 
-  aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = PC18_m_music$POND_m) + 
-  geom_density(alpha = 5/10) + 
-  ylab("Density") +
-  xlab("Age") +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
-                     labels = c("0" = "Not treated",
-                                  "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
-  theme_bw()
-
-ggsave("traitements_article_files/plot png/music_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
-       bg = "white", device = "png")
-```
 
 ## Film
 
@@ -351,7 +339,6 @@ allvar_mod <- c("SEXE_r_Homme",
                 "DIPLOME_r_Bac",
                 "DIPLOME_r_Bac +2/3",
                 "DIPLOME_r_Bac +5",
-                "DIPLOME_r_Doctorat",
                 "naiss_parents_Deux parents nés à l'étranger",
                 "naiss_parents_Deux parents nés en France",
                 "naiss_parents_Un des deux parents né à l'étranger",
@@ -509,40 +496,27 @@ ggsave("traitements_article_files/plot png/film_love_part2.png", width = 21, hei
 
 ### Age variable
 
-**Before matching**
 ```{r}
-ggplot(PC18_to_m_film) + 
-  aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = PC18_to_m_film$POND) +
+bind_rows(
+  PC18_to_m_film %>% select(AGE, film_stream_VOD, POND) %>% 
+  mutate(matching_status = "Before matching"),
+  PC18_m_film %>% select(AGE, film_stream_VOD, POND) %>% 
+  mutate(matching_status = "After matching")) %>% 
+  mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
+  ggplot() + 
+  aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = POND) +
   scale_color_manual(values=c("#d7191c", "#1a9641"),
                      labels = c("0" = "Not treated",
                                   "1" ="Treated"), name = "Group") +
   scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
   guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
-  theme_bw() +
   geom_density(alpha = 5/10) +
-  ylab("Density") +
-  xlab("Age")
-
-ggsave("traitements_article_files/plot png/film_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
-       bg = "white", device = "png")
-```
-
-
-**After matching**
-```{r}
-ggplot(PC18_m_film) + 
-  aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = PC18_m_film$POND_m) + 
-  geom_density(alpha = 5/10) + 
+  facet_grid( ~ matching_status) +
   ylab("Density") +
   xlab("Age") +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
-                     labels = c("0" = "Not treated",
-                                  "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
   theme_bw()
 
-ggsave("traitements_article_files/plot png/film_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+ggsave("traitements_article_files/plot png/film_age.png", width = 18, height = 10, units = "cm", dpi = 300,
        bg = "white", device = "png")
 ```
 
@@ -593,7 +567,6 @@ allvar_mod <- c("SEXE_r_Homme",
                 "DIPLOME_r_Bac",
                 "DIPLOME_r_Bac +2/3",
                 "DIPLOME_r_Bac +5",
-                "DIPLOME_r_Doctorat",
                 "naiss_parents_Deux parents nés à l'étranger",
                 "naiss_parents_Deux parents nés en France",
                 "naiss_parents_Un des deux parents né à l'étranger",
@@ -751,43 +724,75 @@ ggsave("traitements_article_files/plot png/serie_love_part2.png", width = 21, he
 
 ### Age variable
 
-**Before matching**
 ```{r}
-ggplot(PC18_to_m_serie) + 
-  aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = PC18_to_m_serie$POND) +
+bind_rows(
+  PC18_to_m_serie %>% select(AGE, serie_stream_VOD, POND) %>% 
+  mutate(matching_status = "Before matching"),
+  PC18_m_serie %>% select(AGE, serie_stream_VOD, POND) %>% 
+  mutate(matching_status = "After matching")) %>% 
+  mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
+  ggplot() + 
+  aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = POND) +
   scale_color_manual(values=c("#d7191c", "#1a9641"),
                      labels = c("0" = "Not treated",
                                   "1" ="Treated"), name = "Group") +
   scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
   guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
-  theme_bw() +
   geom_density(alpha = 5/10) +
-  ylab("Density") +
-  xlab("Age")
-
-ggsave("traitements_article_files/plot png/serie_age_before_m.png", width = 18, height = 10, units = "cm", dpi = 300,
-       bg = "white", device = "png")
-```
-
-
-**After matching**
-```{r}
-ggplot(PC18_m_serie) + 
-  aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = PC18_m_serie$POND_m) + 
-  geom_density(alpha = 5/10) + 
+  facet_grid( ~ matching_status) +
   ylab("Density") +
   xlab("Age") +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
-                     labels = c("0" = "Not treated",
-                                  "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
   theme_bw()
 
-ggsave("traitements_article_files/plot png/serie_age_after_m.png", width = 18, height = 10, units = "cm", dpi = 300,
+ggsave("traitements_article_files/plot png/serie_age.png", width = 18, height = 10, units = "cm", dpi = 300,
        bg = "white", device = "png")
 ```
 
+## size of treated, non-treated, and control groups
+
+```{r}
+tmp_music <- bind_rows(PC18_to_m_music %>% select(stream_spe) %>% 
+                               mutate(matching_status = 0),
+                             PC18_m_music %>% select(stream_spe) %>% 
+                               mutate(matching_status = 1)) %>% 
+  mutate(medium = "Music") %>% 
+  rename("stream" = "stream_spe")
+
+tmp_movie <- bind_rows(PC18_to_m_film %>% select(film_stream_VOD) %>% 
+                               mutate(matching_status = 0),
+                             PC18_m_film %>% select(film_stream_VOD) %>% 
+                               mutate(matching_status = 1)) %>% 
+  mutate(medium = "Movie") %>% 
+  rename("stream" = "film_stream_VOD")
+
+tmp_series <- bind_rows(PC18_to_m_serie %>% select(serie_stream_VOD) %>% 
+                               mutate(matching_status = 0),
+                             PC18_m_serie %>% select(serie_stream_VOD) %>% 
+                               mutate(matching_status = 1)) %>% 
+  mutate(medium = "Series") %>% 
+  rename("stream" = "serie_stream_VOD")
+
+overall_summary <- bind_rows(tmp_music, tmp_movie, tmp_series) %>% 
+  group_by(matching_status, medium, stream) %>% 
+  summarise(n = n(), .groups = "drop") %>% 
+  filter(!(matching_status == 1 & stream == 1)) %>% 
+  arrange(desc(n)) %>% 
+  pivot_wider(names_from = c(matching_status, stream),
+              values_from = n) %>% 
+  relocate("0_0", .after = "0_1") %>% 
+  rename("Domain" = "medium",
+         "Size of treated group" = "0_1",
+         "Size of non-treated group" = "0_0",
+         "Size of control group selected by matching procedure" = "1_0") %>% 
+  gt() %>% 
+  opt_table_font(font = "Times New Roman") %>%
+  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
+              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
+              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
+              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+
+overall_summary
+```
 
 
 # Outcomes
@@ -1534,9 +1539,9 @@ d_music_detail <- music_detail$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 6023,
-                  group == "non_user_m" ~ 1438,
-                  group == "user" ~ 2270),
+    n = case_when(group == "non_user_unm" ~ 5839,
+                  group == "non_user_m" ~ 1368,
+                  group == "user" ~ 1922),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -1735,9 +1740,9 @@ d_film_detail <- film_detail$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 5003,
-                  group == "non_user_m" ~ 1387,
-                  group == "user" ~ 2265),
+    n = case_when(group == "non_user_unm" ~ 4844,
+                  group == "non_user_m" ~ 1350,
+                  group == "user" ~ 1925),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -1935,9 +1940,9 @@ d_show_detail <- show_detail$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 4274,
-                  group == "non_user_m" ~ 1053,
-                  group == "user" ~ 1778),
+    n = case_when(group == "non_user_unm" ~ 4122,
+                  group == "non_user_m" ~ 1024,
+                  group == "user" ~ 1463),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -2163,9 +2168,9 @@ d_music_lang <- music_lang$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 6023,
-                  group == "non_user_m" ~ 1438,
-                  group == "user" ~ 2270),
+    n = case_when(group == "non_user_unm" ~ 5839,
+                  group == "non_user_m" ~ 1368,
+                  group == "user" ~ 1922),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -2263,9 +2268,9 @@ d_film_lang <- film_lang$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 5003,
-                  group == "non_user_m" ~ 1387,
-                  group == "user" ~ 2265),
+    n = case_when(group == "non_user_unm" ~ 4844,
+                  group == "non_user_m" ~ 1350,
+                  group == "user" ~ 1925),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -2362,9 +2367,9 @@ d_show_lang <- show_lang$table_body %>%
   pivot_wider(values_from = value,
               names_from = valeur) %>% 
   mutate(
-    n = case_when(group == "non_user_unm" ~ 4274,
-                  group == "non_user_m" ~ 1053,
-                  group == "user" ~ 1778),
+    n = case_when(group == "non_user_unm" ~ 4122,
+                  group == "non_user_m" ~ 1024,
+                  group == "user" ~ 1463),
     p = v / 100,
     ci_up = (p + 1.96 * sqrt((p * (1 - p)) / n)) * 100,
     ci_down = (p - 1.96 * sqrt((p * (1 - p)) / n)) * 100)
@@ -2420,12 +2425,12 @@ plot <- d_three_diff %>%
   labs(color="Sample") +
   scale_color_manual(values=c("#1a9641", "#d7191c")) +
   theme_bw() +
-  theme(plot.title = element_text(hjust = 0, colour = 'black', size = 9),
-        axis.text = element_text(colour = 'black', size = 7),
-        axis.title.x = element_text(size = 9),
-        legend.title = element_text(colour = 'black', size = 9),
-        legend.text = element_text(colour = 'black', size = 7),
-        strip.text.y = element_text(size =7)
+  theme(plot.title = element_text(hjust = 0, colour = 'black', size = 14),
+        axis.text = element_text(colour = 'black', size = 12),
+        axis.title.x = element_text(size = 14),
+        legend.title = element_text(colour = 'black', size = 14),
+        legend.text = element_text(colour = 'black', size = 12),
+        strip.text.y = element_text(size =12)
   )
 
 plot
@@ -2433,13 +2438,12 @@ plot
 ggsave(filename = "Diff in foreign language.png",
        path = "traitements_article_files/plot png",
        device = "png",
-       width = 12,
-       height = 8,
+       width = 18,
+       height = 10,
        units = "cm")
 
 
 ```
-
 
 
 

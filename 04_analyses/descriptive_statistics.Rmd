@@ -28,6 +28,8 @@ library(ggthemes)
 
 
 source(here("02_import", "import_bases.R"))
+
+PC18 <- PC18 %>% filter(AGE > 20)
 ```
 
 # Description of streaming users population
@@ -40,280 +42,120 @@ PC18_survey <- survey::svydesign(id = ~IDENT18, data = PC18, weights = PC18$POND
 
 ## Music streaming
 
-
-### Prevalence of music streaming practice
-
-```{r}
-t_modes_ecoute <- PC18_survey %>%
-  subset(!is.na(stream_spe)) %>%
-  tbl_svysummary(
-    include = c("stream_spe"), 
-    label = list(stream_spe ~ "Streaming music on a specialised platform (Spotify, Deezer, Qobuz, etc.)"),
-    missing = "no",
-    statistic = list(all_continuous() ~ "{mean} ({sd})",
-                     all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(1,1),
-                  all_categorical() ~ c(0,0))
-  ) %>%
-  modify_header(label = "**Listening to music via :**") %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Survey on cultural practices of the french 2018.
-    <br><u>Données</u> : Pourcentages pondérés.
-                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
-                                     <br><u>Lecture</u> : Dans la population totale des auditeurs de musique, 31 % déclarent utiliser les plateformes de streaming spécialisées (Spotify, Deezer, Qobuz, etc).</p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
-
-t_modes_ecoute
-```
-
-
 ### soc-dem char X streaming music
 ```{r}
-t_stream_socdem <- PC18_survey %>%
+t_stream_music_socdem <- PC18_survey %>%
   subset(!is.na(stream_spe)) %>%
   tbl_svysummary(
-    include = c("stream_spe", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(AGE ~ "Age moyen (écart-type)",
-                 AGE_r ~ "Age en tranche",
-                 SEXE_r ~ "Sexe",
-                 DIPLOME_r ~ "Niveau de diplôme",
-                 PCS_MENAGE ~ "PCS Ménage"),
+    include = c("stream_spe", "AGE", "SEXE_femme", "DIPLOME_eng"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age mean (sd)",
+                 SEXE_femme ~ "% women",
+                 DIPLOME_eng ~ "Education level"),
     by = stream_spe,
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
-                     all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(0,0))
-  ) %>%
-  add_overall(last = T,
-  ) %>%
-  add_p(test = list(all_continuous() ~ "svy.t.test",
-                    all_categorical() ~ "svy.chisq.test")) %>%
-  bold_labels() %>%
-  modify_header(update = list(
-    all_stat_cols() ~ "**{level}**, N = {n_unweighted}",
-    stat_1 ~ gt::html("**Non streameur**<br> N = {n_unweighted}"),
-    stat_2 ~ gt::html("**Streameur**<br> N = {n_unweighted}"))) %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
-                                p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
-                                khi-2 pour les variables catégorielles.")) %>% 
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
-    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
-                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant écouter de la musique.
-                                     <br> <u>Lecture</u> : Parmi les utilisateurs de plateformes de streaming spécialisées, 32 % ont entre 15 et 25 ans. En revanche, dans la population totale des gens déclarant écouter de la musique, les 15 - 25 ans ne représentent que 16 % des individus.</p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
-
-t_stream_socdem
-```
-
-### Some cultural engagement variables X streaming music
-
-```{r}
-t_stream_cult <- PC18_survey %>%
-  subset(!is.na(stream_spe)) %>%
-  tbl_svysummary(
-    include = c("stream_spe", "musee_art_12m", "freq_jv", "freq_tv", "freq_lecture"), #L'ensemble des variables que l'on veut dans le tableau
-    by = stream_spe,
-    missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
-                     all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(0,0))
-  ) %>%
-  add_overall(last = T,
-  ) %>%
-  add_p(test = list(all_continuous() ~ "svy.t.test",
-                    all_categorical() ~ "svy.chisq.test")) %>%
-  bold_labels() %>%
-  modify_header(update = list(
-    all_stat_cols() ~ "**{level}**, N = {n_unweighted}",
-    stat_1 ~ gt::html("**Non streameur**<br> N = {n_unweighted}"),
-    stat_2 ~ gt::html("**Streameur**<br> N = {n_unweighted}"))) %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
-                                p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
-                                khi-2 pour les variables catégorielles.")) %>% 
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : 
-    <br> <u>Champ</u> : 
-                                     <br> <u>Champ</u> : 
-                                     <br> <u>Lecture</u> : </p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
-
-t_stream_cult
-```
-
-
-## Film
-
-### prevalence of film streaming practice
-
-```{r}
-t_modes_ecoute <- PC18_survey %>%
-  subset(freq_film != "Jamais") %>%
-  tbl_svysummary(
-    include = c("film_stream_VOD"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(film_stream_VOD ~ "Streaming VOD sur une plateforme spécialisée (netflix, canalPlay, OCS)"),
-    missing = "no",
+    missing_text = "N missing",
     statistic = list(all_continuous() ~ "{mean} ({sd})",
                      all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(1,1),
-                  all_categorical() ~ c(0,0))
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 0)
   ) %>%
-  modify_header(label = "**Regarde des films via :**") %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
-    <br><u>Données</u> : Pourcentages pondérés.
-                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des films.
-                                     <br><u>Lecture</u> : </p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+  add_overall(last = T
+  ) %>% 
+  bold_labels() %>%
+  modify_header(update = list(
+    all_stat_cols() ~ "**{level}**, N = {n_unweighted}",
+    stat_1 ~ gt::html("**Non user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_2 ~ gt::html("**Streaming user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_0 ~ gt::html("**All music consumers**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"))) %>%
+  modify_footnote(update = everything() ~ NA)
 
-t_modes_ecoute
+t_stream_music_socdem
 ```
+
+## Film
 
 ### soc-dem X watching film on streaming plateforme
 
 ```{r}
-t_stream_socdem <- PC18_survey %>%
+
+t_stream_film_socdem <- PC18_survey %>%
   subset(freq_film != "Jamais") %>%
   tbl_svysummary(
-    include = c("film_stream_VOD", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(AGE ~ "Age moyen (écart-type)",
-                 AGE_r ~ "Age en tranche",
-                 SEXE_r ~ "Sexe",
-                 DIPLOME_r ~ "Niveau de diplôme",
-                 PCS_MENAGE ~ "PCS Ménage"),
+    include = c("film_stream_VOD", "AGE", "SEXE_femme", "DIPLOME_eng"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age mean (sd)",
+                 SEXE_femme ~ "% women",
+                 DIPLOME_eng ~ "Education level"),
     by = film_stream_VOD,
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+    missing_text = "N missing",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
                      all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(0,0))
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 0)
   ) %>%
-  add_overall(last = T) %>%
-  add_p(test = list(all_continuous() ~ "svy.t.test",
-                    all_categorical() ~ "svy.chisq.test")) %>%
+  add_overall(last = T
+  ) %>% 
   bold_labels() %>%
   modify_header(update = list(
     all_stat_cols() ~ "**{level}**, N = {n_unweighted}",
-    stat_1 ~ gt::html("**Non streameur**<br> N = {n_unweighted}"),
-    stat_2 ~ gt::html("**Streameur**<br> N = {n_unweighted}"))) %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
-                                p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
-                                khi-2 pour les variables catégorielles.")) %>% 
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
-    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
-                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des films.
-                                     <br> <u>Lecture</u> : </p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
+    stat_1 ~ gt::html("**Non user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_2 ~ gt::html("**Streaming user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_0 ~ gt::html("**All movies consumers**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"))) %>%
+  modify_footnote(update = everything() ~ NA) 
 
-t_stream_socdem
+t_stream_film_socdem
 ```
 
 ## Show
 
-### prevalence of show streaming practice
-
-```{r}
-t_modes_ecoute <- PC18_survey %>%
-  subset(freq_serie != "Jamais") %>%
-  tbl_svysummary(
-    include = c("serie_stream_VOD"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(serie_stream_VOD ~ "Streaming VOD sur une plateforme spécialisée (netflix, canalPlay, OCS)"),
-    missing = "no",
-    statistic = list(all_continuous() ~ "{mean} ({sd})",
-                     all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(1,1),
-                  all_categorical() ~ c(0,0))
-  ) %>%
-  modify_header(label = "**Regarde des séries via :**") %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.")) %>%
-  as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratiques culturelles des français 2018.
-    <br><u>Données</u> : Pourcentages pondérés.
-                                     <br><u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des séries.
-                                     <br><u>Lecture</u> : </p>")) %>%
-  opt_table_font(font = "Times New Roman") %>%
-  tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
-              table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
-              heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
-              table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
-
-t_modes_ecoute
-```
-
 ### soc-dem X watching show on streaming plateformes
 
 ```{r}
-t_stream_socdem <- PC18_survey %>%
+t_stream_serie_socdem <- PC18_survey %>%
   subset(freq_serie != "Jamais") %>%
   tbl_svysummary(
-    include = c("serie_stream_VOD", "AGE", "AGE_r", "SEXE_r", "DIPLOME_r", "PCS_MENAGE"), #L'ensemble des variables que l'on veut dans le tableau
-    label = list(AGE ~ "Age moyen (écart-type)",
-                 AGE_r ~ "Age en tranche",
-                 SEXE_r ~ "Sexe",
-                 DIPLOME_r ~ "Niveau de diplôme",
-                 PCS_MENAGE ~ "PCS Ménage"),
+    include = c("serie_stream_VOD", "AGE", "SEXE_femme", "DIPLOME_eng"), #L'ensemble des variables que l'on veut dans le tableau
+    label = list(AGE ~ "Age mean (sd)",
+                 SEXE_femme ~ "% women",
+                 DIPLOME_eng ~ "Education level"),
     by = serie_stream_VOD,
     missing = "ifany",
-    statistic = list(all_continuous() ~ "{mean} ans ({sd})",
+    missing_text = "N missing",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
                      all_categorical() ~ "{p} %"),
-    digits = list(all_continuous() ~ c(0,0))
+    digits = list(all_continuous() ~ c(0,0),
+                  all_categorical() ~ 0)
   ) %>%
-  add_overall(last = T) %>%
-  add_p(test = list(all_continuous() ~ "svy.t.test",
-                    all_categorical() ~ "svy.chisq.test")) %>%
+  add_overall(last = T
+  ) %>% 
   bold_labels() %>%
   modify_header(update = list(
     all_stat_cols() ~ "**{level}**, N = {n_unweighted}",
-    stat_1 ~ gt::html("**Non streameur**<br> N = {n_unweighted}"),
-    stat_2 ~ gt::html("**Streameur**<br> N = {n_unweighted}"))) %>%
-  modify_footnote(update = everything() ~ NA) %>%
-  modify_footnote(update = list(stat_0 ~ "Effectifs non pondérés.",
-                                p.value ~ "Calculé à partir d'un test de Student pour les variables continues, 
-                                khi-2 pour les variables catégorielles.")) %>% 
+    stat_1 ~ gt::html("**Non user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_2 ~ gt::html("**Streaming user**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"),
+    stat_0 ~ gt::html("**All series consumers**<br> N = {n_unweighted} <br> {round(p_unweighted * 100, 0)} %"))) %>%
+  modify_footnote(update = everything() ~ NA) 
+
+t_stream_serie_socdem
+```
+
+
+## The three together
+
+```{r}
+tbl_all_stream_socdem <-
+  tbl_merge(
+    tbls = list(t_stream_music_socdem, t_stream_film_socdem, t_stream_serie_socdem),
+    tab_spanner = c("**Music**", "**Movies**", "**Series**")
+  ) %>%
   as_gt() %>%
-  tab_source_note(source_note = gt::html("<p align=\"justify\" style=\"
-    margin: 0;\"><u>Source</u> : Enquête Pratique culturelles des français 2018.
-    <br> <u>Champ</u> : Moyennes et écart-types pondérés. Pourcentages pondérés.
-                                     <br> <u>Champ</u> : Résidant en France agés de 15 ans et plus, déclarant regarder des séries.
-                                     <br> <u>Lecture</u> : </p>")) %>%
   opt_table_font(font = "Times New Roman") %>%
   tab_options(table_body.hlines.color = "black", source_notes.border.bottom.color = "black", table_body.border.bottom.color = "black",
               table_body.border.top.color = "black", row_group.border.top.color = "black", row_group.border.bottom.color = "black",
               heading.border.bottom.color = "black", column_labels.border.top.color = "black",  table.border.top.color = "black",
               table.border.bottom.color = "black", column_labels.border.bottom.color = "black")
 
-t_stream_socdem
+
+tbl_all_stream_socdem
 ```
+
