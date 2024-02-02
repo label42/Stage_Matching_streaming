@@ -1,10 +1,8 @@
-library(tidyverse)
-library(questionr)
 library(MatchIt)
 library(here)
 
-
-source(here("03_scripts", "gestion_NA_matching.R"))
+load(here("data", "PC18.RData"))
+source(here("R", "gestion_NA_matching.R"))
 
 list_var_match_serie <- c("serie_stream_VOD", "SEXE_r", "AGE_5_r", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere","sorties_ami", "VITENCOUPLE_r", 
@@ -54,3 +52,5 @@ PC18_m_serie <- match.data(res_match_template_stream_serie_VOD, weights = "POND_
 
 tmp <- sum(PC18_m_serie$POND_m)/nrow(PC18_m_serie) 
 PC18_m_serie$POND_m <- PC18_m_serie$POND_m/tmp
+
+save(PC18_m_serie, PC18_to_m_serie, res_match_template_stream_serie_VOD, file = here("data", "serie_matched.RData"))

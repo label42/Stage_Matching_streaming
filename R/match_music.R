@@ -1,9 +1,8 @@
-library(tidyverse)
-library(questionr)
 library(MatchIt)
 library(here)
 
-source(here("03_scripts", "gestion_NA_matching.R"))
+load(here("data", "PC18.RData"))
+source(here("R", "gestion_NA_matching.R"))
 
 list_var_match_music <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere","sorties_ami", "VITENCOUPLE_r", 
@@ -60,3 +59,4 @@ PC18_m_music <- match.data(res_match_template_stream_music, weights = "POND_m")
 tmp <- sum(PC18_m_music$POND_m)/nrow(PC18_m_music) 
 PC18_m_music$POND_m <- PC18_m_music$POND_m/tmp
 
+save(PC18_m_music, PC18_to_m_music, res_match_template_stream_music, file = here("data", "music_matched.RData"))

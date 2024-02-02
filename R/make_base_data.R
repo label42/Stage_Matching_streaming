@@ -1,7 +1,11 @@
-
-
 library(tidyverse)
+library(here)
 library(questionr)
+
+PC18 <- read.csv(here("data", "pc18_quetelet_octobre2021.csv"),sep=";")
+
+# Filter out 20 yo and less
+PC18 <- PC18 %>% filter(AGE > 20)
 
 #------------------#
 #### Socio démo ####
@@ -75,16 +79,16 @@ PC18$AGE_5_r <- as.factor(PC18$AGE_5_r)
 
 ## Recodage de PC18$G_PCS_MENAGE_ en PC18$PCS_MENAGE
 PC18$PCS_MENAGE <- fct_recode(PC18$G_PCS_MENAGE_,
-                           NULL = "",
-                           NULL = "1971",
-                           NULL = "2001",
-                           "Dominante cadre" = "I",
-                           "Dominante intermédiaire" = "II",
-                           "Dominante indépendante" = "IV",
-                           "Dominante employée" = "III",
-                           "Dominante ouvrière" = "V",
-                           "Un employé ou ouvrier" = "VI",
-                           "Inactifs (hors retraités)" = "VII"
+                              NULL = "",
+                              NULL = "1971",
+                              NULL = "2001",
+                              "Dominante cadre" = "I",
+                              "Dominante intermédiaire" = "II",
+                              "Dominante indépendante" = "IV",
+                              "Dominante employée" = "III",
+                              "Dominante ouvrière" = "V",
+                              "Un employé ou ouvrier" = "VI",
+                              "Inactifs (hors retraités)" = "VII"
 )
 
 ## Réordonnancement de PC18$PCS_MENAGE
@@ -190,17 +194,17 @@ PC18$matiere_diplome <- trunc(PC18$matiere_diplome/100)
 ## Recodage de PC18$matiere_diplome
 PC18$matiere_diplome <- as.character(PC18$matiere_diplome)
 PC18$matiere_diplome <- fct_recode(PC18$matiere_diplome,
-  "Certif. generique" = "0",
-  "Education" = "1",
-  "Lettres et arts" = "2",
-  "SHS et journalisme" = "3",
-  "Commerce, admin. et droit" = "4",
-  "Sciences nat., maths et stats" = "5",
-  "TIC" = "6",
-  "Ingénierie et construction" = "7",
-  "Agriculture et vétérinaire" = "8",
-  "Santé" = "9",
-  "Services" = "10"
+                                   "Certif. generique" = "0",
+                                   "Education" = "1",
+                                   "Lettres et arts" = "2",
+                                   "SHS et journalisme" = "3",
+                                   "Commerce, admin. et droit" = "4",
+                                   "Sciences nat., maths et stats" = "5",
+                                   "TIC" = "6",
+                                   "Ingénierie et construction" = "7",
+                                   "Agriculture et vétérinaire" = "8",
+                                   "Santé" = "9",
+                                   "Services" = "10"
 )
 
 # Variable synthétique lieu de naissance des parents
@@ -285,23 +289,23 @@ PC18$CS_mere <- as.factor(PC18$CS_mere)
 
 ## Recodage de PC18$VITENCOUPLE en PC18$VITENCOUPLE_r
 PC18$VITENCOUPLE_r <- fct_recode(PC18$VITENCOUPLE,
-                              "Oui, vit dans logement" = "1",
-                              "Oui, vit pas dans logement" = "2",
-                              "Non" = "3",
-                              NULL = "4",
-                              NULL = "421,421",
-                              NULL = "5",
-                              NULL = ""
+                                 "Oui, vit dans logement" = "1",
+                                 "Oui, vit pas dans logement" = "2",
+                                 "Non" = "3",
+                                 NULL = "4",
+                                 NULL = "421,421",
+                                 NULL = "5",
+                                 NULL = ""
 )
 
 ## Recodage de PC18$STOC en PC18$logement
 PC18$logement <- as.character(PC18$STOC)
 PC18$logement <- fct_recode(PC18$logement,
-                         "Propriétaire (crédit en cours)" = "1",
-                         "Propriétaire (sans crédit)" = "2",
-                         "Usufruitier" = "3",
-                         "Locataire" = "4",
-                         "A titre gratuit" = "5"
+                            "Propriétaire (crédit en cours)" = "1",
+                            "Propriétaire (sans crédit)" = "2",
+                            "Usufruitier" = "3",
+                            "Locataire" = "4",
+                            "A titre gratuit" = "5"
 )
 
 #---------------------------------------#
@@ -312,14 +316,14 @@ PC18$logement <- fct_recode(PC18$logement,
 ## Recodage de PC18$A8 en PC18$sorties_ami
 PC18$sorties_ami <- as.character(PC18$A8)
 PC18$sorties_ami <- fct_recode(PC18$sorties_ami,
-                            "Plusieurs fois/semaine" = "1",
-                            "Plusieurs fois/mois" = "2",
-                            "Plusieurs fois/mois" = "3",
-                            "Une fois par mois" = "4",
-                            "Rarement" = "5",
-                            "Jamais" = "6",
-                            NULL = "7",
-                            NULL = "8"
+                               "Plusieurs fois/semaine" = "1",
+                               "Plusieurs fois/mois" = "2",
+                               "Plusieurs fois/mois" = "3",
+                               "Une fois par mois" = "4",
+                               "Rarement" = "5",
+                               "Jamais" = "6",
+                               NULL = "7",
+                               NULL = "8"
 )
 
 # Variable synthétique "est partie a l'étranger pour vacances au cours des 12 derniers mois
@@ -346,14 +350,14 @@ PC18$music_amateur <- PC18$A1901
 ## Recodage de PC18$B2 en PC18$freq_jv
 PC18$freq_jv <- as.character(PC18$B2)
 PC18$freq_jv <- fct_recode(PC18$freq_jv,
-  "Tous les jours" = "1",
-  "Une à plusieurs fois/semaine" = "2",
-  "Une à plusieurs fois/semaine" = "3",
-  "1 à 3 fois/mois" = "4",
-  "Plus rarement" = "5",
-  "Plus rarement" = "6",
-  NULL = "7",
-  NULL = "8"
+                           "Tous les jours" = "1",
+                           "Une à plusieurs fois/semaine" = "2",
+                           "Une à plusieurs fois/semaine" = "3",
+                           "1 à 3 fois/mois" = "4",
+                           "Plus rarement" = "5",
+                           "Plus rarement" = "6",
+                           NULL = "7",
+                           NULL = "8"
 )
 PC18$freq_jv <- fct_explicit_na(PC18$freq_jv, "Ne joue pas aux JV")
 
@@ -364,13 +368,13 @@ PC18$freq_jv <- fct_explicit_na(PC18$freq_jv, "Ne joue pas aux JV")
 ## Recodage de PC18$C1 en PC18$freq_tv
 PC18$freq_tv <- as.character(PC18$C1)
 PC18$freq_tv <- fct_recode(PC18$freq_tv,
-  "Tous les jours" = "1",
-  "1 à 4 jours/semaine" = "2",
-  "1 à 4 jours/semaine" = "3",
-  "Plus rarement" = "4",
-  "Jamais" = "5",
-  NULL = "6",
-  NULL = "7"
+                           "Tous les jours" = "1",
+                           "1 à 4 jours/semaine" = "2",
+                           "1 à 4 jours/semaine" = "3",
+                           "Plus rarement" = "4",
+                           "Jamais" = "5",
+                           NULL = "6",
+                           NULL = "7"
 )
 
 # Type d'équipement pour  régarder la TV
@@ -393,13 +397,13 @@ PC18$clip_tv[is.na(PC18$clip_tv)] <- 0
 ## Recodage de PC18$C19 en PC18$freq_film
 PC18$freq_film <- as.character(PC18$C19)
 PC18$freq_film <- fct_recode(PC18$freq_film,
-  "Tous les jours" = "1",
-  "Une fois/semaine mini" = "2",
-  "Une fois/mois mini" = "3",
-  "Plus rarement" = "4",
-  "Jamais" = "5",
-  NULL = "6",
-  NULL = "7"
+                             "Tous les jours" = "1",
+                             "Une fois/semaine mini" = "2",
+                             "Une fois/mois mini" = "3",
+                             "Plus rarement" = "4",
+                             "Jamais" = "5",
+                             NULL = "6",
+                             NULL = "7"
 )
 
 # Type d'équipement pour  régarder des films
@@ -489,13 +493,13 @@ PC18$film_manque <- PC18$C30 %>%
 ## Recodage de PC18$C19 en PC18$freq_serie
 PC18$freq_serie <- as.character(PC18$C31)
 PC18$freq_serie <- fct_recode(PC18$freq_serie,
-                          "Tous les jours" = "1",
-                          "Une fois/semaine mini" = "2",
-                          "Une fois/mois mini" = "3",
-                          "Plus rarement" = "4",
-                          "Jamais" = "5",
-                          NULL = "6",
-                          NULL = "7"
+                              "Tous les jours" = "1",
+                              "Une fois/semaine mini" = "2",
+                              "Une fois/mois mini" = "3",
+                              "Plus rarement" = "4",
+                              "Jamais" = "5",
+                              NULL = "6",
+                              NULL = "7"
 )
 
 PC18 <- PC18 %>% mutate(    
@@ -596,12 +600,12 @@ PC18$info_internet <- as.factor(PC18$info_internet)
 ## Recodage de PC18$D2 en PC18$D2_rec
 PC18$freq_info <- as.character(PC18$D2)
 PC18$freq_info <- fct_recode(PC18$freq_info,
-                          "Tous les jours" = "1",
-                          "Une ou plusieurs/semaines" = "2",
-                          "Une ou plusieurs/semaines" = "3",
-                          "Plus rarement" = "4",
-                          "Plus rarement" = "5",
-                          NULL = "6"
+                             "Tous les jours" = "1",
+                             "Une ou plusieurs/semaines" = "2",
+                             "Une ou plusieurs/semaines" = "3",
+                             "Plus rarement" = "4",
+                             "Plus rarement" = "5",
+                             NULL = "6"
 )
 
 
@@ -612,24 +616,24 @@ PC18$freq_info <- fct_recode(PC18$freq_info,
 
 PC18$autojuge_lecture <- as.character(PC18$F5)
 PC18$autojuge_lecture <- fct_recode(PC18$autojuge_lecture,
-                                 "Beaucoup" = "1",
-                                 "Moyennement" = "2",
-                                 "Peu" = "3",
-                                 "Pas" = "4",
-                                 NULL = "5",
-                                 NULL = "6"
+                                    "Beaucoup" = "1",
+                                    "Moyennement" = "2",
+                                    "Peu" = "3",
+                                    "Pas" = "4",
+                                    NULL = "5",
+                                    NULL = "6"
 )
 
 PC18$freq_lecture <- as.character(PC18$F11)
 PC18$freq_lecture <- fct_explicit_na(PC18$freq_lecture, na_level = "Ne lit pas")
 PC18$freq_lecture <- fct_recode(PC18$freq_lecture,
-                             "Tous les jours" = "1",
-                             "1/semaine au moins" = "2",
-                             "1/mois au mois" = "3",
-                             "Plus rarement" = "4",
-                             "Plus rarement" = "5",
-                             NULL = "6",
-                             NULL = "7"
+                                "Tous les jours" = "1",
+                                "1/semaine au moins" = "2",
+                                "1/mois au mois" = "3",
+                                "Plus rarement" = "4",
+                                "Plus rarement" = "5",
+                                NULL = "6",
+                                NULL = "7"
 )
 
 # Variable synthétique lecture sur support numérique
@@ -646,10 +650,10 @@ PC18$equip_lecture <- as.factor(PC18$equip_lecture)
 ## Recodage de PC18$F9 en PC18$lecture_nonFR
 PC18$lecture_nonFR <- as.character(PC18$F9)
 PC18$lecture_nonFR <- fct_recode(PC18$lecture_nonFR,
-  "Oui" = "1",
-  "Non" = "2",
-  NULL = "3",
-  NULL = "4"
+                                 "Oui" = "1",
+                                 "Non" = "2",
+                                 NULL = "3",
+                                 NULL = "4"
 )
 PC18$lecture_nonFR <- fct_explicit_na(PC18$lecture_nonFR, na_level = "Ne lit pas de livre")
 
@@ -695,22 +699,22 @@ PC18$acces_internet <- PC18$I112
 ## Recodage de PC18$I4 en PC18$freq_internet
 PC18$freq_internet <- as.character(PC18$I4)
 PC18$freq_internet <- fct_recode(PC18$freq_internet,
-  "Tous les jours" = "1",
-  "Plusieurs fois/semaine" = "2",
-  "Plus rarement" = "3",
-  "Plus rarement" = "4",
-  "Jamais" = "5",
-  NULL = "6",
-  NULL = "7"
+                                 "Tous les jours" = "1",
+                                 "Plusieurs fois/semaine" = "2",
+                                 "Plus rarement" = "3",
+                                 "Plus rarement" = "4",
+                                 "Jamais" = "5",
+                                 NULL = "6",
+                                 NULL = "7"
 )
 
 ## Recodage de PC18$I5 en PC18$reseaux_sociaux
 PC18$reseaux_sociaux <- as.character(PC18$I5)
 PC18$reseaux_sociaux <- fct_recode(PC18$reseaux_sociaux,
-  "0" = "1",
-  "1" = "2",
-  NULL = "3",
-  NULL = "4"
+                                   "0" = "1",
+                                   "1" = "2",
+                                   NULL = "3",
+                                   NULL = "4"
 )
 PC18$reseaux_sociaux <- as.numeric(as.character(PC18$reseaux_sociaux))
 
@@ -730,32 +734,32 @@ PC18 <- PC18 %>% mutate(
 
 PC18$tv_enfance <- as.character(PC18$M1_SQ1)
 PC18$tv_enfance <- fct_recode(PC18$tv_enfance,
-  "Souvent" = "1",
-  "De temps en temps" = "2",
-  "Rarement" = "3",
-  "Jamais" = "4",
-  NULL = "5",
-  NULL = "6"
+                              "Souvent" = "1",
+                              "De temps en temps" = "2",
+                              "Rarement" = "3",
+                              "Jamais" = "4",
+                              NULL = "5",
+                              NULL = "6"
 )
 
 PC18$musique_enfance <- as.character(PC18$M1_SQ2)
 PC18$musique_enfance <- fct_recode(PC18$musique_enfance,
-                                "Souvent" = "1",
-                                "De temps en temps" = "2",
-                                "Rarement" = "3",
-                                "Jamais" = "4",
-                                NULL = "5",
-                                NULL = "6"
+                                   "Souvent" = "1",
+                                   "De temps en temps" = "2",
+                                   "Rarement" = "3",
+                                   "Jamais" = "4",
+                                   NULL = "5",
+                                   NULL = "6"
 )
 
 PC18$cinema_enfance <- as.character(PC18$M1_SQ5)
 PC18$cinema_enfance <- fct_recode(PC18$cinema_enfance,
-                                "Souvent" = "1",
-                                "De temps en temps" = "2",
-                                "Rarement" = "3",
-                                "Jamais" = "4",
-                                NULL = "5",
-                                NULL = "6"
+                                  "Souvent" = "1",
+                                  "De temps en temps" = "2",
+                                  "Rarement" = "3",
+                                  "Jamais" = "4",
+                                  NULL = "5",
+                                  NULL = "6"
 )
 
 # variable synthéthique nbr genre écouté par les parents
@@ -822,10 +826,10 @@ PC18$autre_langue <- PC18$M122
 ## Recodage de PC18$D6 en PC18$info_nonFR
 PC18$info_nonFR <- as.character(PC18$D6)
 PC18$info_nonFR <- fct_recode(PC18$info_nonFR,
-  "Oui" = "1",
-  "Non" = "2",
-  NULL = "3",
-  NULL = "4"
+                              "Oui" = "1",
+                              "Non" = "2",
+                              NULL = "3",
+                              NULL = "4"
 )
 PC18$info_nonFR <- fct_explicit_na(PC18$info_nonFR, na_level = "Ne s'informe pas")
 
@@ -838,26 +842,26 @@ PC18$info_nonFR <- fct_explicit_na(PC18$info_nonFR, na_level = "Ne s'informe pas
 ## Fréquence d'écoute de musique
 PC18$music_12m <- as.character(PC18$E7)
 PC18$music_12m <- fct_recode(PC18$music_12m,
-                          "Tous les jours" = "1",
-                          "Une à plusieurs fois/semaine" = "2",
-                          "Une à plusieurs fois/semaine" = "3",
-                          "Rarement" = "4",
-                          "Rarement" = "5",
-                          "Jamais" = "6",
-                          NULL = "7",
-                          NULL = "8"
+                             "Tous les jours" = "1",
+                             "Une à plusieurs fois/semaine" = "2",
+                             "Une à plusieurs fois/semaine" = "3",
+                             "Rarement" = "4",
+                             "Rarement" = "5",
+                             "Jamais" = "6",
+                             NULL = "7",
+                             NULL = "8"
 )
 
 ## Recodage de PC18$E7 en PC18$music_TLJ
 PC18$music_TLJ <- as.character(PC18$E7)
 PC18$music_TLJ <- fct_recode(PC18$music_TLJ,
-  "0" = "2",
-  "0" = "3",
-  "0" = "4",
-  "0" = "5",
-  "0" = "6",
-  NULL = "7",
-  NULL = "8"
+                             "0" = "2",
+                             "0" = "3",
+                             "0" = "4",
+                             "0" = "5",
+                             "0" = "6",
+                             NULL = "7",
+                             NULL = "8"
 )
 PC18$music_TLJ <- as.numeric(as.character(PC18$music_TLJ))
 
@@ -961,3 +965,5 @@ PC18$nbr_artiste_ecoute[is.na(PC18$nbr_artiste_ecoute)] <- 0
 PC18$detest_clas <- PC18$E1312
 
 PC18$aime_clas <- PC18$E1212
+
+save(PC18, file = here("data", "PC18.RData"))

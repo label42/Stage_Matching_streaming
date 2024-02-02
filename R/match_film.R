@@ -1,9 +1,8 @@
-library(tidyverse)
-library(questionr)
 library(MatchIt)
 library(here)
 
-source(here("03_scripts", "gestion_NA_matching.R"))
+load(here("data", "PC18.RData"))
+source(here("R", "gestion_NA_matching.R"))
 
 list_var_match_film <- c("film_stream_VOD", "SEXE_r", "AGE_5_r", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere","sorties_ami", "VITENCOUPLE_r", 
@@ -60,3 +59,5 @@ PC18_m_film <- match.data(res_match_template_stream_film_VOD, weights = "POND_m"
 
 tmp <- sum(PC18_m_film$POND_m)/nrow(PC18_m_film) 
 PC18_m_film$POND_m <- PC18_m_film$POND_m/tmp
+
+save(PC18_m_film, PC18_to_m_film, res_match_template_stream_film_VOD, file = here("data", "film_matched.RData"))
