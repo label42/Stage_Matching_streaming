@@ -657,6 +657,13 @@ PC18$lecture_nonFR <- fct_recode(PC18$lecture_nonFR,
 )
 PC18$lecture_nonFR <- fct_explicit_na(PC18$lecture_nonFR, na_level = "Ne lit pas de livre")
 
+# Nombre genre littéraires lus
+
+list <- c("F601","F602", "F603", "F604", "F605","F606","F607","F608","F609","F610","F611","F612","F613","F614","F615","F616")
+
+PC18$nbr_genre_livre <- rowSums(PC18[,list])
+PC18$nbr_genre_livre[is.na(PC18$nbr_genre_livre)] <- 0
+
 #-------------------------------------#
 #### Sortie culturelles legitimes #####
 #------------------------------------#
