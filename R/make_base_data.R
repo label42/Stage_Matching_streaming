@@ -664,6 +664,43 @@ list <- c("F601","F602", "F603", "F604", "F605","F606","F607","F608","F609","F61
 PC18$nbr_genre_livre <- rowSums(PC18[,list])
 PC18$nbr_genre_livre[is.na(PC18$nbr_genre_livre)] <- 0
 
+# Nombre genre JV joués
+
+list <- c("B601","B602", "B603", "B604", "B605","B606","B607","B608","B609","B610","B611")
+
+PC18$nbr_genre_jeuxvideo <- rowSums(PC18[,list])
+PC18$nbr_genre_jeuxvideo[is.na(PC18$nbr_genre_jeuxvideo)] <- 0
+
+# Nombre genre programme télé regardé
+list <- c("C701", "C702", "C703", "C704", "C705", "C706", "C707", "C708", "C709", "C710")
+
+PC18$nbr_genre_prgtele <- rowSums(PC18[,list])
+PC18$nbr_genre_prgtele[is.na(PC18$nbr_genre_prgtele)] <- 0
+
+# Nombre genre vidéo sur internet regardées
+list <- c("C1701", "C1702", "C1703", "C1704", "C1705", "C1706", "C1707", "C1708", "C1709", "C1710")
+
+PC18$nbr_genre_videointernet <- rowSums(PC18[,list])
+PC18$nbr_genre_videointernet[is.na(PC18$nbr_genre_videointernet)] <- 0
+
+# Nombre genre actualité intéressé
+list <- c("D101", "D102", "D103", "D104", "D105", "D106", "D107", "D108", "D109", "D110", "D111", "D112", "D113", "D114")
+
+PC18$nbr_genre_actu <- rowSums(PC18[,list])
+PC18$nbr_genre_actu[is.na(PC18$nbr_genre_actu)] <- 0
+
+# Nombre genre émissions radio écoutés
+list <- c("E501", "E502", "E503", "E504", "E505", "E506", "E507", "E508", "E509", "E510", "E511")
+
+PC18$nbr_genre_radio <- rowSums(PC18[,list])
+PC18$nbr_genre_radio[is.na(PC18$nbr_genre_radio)] <- 0
+
+# Nombre genre de musique écoutés à 12 ans
+list <- c("M201", "M202", "M203", "M204", "M205", "M206", "M207", "M208", "M209", "M210", "M211", "M212", "M213")
+
+PC18$nbr_genre_musique12ans <- rowSums(PC18[,list])
+PC18$nbr_genre_musique12ans[is.na(PC18$nbr_genre_musique12ans)] <- 0
+
 #-------------------------------------#
 #### Sortie culturelles legitimes #####
 #------------------------------------#

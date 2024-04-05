@@ -1,5 +1,4 @@
 # Packages ------
-
 library(tidyverse)
 library(here)
 library(gt)
@@ -8,6 +7,7 @@ library(cobalt)
 library(survey)
 library(smd)
 library(ggthemes)
+library(EValue)
 
 # Load data ------
 
@@ -585,6 +585,16 @@ ggsave(filename = here("output", "Figure 1 SMD genre detailed.png"),
        width = 22,
        height = 23,
        units = "cm")
+
+## Sensitivity analysis ------
+result_to_plot %>% 
+  filter(sample == "matched") %>% 
+  rowwise() %>% 
+  mutate(e_value_m = evalues.MD(smd, se = std.error, true = 0)[2, 1],
+         e_value_l = evalues.MD(smd, se = std.error, true = 0)[2, 2],
+         e_value_u = evalues.MD(smd, se = std.error, true = 0)[2, 3]) %>% 
+  gt() %>% 
+  gtsave(here("output", "Table_sensitivity.tex"))
 
 # Foreign language: Figure 2 -------
 
