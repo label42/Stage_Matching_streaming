@@ -54,14 +54,11 @@ PC18_to_m_serie_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m_seri
 
 mean_genre_unm <- PC18_to_m_music_survey %>%
   tbl_svysummary(
-    include = c("stream_spe", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
+    include = c("stream_spe", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
                  nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
                  nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+                 nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = stream_spe, 
     missing = "ifany",
@@ -75,14 +72,11 @@ mean_genre_unm <- PC18_to_m_music_survey %>%
 
 mean_genre_m <- PC18_m_music_survey %>%
   tbl_svysummary(
-    include = c("stream_spe", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
-                 nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
-                 nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+    include = c("stream_spe", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = stream_spe, 
     missing = "ifany",
@@ -105,14 +99,11 @@ t_comp_m
 
 mean_genre_unm <- PC18_to_m_film_survey %>%
   tbl_svysummary(
-    include = c("film_stream_VOD", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
-                 nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
-                 nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+    include = c("film_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = film_stream_VOD, 
     missing = "ifany",
@@ -127,14 +118,11 @@ mean_genre_unm <- PC18_to_m_film_survey %>%
 
 mean_genre_m <- PC18_m_film_survey %>%
   tbl_svysummary(
-    include = c("film_stream_VOD", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
-                 nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
-                 nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+    include = c("film_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = film_stream_VOD, 
     missing = "ifany",
@@ -160,14 +148,11 @@ t_comp_m
 
 mean_genre_unm <- PC18_to_m_serie_survey %>%
   tbl_svysummary(
-    include = c("serie_stream_VOD", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
-                 nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
-                 nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+    include = c("serie_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = serie_stream_VOD, 
     missing = "ifany",
@@ -181,14 +166,11 @@ mean_genre_unm <- PC18_to_m_serie_survey %>%
 
 mean_genre_m <- PC18_m_serie_survey %>%
   tbl_svysummary(
-    include = c("serie_stream_VOD", "nbr_genre_livre", "nbr_genre_jeuxvideo", "nbr_genre_prgtele", "nbr_genre_videointernet", "nbr_genre_actu", "nbr_genre_radio", "nbr_genre_musique12ans"),
-    label = list(nbr_genre_livre ~ "Literary genre",
-                 nbr_genre_jeuxvideo ~ "Number of video games genres played",
-                 nbr_genre_prgtele ~ "Number of types of TV programs watched",
-                 nbr_genre_videointernet ~ "Number of internet video genres watched",
-                 nbr_genre_actu ~ "Number of news domain interested in",
-                 nbr_genre_radio ~ "Number of radio program genres listened",
-                 nbr_genre_musique12ans ~ "Number of music genres played when 12 years old"
+    include = c("serie_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
     ),
     by = serie_stream_VOD, 
     missing = "ifany",
@@ -211,19 +193,19 @@ t_comp_m
 # graphe of standardized mean diffrence between users and non users
 
 diff_unm <- PC18_to_m_music %>% summarize_at(
-  .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+  .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
   .funs = list(smd = ~ smd(., g = stream_spe, w = POND, gref = 2, std.error = T)$estimate,
                std.error = ~ smd(., g = stream_spe, w = POND, gref = 2, std.error = T)$std.error)) %>%
   rename_with(~paste0("Music_", .x)) %>%  
   bind_cols(PC18_to_m_film %>% summarize_at(
-    .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = film_stream_VOD, w = POND, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = film_stream_VOD, w = POND, gref = 2, std.error = T)$std.error)) %>%
       rename_with(~paste0("Movies_", .x)) 
       
   ) %>% 
   bind_cols(PC18_to_m_serie %>% summarize_at(
-    .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$std.error)) %>%
       rename_with(~paste0("TV series_", .x)) 
@@ -231,19 +213,19 @@ diff_unm <- PC18_to_m_music %>% summarize_at(
   mutate(sample = "unmatched")
 
 diff_m <- PC18_m_music %>% summarize_at(
-  .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+  .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
   .funs = list(smd = ~ smd(., g = stream_spe, w = POND_m, gref = 2, std.error = T)$estimate,
                std.error = ~ smd(., g = stream_spe, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
   rename_with(~paste0("Music_", .x)) %>%   
   bind_cols(PC18_m_film %>% summarize_at(
-    .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = film_stream_VOD, w = POND_m, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = film_stream_VOD, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
       rename_with(~paste0("Movies_", .x)) 
       
   ) %>% 
   bind_cols(PC18_m_serie %>% summarize_at(
-    .vars = vars(c(nbr_genre_livre, nbr_genre_jeuxvideo, nbr_genre_prgtele, nbr_genre_videointernet, nbr_genre_actu, nbr_genre_radio, nbr_genre_musique12ans)),
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
       rename_with(~paste0("TV series_", .x)) 

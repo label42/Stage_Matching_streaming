@@ -6,6 +6,7 @@ source(here("R", "gestion_NA_matching.R"))
 
 list_var_match_music <- c("stream_spe", "SEXE_r", "AGE", "CRITREVENU_r", "PCS_MENAGE", "h_travail_semaine", "DIPLOME_r", 
                     "naiss_parents", "DIPLOME_pere", "CS_pere", "DIPLOME_mere", "CS_mere","sorties_ami", "VITENCOUPLE_r", 
+                    "nbr_genre_jeuxvideo", "nbr_genre_livre",
                     "logement", "freq_jv", "freq_tv", "equip_tv", "clip_tv", "equip_film", "film_stream_VOD", 
                     "film_stream_autre", "film_DVD", "film_num", "nbr_genre_film", "freq_serie", "equip_serie", 
                     "serie_stream_VOD", "serie_stream_autre", "nbr_genre_serie", "info_internet", "freq_lecture", 
@@ -22,6 +23,7 @@ PC18_to_m_music <- clear_NA_to_m(PC18, list_var_match_music)
 model_matching_music <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r + PCS_MENAGE + h_travail_semaine + 
     DIPLOME_r + naiss_parents + DIPLOME_pere + CS_pere + DIPLOME_mere + CS_mere + 
     sorties_ami + VITENCOUPLE_r + logement + 
+    nbr_genre_jeuxvideo + nbr_genre_livre +
     freq_jv + freq_tv + equip_tv + clip_tv + equip_film + film_stream_VOD + 
     film_stream_autre + film_DVD + film_num + nbr_genre_film + 
     freq_serie + equip_serie + serie_stream_VOD + serie_stream_autre + 
@@ -37,11 +39,11 @@ model_matching_music <- as.formula("stream_spe ~ SEXE_r + AGE_5_r + CRITREVENU_r
 ###########################
 
 # Accepted SMD SPD for each covariate
-tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
+tols_all_var = c(0.05, 0.005, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
                  0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05,
-                 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
+                 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05)
 
 # Performing matching
 res_match_template_stream_music <- matchit(model_matching_music,
