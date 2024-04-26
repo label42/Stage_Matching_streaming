@@ -586,16 +586,6 @@ ggsave(filename = here("output", "Figure 1 SMD genre detailed.png"),
        height = 23,
        units = "cm")
 
-## Sensitivity analysis ------
-result_to_plot %>% 
-  filter(sample == "matched") %>% 
-  rowwise() %>% 
-  mutate(e_value_m = evalues.MD(smd, se = std.error, true = 0)[2, 1],
-         e_value_l = evalues.MD(smd, se = std.error, true = 0)[2, 2],
-         e_value_u = evalues.MD(smd, se = std.error, true = 0)[2, 3]) %>% 
-  gt() %>% 
-  gtsave(here("output", "Table_sensitivity.tex"))
-
 # Foreign language: Figure 2 -------
 
 ## Music
@@ -898,7 +888,80 @@ ggsave(filename = "Figure 2 Diff in foreign language.png",
        height = 10,
        units = "cm")
 
+# Table A1: Control variables ------
 
+controls <- read_csv(here("data", "control_variables.csv")) %>% 
+  mutate(film = ifelse(film, "F", ""),
+         music = ifelse(music, "M", ""),
+         serie = ifelse(serie, "S", ""),
+         model = paste0(music, film, serie),
+         set = factor(set, 
+                      levels = c("demographics", "social", "digital use", 
+                                 "childhood participation", 
+                                 "intensity cultural participation", "cultural diversity"),
+                      labels = c("Demographics",
+                                 "Social Position and Origin",
+                                 "Digital Uses",
+                                 "Cultural Participation during Childhood",
+                                 "Intensity of Cultural Participation",
+                                 "Propensity towards diversity")
+                      ),
+         full_line = paste(varlabel, vartype, varorig, model, sep = " & ") %>% 
+           paste(., "\\\\\n")
+         )
+if(file.exists(here("output", "Table A1_controls.tex"))) file.remove(here("output", "Table A1_controls.tex"))
+cat("
+\\begin{center}
+\\begin{ThreePartTable}
+\\begingroup\\small
+\\begin{TableNotes}
+\\item Model indicates whether the variable was used as a control
+in the Music (M), Movies (F) and/or Series (S) model.
+\\item Type indicates whether the variable is binary (Bin), categorical
+(Cat), or numeric (Num).
+\\vspace{10pt}
+\\end{TableNotes}
+\\begin{longtable}{p{4.5cm}p{1cm}p{5cm}p{1cm}}
+\\caption{List of control variables}
+\\label{tab:controls}\\\\
+\\insertTableNotes
+\\hline
+\\textbf{Description} & \\textbf{Type} & \\textbf{Orignal question} & \\textbf{Model}\\\\
+\\hline
+\\endfirsthead
+\\multicolumn{4}{c}%
+{\\tablename\\ \\thetable\\ -- \\textit{Continued from previous page}} \\\\
+\\hline
+\\textbf{Description} & \\textbf{Type} & \\textbf{Orignal question} & \\textbf{Model}\\\\
+\\hline
+\\endhead
+\\hline \\multicolumn{4}{r}{\\textit{Continued on next page}} \\\\
+\\endfoot
+\\hline
+\\endlastfoot
+    ",
+    sep = "",
+    file = here("output", "Table A1_controls.tex"),
+    append = TRUE
+)
+for(s in levels(controls$set)){
+  x <- controls %>% 
+    filter(set == s)
+  cat("\n\\vspace{20pt}\\\\\n
+\\multicolumn{4}{c}{\\textbf{", s, "}}\\\\*\n", 
+      x$full_line, 
+      sep = "",
+      file = here("output", "Table A1_controls.tex"),
+      append = TRUE)
+}
+cat("
+\\end{longtable}
+\\endgroup
+\\end{ThreePartTable}
+\\end{center}", 
+    sep = "",
+    file = here("output", "Table A1_controls.tex"),
+    append = TRUE)
 # Table A2: Demographics of streaming users ------
 
 theme_gtsummary_language(language = "en", decimal.mark = ",", big.mark = " ")

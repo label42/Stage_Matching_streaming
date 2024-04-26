@@ -111,6 +111,7 @@ PC18 <- PC18 %>% mutate(class = fct_recode(PCS_MENAGE,
 
 #renome h de travail par semaine. 4812 NA, pour les gens qui ne travail pas.
 PC18$h_travail_semaine <- PC18$S11_C_1
+PC18$h_travail_semaine[is.na(PC18$h_travail_semaine)] <- 0
 
 # Diplome en 3 et 5 postes
 PC18 <- PC18 %>% mutate(    
@@ -215,6 +216,28 @@ PC18 <- PC18 %>% mutate(
     NAIM == 2 & NAIP == 2 ~ "Deux parents nés à l'étranger"
   ))
 PC18$naiss_parents <- as.factor(PC18$naiss_parents)
+
+PC18 <- PC18 %>% 
+  mutate(SITUA = factor(SITUA, levels = 1L:8L,
+                        labels = c('Occupe un emploi',
+                                   'Apprenti(e) sous contrat ou stagiaire rémunéré',
+                                   'Etudiant(e), élève, en formation ou stagiaire non rémunéré',
+                                   'Chômeur (inscrit(e) ou non au Pôle Emploi)',
+                                   'Retraité(e) ou retiré(e) des affaires ou en préretraite',
+                                   'Femme ou homme au foyer',
+                                   'Inactif(ve) pour cause d’invalidité',
+                                   'Autre situation d’inactivité')) %>% 
+                          fct_collapse(`etudiant apprenti stagiaire` = c('Apprenti(e) sous contrat ou stagiaire rémunéré',
+                                                                         'Etudiant(e), élève, en formation ou stagiaire non rémunéré'),
+                                       `inactifs hors retraites` = c('Femme ou homme au foyer',
+                                                                     'Inactif(ve) pour cause d’invalidité',
+                                                                     'Autre situation d’inactivité')
+                                       )
+         )
+PC18 <- PC18 %>% 
+  mutate(sante = factor(A15, levels = 1L:5L,
+                        labels = c("Très bon", "Bon", "Assez bon", "Mauvais", "Très mauvais")),
+         tempslibre = factor(A2, levels = 1L:3L, labels = c("Oui, souvent", "Oui, de temps en temps", "Non, jamais")))
 
 
 # Diplome et PCS des parents
@@ -343,6 +366,12 @@ PC18 <- PC18 %>% mutate(
 
 PC18$music_amateur <- PC18$A1901
 
+PC18$numerique_pratiques_amateur <- (1-PC18$A314)
+PC18$numerique_pratiques_amateur <- factor(PC18$numerique_pratiques_amateur,
+                                           levels =c(0, 1), 
+                                           labels = c("non", "oui")) %>% 
+  fct_na_value_to_level("pas de pratique amateur")
+
 #--------------------#
 #### Jeux vidéos #####
 #--------------------#
@@ -359,7 +388,7 @@ PC18$freq_jv <- fct_recode(PC18$freq_jv,
                            NULL = "7",
                            NULL = "8"
 )
-PC18$freq_jv <- fct_explicit_na(PC18$freq_jv, "Ne joue pas aux JV")
+PC18$freq_jv <- fct_na_value_to_level(PC18$freq_jv, "Ne joue pas aux JV")
 
 #--------------------#
 #### Audiovisuel #####
@@ -485,7 +514,8 @@ PC18$film_manque <- PC18$C30 %>%
     "Pas tellement" = "3",
     "Pas du tout" = "4",
     NULL = "5"
-  )
+  ) %>% 
+  fct_na_value_to_level("pas de films")
 
 
 ##### Séries 
@@ -520,7 +550,8 @@ PC18$serie_manque <- PC18$C42 %>%
     "Pas tellement" = "3",
     "Pas du tout" = "4",
     NULL = "5"
-  )
+  ) %>% 
+  fct_na_value_to_level("pas de series")
 
 
 #Meme remarque que pour les films
@@ -806,6 +837,45 @@ PC18$cinema_enfance <- fct_recode(PC18$cinema_enfance,
                                   NULL = "6"
 )
 
+PC18$livre_enfance <- as.character(PC18$M1_SQ3)
+PC18$livre_enfance <- fct_recode(PC18$livre_enfance,
+                                  "Souvent" = "1",
+                                  "De temps en temps" = "2",
+                                  "Rarement" = "3",
+                                  "Jamais" = "4",
+                                  NULL = "5",
+                                  NULL = "6"
+)
+
+PC18$musee_enfance <- as.character(PC18$M1_SQ8)
+PC18$musee_enfance <- fct_recode(PC18$musee_enfance,
+                                 "Souvent" = "1",
+                                 "De temps en temps" = "2",
+                                 "Rarement" = "3",
+                                 "Jamais" = "4",
+                                 NULL = "5",
+                                 NULL = "6"
+)
+
+PC18$theatre_enfance <- as.character(PC18$M1_SQ9)
+PC18$theatre_enfance <- fct_recode(PC18$theatre_enfance,
+                                 "Souvent" = "1",
+                                 "De temps en temps" = "2",
+                                 "Rarement" = "3",
+                                 "Jamais" = "4",
+                                 NULL = "5",
+                                 NULL = "6"
+)
+
+PC18 <- PC18 %>% 
+  mutate(across(starts_with("A20_"), ~as.integer(.x < 16 & !is.na(.x)))) %>% 
+  rename(amateur_musique_enfance = A20_musique,
+         amateur_romans_enfance = A20_romans,
+         amateur_peinture_enfance = A20_peinture,
+         amateur_dessin_enfance = A20_dessin,
+         amateur_theatre_enfance = A20_theatre,
+         amateur_danse_enfance = A20_danse)
+
 # variable synthéthique nbr genre écouté par les parents
 list <- c("M301", "M302", "M303", "M304", "M305", "M306", "M307", 
           "M308", "M309", "M310", "M311", "M312", "M313")
@@ -1010,4 +1080,31 @@ PC18$detest_clas <- PC18$E1312
 
 PC18$aime_clas <- PC18$E1212
 
+# Livre manque, cinema manque
+
+PC18$livre_manque <- PC18$F17 %>%
+  as.character() %>%
+  fct_recode(
+    "Beaucoup" = "1",
+    "Un peu" = "2",
+    "Pas tellement" = "3",
+    "Pas du tout" = "4",
+    NULL = "5"
+  ) %>% 
+  fct_na_value_to_level("pas de livre")
+
+PC18$cinema_manque <- PC18$G111 %>%
+  as.character() %>%
+  fct_recode(
+    "Beaucoup" = "1",
+    "Un peu" = "2",
+    "Pas tellement" = "3",
+    "Pas du tout" = "4",
+    NULL = "5",
+    NULL = "6"
+  ) %>% 
+  fct_na_value_to_level("ne va pas au cinema")
+
+
 save(PC18, file = here("data", "PC18.RData"))
+
