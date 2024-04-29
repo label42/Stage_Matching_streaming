@@ -7,10 +7,10 @@ list_var_match_music <- read_csv(here("data", "control_variables.csv")) %>%
   filter(music) %>% 
   pull(var)
 
-PC18_to_m_music <- subset(PC18, !is.na(stream_spe))
-
 # Clearning NA before matching
 PC18_to_m_music <- clear_NA_to_m(PC18, list_var_match_music)
+
+PC18_to_m_music <- subset(PC18_to_m_music, !is.na(stream_spe))
 
 # Creating formula for matching
 model_matching_music <- as.formula(paste0("stream_spe",
@@ -24,6 +24,7 @@ model_matching_music <- as.formula(paste0("stream_spe",
 # Accepted SMD SPD for each covariate
 tols_all_var = c(0.005, rep(0.05, times = length(list_var_match_music)-1))
 
+PC18_to_m_music <- droplevels(PC18_to_m_music)
 
 # Performing matching
 res_match_template_stream_music <- matchit(model_matching_music,

@@ -40,10 +40,6 @@ PC18_m_serie_survey <- survey::svydesign(id = ~IDENT18, data = PC18_m_serie, wei
 PC18_to_m_serie_survey <- survey::svydesign(id = ~IDENT18, data = PC18_to_m_serie, weights = PC18_to_m_serie$POND)
 
 
-# Sensitivity analysis ------
-
-
-
 # Effects of streaming on unrelated outcomes ------
 
 # Effect of streaming on the diversity of literary genre consumed
@@ -266,7 +262,7 @@ plot <- result_to_plot %>%
 plot
 
 
-ggsave(filename = "Robustness_other_outcomes",
+ggsave(filename = "Robustness_other_outcomes.png",
        path = "output/robustness check",
        device = "png",
        width = 22,
