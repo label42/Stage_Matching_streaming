@@ -81,10 +81,11 @@ overall_summary <- bind_rows(tmp_music, tmp_movie, tmp_series) %>%
 overall_summary
 
 gtsave(overall_summary, 
-       filename = here("output", "Table 1 Size of treated untreated control.docx"))
+       filename = "Table 1 Size of treated untreated control.tex",
+       path = here("output"))
 
 
-# Effects of streaming on tastes: Figure 1 ------
+# Figure 1: Effects of streaming on tastes ------
 
 ## Music ------
 
@@ -527,8 +528,8 @@ plot <- result_to_plot %>%
 plot
 
 
-ggsave(filename = "nbr genre consumed.png",
-       path = "output/presentations",
+ggsave(filename = "Fig pres nbr genre consumed.png",
+       path = "output",
        device = "png",
        width = 22,
        height = 10,
@@ -579,14 +580,25 @@ plot <- result_to_plot %>%
 
 plot
 
-
 ggsave(filename = here("output", "Figure 1 SMD genre detailed.png"),
        device = "png",
        width = 22,
        height = 23,
        units = "cm")
 
-# Foreign language: Figure 2 -------
+# Table A??: E-values
+
+result_to_plot %>% 
+  filter(sample == "matched") %>% 
+  rowwise() %>% 
+  mutate(e_value_m = evalues.MD(smd, se = std.error, true = 0)[2, 1],
+         e_value_l = evalues.MD(smd, se = std.error, true = 0)[2, 2],
+         e_value_u = evalues.MD(smd, se = std.error, true = 0)[2, 3]) %>% 
+  gt() %>% 
+  gtsave(filename = "Table A3 sensitivity.tex",
+         path = here("output"))
+
+# Figure 2: Foreign language -------
 
 ## Music
 
@@ -911,8 +923,10 @@ controls <- read_csv(here("data", "control_variables.csv")) %>%
          )
 if(file.exists(here("output", "Table A1_controls.tex"))) file.remove(here("output", "Table A1_controls.tex"))
 cat("
-\\begin{center}
-\\begin{ThreePartTable}
+\\begin{ThreePartTable}[htp]
+\\caption{List of control variables}
+\\label{tab:controls}
+\\centering
 \\begingroup\\small
 \\begin{TableNotes}
 \\item Model indicates whether the variable was used as a control
@@ -922,8 +936,6 @@ in the Music (M), Movies (F) and/or Series (S) model.
 \\vspace{10pt}
 \\end{TableNotes}
 \\begin{longtable}{p{4.5cm}p{1cm}p{5cm}p{1cm}}
-\\caption{List of control variables}
-\\label{tab:controls}\\\\
 \\insertTableNotes
 \\hline
 \\textbf{Description} & \\textbf{Type} & \\textbf{Orignal question} & \\textbf{Model}\\\\
@@ -957,12 +969,11 @@ for(s in levels(controls$set)){
 cat("
 \\end{longtable}
 \\endgroup
-\\end{ThreePartTable}
-\\end{center}", 
+\\end{ThreePartTable}", 
     sep = "",
     file = here("output", "Table A1_controls.tex"),
     append = TRUE)
-# Table A2: Demographics of streaming users ------
+# Table 2: Demographics of streaming users ------
 
 theme_gtsummary_language(language = "en", decimal.mark = ",", big.mark = " ")
 
@@ -1071,7 +1082,9 @@ tbl_all_stream_socdem <-
   ) %>%
   as_gt()
 
-gtsave(tbl_all_stream_socdem, filename = here("output", "Table A2 Descriptive statistics.docx"))
+gtsave(tbl_all_stream_socdem, 
+       filename = "Table 2 Descriptive statistics.tex",
+       path = here("output"))
 
 
 # Figure A1-A6: Evaluate quality of matching ------
@@ -1886,10 +1899,241 @@ plot <- d_three_diff %>%
 
 plot
 
-ggsave(filename = "Diff in proportion (signif genre only) detailed.png",
-       path = "output/presentations",
+ggsave(filename = "Fig_pres Diff in proportion (signif genre only) detailed.png",
+       path = "output",
        device = "png",
        width = 22,
        height = 23,
+       units = "cm")
+
+# Figure A10: Effects of streaming on unrelated outcomes ------
+
+## Music ------
+
+### Diversity of genre
+
+mean_genre_unm <- PC18_to_m_music_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = stream_spe, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+
+
+mean_genre_m <- PC18_m_music_survey %>%
+  tbl_svysummary(
+    include = c("stream_spe", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = stream_spe, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+t_comp_m <- tbl_merge(
+  tbls = list(mean_genre_unm, mean_genre_m),
+  tab_spanner = c("**Non-matched sample**", "**Matched sample**")
+) %>% as_gt() 
+
+t_comp_m
+
+## Film ------
+
+### Diversity of genre
+
+mean_genre_unm <- PC18_to_m_film_survey %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = film_stream_VOD, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+
+
+mean_genre_m <- PC18_m_film_survey %>%
+  tbl_svysummary(
+    include = c("film_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = film_stream_VOD, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+
+t_comp_m <- tbl_merge(
+  tbls = list(mean_genre_unm, mean_genre_m),
+  tab_spanner = c("**Non-matched sample**", "**Matched sample**")
+) %>% 
+  as_gt()
+
+t_comp_m
+
+## Series ------
+
+### Diversity of genre
+
+mean_genre_unm <- PC18_to_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = serie_stream_VOD, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+
+mean_genre_m <- PC18_m_serie_survey %>%
+  tbl_svysummary(
+    include = c("serie_stream_VOD", "nbr_genre_prgtele", "nbr_genre_actu", "nbr_genre_radio"),
+    label = list(
+      nbr_genre_prgtele ~ "Number of types of TV programs watched",
+      nbr_genre_actu ~ "Number of news domain interested in",
+      nbr_genre_radio ~ "Number of radio program genres listened"
+    ),
+    by = serie_stream_VOD, 
+    missing = "ifany",
+    statistic = list(all_continuous() ~ "{mean} ({sd})",
+                     all_categorical() ~ "{p} %"),
+    digits = list(all_continuous() ~ c(1,1))
+  ) %>%
+  modify_header(label = "**Number of :**",
+                update = list(stat_1 ~ gt::html("**Non-user**<br> N = {n_unweighted}"),
+                              stat_2 ~ gt::html("**User**<br> N = {n_unweighted}")))
+
+t_comp_m <- tbl_merge(
+  tbls = list(mean_genre_unm, mean_genre_m),
+  tab_spanner = c("**Non-matched sample**", "**Matched sample**")
+) %>% as_gt()  
+
+t_comp_m
+
+
+# graphe of standardized mean diffrence between users and non users
+
+diff_unm <- PC18_to_m_music %>% summarize_at(
+  .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+  .funs = list(smd = ~ smd(., g = stream_spe, w = POND, gref = 2, std.error = T)$estimate,
+               std.error = ~ smd(., g = stream_spe, w = POND, gref = 2, std.error = T)$std.error)) %>%
+  rename_with(~paste0("Music_", .x)) %>%  
+  bind_cols(PC18_to_m_film %>% summarize_at(
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+    .funs = list(smd = ~ smd(., g = film_stream_VOD, w = POND, gref = 2, std.error = T)$estimate,
+                 std.error = ~ smd(., g = film_stream_VOD, w = POND, gref = 2, std.error = T)$std.error)) %>%
+      rename_with(~paste0("Movies_", .x)) 
+    
+  ) %>% 
+  bind_cols(PC18_to_m_serie %>% summarize_at(
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+    .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$estimate,
+                 std.error = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$std.error)) %>%
+      rename_with(~paste0("TV series_", .x)) 
+  ) %>%   
+  mutate(sample = "unmatched")
+
+diff_m <- PC18_m_music %>% summarize_at(
+  .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+  .funs = list(smd = ~ smd(., g = stream_spe, w = POND_m, gref = 2, std.error = T)$estimate,
+               std.error = ~ smd(., g = stream_spe, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
+  rename_with(~paste0("Music_", .x)) %>%   
+  bind_cols(PC18_m_film %>% summarize_at(
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+    .funs = list(smd = ~ smd(., g = film_stream_VOD, w = POND_m, gref = 2, std.error = T)$estimate,
+                 std.error = ~ smd(., g = film_stream_VOD, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
+      rename_with(~paste0("Movies_", .x)) 
+    
+  ) %>% 
+  bind_cols(PC18_m_serie %>% summarize_at(
+    .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
+    .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$estimate,
+                 std.error = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
+      rename_with(~paste0("TV series_", .x)) 
+  ) %>% 
+  mutate(sample = "matched")
+
+
+result_to_plot <- bind_rows(diff_unm, diff_m) %>% 
+  pivot_longer(-sample) %>%
+  mutate(ind = str_extract(name, "(smd|std.error)"),
+         name = str_remove(name, "(smd|std.error)"),
+         model = str_extract(name, "^(Music|Movies|TV series)"),
+         name = str_remove(name, "^(Music|Movies|TV series)_"),
+  )  %>%
+  pivot_wider(names_from = ind, values_from = value) 
+
+
+plot <- result_to_plot %>%  
+  mutate(sample = recode_factor(sample,
+                                "matched" = "Matched",
+                                "unmatched" = "All population"),
+         name = recode_factor(name, 
+                              "nbr_genre_prgtele_" = "TV programs",
+                              "nbr_genre_actu_" = "News",
+                              "nbr_genre_radio_" = "Radio")) %>%
+  ggplot(aes(x = name, y = smd, color = sample)) +
+  geom_point(position = position_dodge(.4)) +
+  geom_errorbar(aes(ymin = smd - 1.96*std.error, 
+                    ymax = smd + 1.96*std.error),
+                width = .2,
+                position = position_dodge(.4)) +
+  geom_hline(aes(yintercept=0)) +
+  xlab("") +
+  ylab("Standardized mean difference") +
+  facet_wrap(~model) +
+  labs(color="Sample") +
+  coord_flip() +
+  guides(color = guide_legend(reverse = T)) + 
+  scale_color_manual(values=c("#1a9641", "#d7191c")) +
+  theme_bw()
+
+plot
+
+
+ggsave(filename = "Figure A10. Robustness_other_outcomes.png",
+       path = "output",
+       device = "png",
+       width = 22,
+       height = 10,
        units = "cm")
 
