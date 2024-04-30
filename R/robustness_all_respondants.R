@@ -1122,24 +1122,21 @@ PC18$cinema_manque <- PC18$G111 %>%
   fct_na_value_to_level("ne va pas au cinema")
 
 # Input missing data for father and mother education
-## Commented out: does not change the sample size of 
-## matching outcome substantially, does not change
-## the results either.
-# predictor_matrix <- read_csv("data/missing_predictor_matrix.csv") %>% 
-#   as.matrix()
-# row.names(predictor_matrix) <- colnames(predictor_matrix)
-# 
-# missing <- PC18 %>% 
-#   select(IDENT18, 
-#          DIPLOME_pere, DIPLOME_mere, CS_pere, CS_mere, 
-#          AGE_5_r, SEXE_r, naiss_parents, 
-#          DIPLOME_r, PCS_MENAGE,
-#          nbr_genre_parent_ecoute
-#   ) %>% 
-#   mice(m = 1, predictorMatrix = predictor_matrix)
-# PC18 <- complete(missing) %>% 
-#   select(IDENT18, DIPLOME_pere, DIPLOME_mere) %>% 
-#   right_join(select(PC18, -DIPLOME_pere, -DIPLOME_mere))
+predictor_matrix <- read_csv("data/missing_predictor_matrix.csv") %>%
+  as.matrix()
+row.names(predictor_matrix) <- colnames(predictor_matrix)
+
+missing <- PC18 %>%
+  select(IDENT18,
+         DIPLOME_pere, DIPLOME_mere, CS_pere, CS_mere,
+         AGE_5_r, SEXE_r, naiss_parents,
+         DIPLOME_r, PCS_MENAGE,
+         nbr_genre_parent_ecoute
+  ) %>%
+  mice(m = 1, predictorMatrix = predictor_matrix)
+PC18 <- complete(missing) %>%
+  select(IDENT18, DIPLOME_pere, DIPLOME_mere) %>%
+  right_join(select(PC18, -DIPLOME_pere, -DIPLOME_mere))
 
 ###################################
 #### Template Matching: Movies ####
