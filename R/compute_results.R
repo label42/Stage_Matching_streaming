@@ -968,8 +968,8 @@ in the Music (M), Movies (F) and/or Series (S) model.
 \\end{TableNotes}
 \\begin{longtable}{p{4.5cm}p{1cm}p{5cm}p{1cm}}
 \\caption{List of control variables}
-\\label{tab:controls}
-\\insertTableNotes
+\\label{tab:controls}\\\\
+\\insertTableNotes\\\\
 \\hline
 \\textbf{Description} & \\textbf{Type} & \\textbf{Orignal question} & \\textbf{Model}\\\\
 \\hline
