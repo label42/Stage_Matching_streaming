@@ -494,6 +494,8 @@ diff_m <- PC18_m_music %>% summarize_at(
   mutate(sample = "matched")
 
 
+
+
 result_to_plot <- bind_rows(diff_unm, diff_m) %>% 
   pivot_longer(-sample) %>%
   mutate(ind = str_extract(name, "(smd|std.error)"),name = str_remove(name, "_(smd|std.error)")) %>%
@@ -526,7 +528,6 @@ plot <- result_to_plot %>%
   theme_bw()
 
 plot
-
 
 ggsave(filename = "Fig pres nbr genre consumed.png",
        path = "output",
@@ -585,6 +586,38 @@ ggsave(filename = here("output", "Figure 1 SMD genre detailed.png"),
        width = 22,
        height = 23,
        units = "cm")
+
+# Compute the differences in terms of number of genres rather than just sd:
+t1 <- PC18_m_music %>% 
+  select(nbr_genre_music, nbr_genre_aime, nbr_genre_deteste, stream_spe, POND_m) %>% 
+  pivot_longer(nbr_genre_music:nbr_genre_deteste) %>% 
+  group_by(stream_spe, name) %>% 
+  summarize(m = sum(POND_m*value)/n()) %>% 
+  pivot_wider(names_from = stream_spe, values_from = m) %>% 
+  mutate(sample = "matched", domain = "music")
+
+t2 <- PC18_m_film %>% 
+  select(nbr_genre_film, nbr_genre_film_aime, nbr_genre_film_deteste, film_stream_VOD, POND_m) %>% 
+  pivot_longer(nbr_genre_film:nbr_genre_film_deteste) %>% 
+  group_by(film_stream_VOD, name) %>% 
+  summarize(m = sum(POND_m*value)/n()) %>% 
+  pivot_wider(names_from = film_stream_VOD, values_from = m) %>% 
+  mutate(sample = "matched", domain = "film")
+
+t3 <- PC18_m_serie %>% 
+  select(nbr_genre_serie, nbr_genre_serie_aime, nbr_genre_serie_deteste, serie_stream_VOD, POND_m) %>% 
+  pivot_longer(nbr_genre_serie:nbr_genre_serie_deteste) %>% 
+  group_by(serie_stream_VOD, name) %>% 
+  summarize(m = sum(POND_m*value)/n()) %>% 
+  pivot_wider(names_from = serie_stream_VOD, values_from = m) %>% 
+  mutate(sample = "matched", domain = "serie")
+
+bind_rows(t1, t2, t3) %>% 
+  rename(nonusers = "0", users = "1") %>% 
+  mutate(diff = users-nonusers) %>% 
+  gt() %>% 
+  gtsave("effect_estimate.tex", path="output")
+  
 
 # Table A??: E-values
 
@@ -923,9 +956,7 @@ controls <- read_csv(here("data", "control_variables.csv")) %>%
          )
 if(file.exists(here("output", "Table A1_controls.tex"))) file.remove(here("output", "Table A1_controls.tex"))
 cat("
-\\begin{ThreePartTable}[htp]
-\\caption{List of control variables}
-\\label{tab:controls}
+\\begin{ThreePartTable}
 \\centering
 \\begingroup\\small
 \\begin{TableNotes}
@@ -936,6 +967,8 @@ in the Music (M), Movies (F) and/or Series (S) model.
 \\vspace{10pt}
 \\end{TableNotes}
 \\begin{longtable}{p{4.5cm}p{1cm}p{5cm}p{1cm}}
+\\caption{List of control variables}
+\\label{tab:controls}
 \\insertTableNotes
 \\hline
 \\textbf{Description} & \\textbf{Type} & \\textbf{Orignal question} & \\textbf{Model}\\\\
