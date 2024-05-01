@@ -31,7 +31,7 @@ res_match_template_stream_music <- matchit(model_matching_music,
                                        data = PC18_to_m_music, s.weights = PC18_to_m_music$POND, 
                                        method = "cardinality",
                                        estimand = "ATT", ratio = NA, discard = "none",  
-                                       tols = tols_all_var, std.tols = T, solver = "gurobi", time = 30)
+                                       tols = tols_all_var, std.tols = T, solver = "gurobi", time = 5*60)
 
 
 

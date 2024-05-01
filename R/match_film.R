@@ -33,7 +33,7 @@ res_match_template_stream_film_VOD <- matchit(model_matching_film,
                                               data = PC18_to_m_film, s.weights = PC18_to_m_film$POND, 
                                               method = "cardinality",
                                               estimand = "ATT", ratio = NA, discard = "none",  
-                                              tols = tols_all_var, std.tols = T, solver = "gurobi", time = 60)
+                                              tols = tols_all_var, std.tols = T, solver = "gurobi", time = 5*60)
 
 
 # Normalizing weights
