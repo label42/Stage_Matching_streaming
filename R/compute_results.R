@@ -627,6 +627,7 @@ result_to_plot %>%
   mutate(e_value_m = evalues.MD(smd, se = std.error, true = 0)[2, 1],
          e_value_l = evalues.MD(smd, se = std.error, true = 0)[2, 2],
          e_value_u = evalues.MD(smd, se = std.error, true = 0)[2, 3]) %>% 
+  mutate(across(where(is.numeric), ~round(.x, 2))) %>% 
   gt() %>% 
   gtsave(filename = "Table A3 sensitivity.tex",
          path = here("output"))
