@@ -524,16 +524,22 @@ plot <- result_to_plot %>%
   labs(color="Sample") +
   coord_flip() +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw()+ 
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
 ggsave(filename = "Fig pres nbr genre consumed.png",
        path = "output",
        device = "png",
-       width = 22,
-       height = 10,
+       width = 13,
+       height = 5,
        units = "cm")
 
 ## Detailled means 
@@ -550,16 +556,16 @@ plot <- result_to_plot %>%
                              "nbr_genre_serie_aime" = "TV series",
                              "nbr_genre_serie_deteste" = "TV series"),
          name = recode_factor(name, 
-                              "nbr_genre_music" = "Number of genres consumed",
-                              "nbr_genre_aime" = "Number of genres liked",
-                              "nbr_genre_deteste" = "Number of genres disliked",
-                              "nbr_genre_film" = "Number of genres consumed",
-                              "nbr_genre_film_aime" = "Number of genres liked",
-                              "nbr_genre_film_deteste" = "Number of genres disliked",
-                              "nbr_genre_serie" = "Number of genres consumed",
-                              "nbr_genre_serie_aime" = "Number of genres liked",
-                              "nbr_genre_serie_deteste" = "Number of genres disliked"),
-         name = factor(name, c("Number of genres disliked", "Number of genres liked", "Number of genres consumed")),
+                              "nbr_genre_music" = "consumed",
+                              "nbr_genre_aime" = "liked",
+                              "nbr_genre_deteste" = "hated",
+                              "nbr_genre_film" = "consumed",
+                              "nbr_genre_film_aime" = "liked",
+                              "nbr_genre_film_deteste" = "hated",
+                              "nbr_genre_serie" = "consumed",
+                              "nbr_genre_serie_aime" = "liked",
+                              "nbr_genre_serie_deteste" = "hated"),
+         name = factor(name, c("hated", "liked", "consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -572,19 +578,25 @@ plot <- result_to_plot %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(cat ~ .) +
-  xlab("") +
+  xlab("Number of genres...") +
   ylab("Standardized mean difference") +
   labs(color="Sample") +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() + 
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
 ggsave(filename = here("output", "Figure 1 SMD genre detailed.png"),
        device = "png",
-       width = 22,
-       height = 23,
+       width = 9,
+       height = 9,
        units = "cm")
 
 # Compute the differences in terms of number of genres rather than just sd:
@@ -617,7 +629,7 @@ bind_rows(t1, t2, t3) %>%
   mutate(diff = users-nonusers) %>% 
   gt() %>% 
   gtsave("effect_estimate.tex", path="output")
-  
+
 
 # Table A??: E-values
 
@@ -921,17 +933,23 @@ plot <- d_three_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample") +
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  labs(color="Sample")  + 
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() + 
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
 ggsave(filename = "Figure 2 Diff in foreign language.png",
        path = "output",
        device = "png",
-       width = 18,
-       height = 10,
+       width = 9,
+       height = 4,
        units = "cm")
 
 # Table A1: Control variables ------
@@ -951,10 +969,10 @@ controls <- read_csv(here("data", "control_variables.csv")) %>%
                                  "Cultural Participation during Childhood",
                                  "Intensity of Cultural Participation",
                                  "Propensity towards diversity")
-                      ),
+         ),
          full_line = paste(varlabel, vartype, varorig, model, sep = " & ") %>% 
            paste(., "\\\\\n")
-         )
+  )
 if(file.exists(here("output", "Table A1_controls.tex"))) file.remove(here("output", "Table A1_controls.tex"))
 cat("
 \\begin{ThreePartTable}
@@ -1140,7 +1158,7 @@ tab_eval_music <- bal.tab(res_match_template_stream_music, binary = "std", thres
 
 allvar_mod <- rownames(tab_eval_music$Balance)
 cutoff <- loveplot_find_cutoff(allvar_mod)
-  
+
 love_part1 <- love.plot(res_match_template_stream_music, 
                         drop.distance = TRUE, 
                         var.order = "unadjusted",
@@ -1156,7 +1174,7 @@ love_part1 <- love.plot(res_match_template_stream_music,
   ylim(rev(allvar_mod[1:cutoff])) + 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part1
@@ -1180,7 +1198,7 @@ love_part2 <- love.plot(res_match_template_stream_music,
   ylim(rev(allvar_mod[(cutoff+1):length(allvar_mod)]))+ 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part2
@@ -1199,11 +1217,11 @@ bind_rows(
   mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
   ggplot() + 
   aes(x = AGE, group=stream_spe, fill = as.factor(stream_spe), colour = as.factor(stream_spe),  weight = POND) +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
+  scale_color_manual(values=c("#D09898", "#722929"),
                      labels = c("0" = "Not treated",
                                 "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
+  scale_fill_manual(values=c("#D09898", "#722929"), guide="none") +
+  guides(color=guide_legend(override.aes=list(fill=c("#D09898", "#722929")))) +
   geom_density(alpha = 5/10) +
   facet_grid( ~ matching_status) +
   ylab("Density") +
@@ -1236,7 +1254,7 @@ love_part1 <- love.plot(res_match_template_stream_film_VOD,
   ylim(rev(allvar_mod[1:cutoff])) + 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part1
@@ -1260,7 +1278,7 @@ love_part2 <- love.plot(res_match_template_stream_film_VOD,
   ylim(rev(allvar_mod[(cutoff+1):length(allvar_mod)]))+ 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part2
@@ -1280,11 +1298,11 @@ bind_rows(
   mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
   ggplot() + 
   aes(x = AGE, group=film_stream_VOD, fill = as.factor(film_stream_VOD), colour = as.factor(film_stream_VOD),  weight = POND) +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
+  scale_color_manual(values=c("#D09898", "#722929"),
                      labels = c("0" = "Not treated",
                                 "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
+  scale_fill_manual(values=c("#D09898", "#722929"), guide="none") +
+  guides(color=guide_legend(override.aes=list(fill=c("#D09898", "#722929")))) +
   geom_density(alpha = 5/10) +
   facet_grid( ~ matching_status) +
   ylab("Density") +
@@ -1318,7 +1336,7 @@ love_part1 <- love.plot(res_match_template_stream_serie_VOD,
   ylim(rev(allvar_mod[1:cutoff])) + 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample") +
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part1
@@ -1342,7 +1360,7 @@ love_part2 <- love.plot(res_match_template_stream_serie_VOD,
   ylim(rev(allvar_mod[(cutoff+1):length(allvar_mod)]))+ 
   labs(color = "Sample", shape = "Sample", size = "Sample", group = "Sample", stroke = "Sample")+
   theme(axis.text.y = element_text(size = 10)) + 
-  scale_color_manual(values=c("#d7191c", "#1a9641")) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
   theme_bw()
 
 love_part2
@@ -1362,11 +1380,11 @@ bind_rows(
   mutate(matching_status = factor(matching_status, c("Before matching", "After matching"))) %>% 
   ggplot() + 
   aes(x = AGE, group=serie_stream_VOD, fill = as.factor(serie_stream_VOD), colour = as.factor(serie_stream_VOD),  weight = POND) +
-  scale_color_manual(values=c("#d7191c", "#1a9641"),
+  scale_color_manual(values=c("#D09898", "#722929"),
                      labels = c("0" = "Not treated",
                                 "1" ="Treated"), name = "Group") +
-  scale_fill_manual(values=c("#d7191c", "#1a9641"), guide="none") +
-  guides(color=guide_legend(override.aes=list(fill=c("#d7191c","#1a9641")))) +
+  scale_fill_manual(values=c("#D09898", "#722929"), guide="none") +
+  guides(color=guide_legend(override.aes=list(fill=c("#D09898", "#722929")))) +
   geom_density(alpha = 5/10) +
   facet_grid( ~ matching_status) +
   ylab("Density") +
@@ -1533,16 +1551,22 @@ plot <- d_music_detail_diff %>%
   xlab("") +
   ylab("Difference in proportion") +
   labs(color="Sample") +
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
 ggsave(filename = "Figure A7 Diff in proportion music genre detailed.png",
        path = "output",
        device = "png",
-       width = 22,
-       height = 23,
+       width = 13,
+       height = 10,
        units = "cm")
 
 
@@ -1708,16 +1732,22 @@ plot <- d_film_detail_diff %>%
   xlab("") +
   ylab("Difference in proportion") +
   labs(color="Sample") +
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
 ggsave(filename = "Figure A8 Diff in proportion film genre detailed.png",
        path = "output",
        device = "png",
-       width = 22,
-       height = 23,
+       width = 13,
+       height = 11,
        units = "cm")
 
 
@@ -1884,8 +1914,14 @@ plot <- d_show_detail_diff %>%
   xlab("") +
   ylab("Difference in proportion") +
   labs(color="Sample") +
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 
 plot
@@ -1893,8 +1929,8 @@ plot
 ggsave(filename = "Figure A9 Diff in proportion show genre detailed.png",
        path = "output",
        device = "png",
-       width = 22,
-       height = 23,
+       width = 13,
+       height = 11,
        units = "cm")
 
 
@@ -1928,8 +1964,14 @@ plot <- d_three_diff %>%
   ylab("Difference in proportion") +
   labs(color="Sample",
        title = "Difference in the prevalence of genres consumed beetween users and non-users") +
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
@@ -2157,9 +2199,15 @@ plot <- result_to_plot %>%
   facet_wrap(~model) +
   labs(color="Sample") +
   coord_flip() +
-  guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
+  guides(color = guide_legend(reverse = T)) +
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() +
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 
 plot
 
@@ -2167,7 +2215,6 @@ plot
 ggsave(filename = "Figure A10. Robustness_other_outcomes.png",
        path = "output",
        device = "png",
-       width = 22,
-       height = 10,
+       width = 13,
+       height = 6,
        units = "cm")
-
