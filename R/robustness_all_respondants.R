@@ -1703,16 +1703,16 @@ plot <- result_to_plot %>%
                              "nbr_genre_serie_aime" = "TV series",
                              "nbr_genre_serie_deteste" = "TV series"),
          name = recode_factor(name, 
-                              "nbr_genre_music" = "Number of genres consumed",
-                              "nbr_genre_aime" = "Number of genres liked",
-                              "nbr_genre_deteste" = "Number of genres disliked",
-                              "nbr_genre_film" = "Number of genres consumed",
-                              "nbr_genre_film_aime" = "Number of genres liked",
-                              "nbr_genre_film_deteste" = "Number of genres disliked",
-                              "nbr_genre_serie" = "Number of genres consumed",
-                              "nbr_genre_serie_aime" = "Number of genres liked",
-                              "nbr_genre_serie_deteste" = "Number of genres disliked"),
-         name = factor(name, c("Number of genres disliked", "Number of genres liked", "Number of genres consumed")),
+                              "nbr_genre_music" = "consumed",
+                              "nbr_genre_aime" = "liked",
+                              "nbr_genre_deteste" = "hated",
+                              "nbr_genre_film" = "consumed",
+                              "nbr_genre_film_aime" = "liked",
+                              "nbr_genre_film_deteste" = "hated",
+                              "nbr_genre_serie" = "consumed",
+                              "nbr_genre_serie_aime" = "liked",
+                              "nbr_genre_serie_deteste" = "hated"),
+         name = factor(name, c("hated", "liked", "consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Matched",
                                 "unmatched" = "All population")) %>% 
@@ -1725,17 +1725,22 @@ plot <- result_to_plot %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   facet_grid(cat ~ .) +
-  xlab("") +
+  xlab("Number of genres...") +
   ylab("Standardized mean difference") +
   labs(color="Sample") +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#1a9641", "#d7191c")) +
-  theme_bw()
-
+  scale_color_manual(values=c("#D09898", "#722929")) +
+  theme_bw() + 
+  theme(legend.position = "bottom",
+        legend.margin = margin(t = 0),
+        legend.box.margin = margin(t = 0),
+        legend.box.spacing = unit(0, "mm"),
+        axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10))
 plot
 
 ggsave(filename = here("output", "Figure_A12_With_15-20yo_SMD_genre_detailed.png"),
        device = "png",
-       width = 22,
-       height = 23,
+       width = 9,
+       height = 9,
        units = "cm")
