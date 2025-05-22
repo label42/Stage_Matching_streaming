@@ -510,8 +510,8 @@ plot <- result_to_plot %>%
                               "nbr_genre_serie" = "Series genre"),
          name = factor(name, c("Series genre", "Film genre", "Music genre")),
          sample = recode_factor(sample,
-                                "matched" = "Matched",
-                                "unmatched" = "All population")) %>% 
+                                "matched" = "Net difference",
+                                "unmatched" = "Raw difference")) %>% 
   ggplot(aes(x = name, y = smd, color = sample)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = smd - 1.96*std.error, 
@@ -521,10 +521,10 @@ plot <- result_to_plot %>%
   geom_hline(aes(yintercept=0)) +
   xlab("") +
   ylab("Standardized mean difference") +
-  labs(color="Sample") +
+  labs(color="") +
   coord_flip() +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw()+ 
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -567,8 +567,8 @@ plot <- result_to_plot %>%
                               "nbr_genre_serie_deteste" = "hated"),
          name = factor(name, c("hated", "liked", "consumed")),
          sample = recode_factor(sample,
-                                "matched" = "Matched",
-                                "unmatched" = "All population")) %>% 
+                                "matched" = "Net difference",
+                                "unmatched" = "Raw difference")) %>% 
   ggplot(aes(x = name, y = smd, color = sample)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = smd - 1.96*std.error, 
@@ -580,9 +580,9 @@ plot <- result_to_plot %>%
   facet_grid(cat ~ .) +
   xlab("Number of genres...") +
   ylab("Standardized mean difference") +
-  labs(color="Sample") +
+  labs(color="") +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() + 
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -919,7 +919,7 @@ d_three_diff <- dplyr::union(d_music_lang_diff %>% mutate(medium = "Music"),
                              d_film_lang_diff %>% mutate(medium = "Movie")) %>% 
   dplyr::union(d_show_lang_diff %>% mutate(medium = "Series")) %>% 
   mutate(medium = factor(medium, c("Series", "Movie", "Music"), labels = c("Series", "Movie", "Music")),
-         group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) 
+         group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) 
 
 plot <- d_three_diff %>% 
   ggplot(aes(x = medium, y = diff, color = group)) +
@@ -934,7 +934,7 @@ plot <- d_three_diff %>%
   xlab("") +
   ylab("Difference in proportion") +
   labs(color="Sample")  + 
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() + 
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -945,8 +945,7 @@ plot <- d_three_diff %>%
 
 plot
 
-ggsave(filename = "Figure 2 Diff in foreign language.png",
-       path = "output",
+ggsave(filename = here("output","Figure 2 Diff in foreign language.png"),
        device = "png",
        width = 9,
        height = 4,
@@ -1166,7 +1165,7 @@ love_part1 <- love.plot(res_match_template_stream_music,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"), 
+                        sample.names = c("Before matching", "After matching"), 
                         title = NULL) +
   xlim(c(0,1)) +
   xlab("Standardized Proportion Difference") +
@@ -1191,7 +1190,7 @@ love_part2 <- love.plot(res_match_template_stream_music,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"),
+                        sample.names = c("Before matching", "After matching"),
                         title = NULL) +
   xlab("Standardized Proportion Difference") +
   scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
@@ -1246,7 +1245,7 @@ love_part1 <- love.plot(res_match_template_stream_film_VOD,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"), 
+                        sample.names = c("Before matching", "After matching"), 
                         title = NULL) +
   xlim(c(0,1)) +
   xlab("Standardized Proportion Difference") +
@@ -1271,7 +1270,7 @@ love_part2 <- love.plot(res_match_template_stream_film_VOD,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"),
+                        sample.names = c("Before matching", "After matching"), 
                         title = NULL) +
   xlab("Standardized Proportion Difference") +
   scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
@@ -1328,7 +1327,7 @@ love_part1 <- love.plot(res_match_template_stream_serie_VOD,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"), 
+                        sample.names = c("Before matching", "After matching"), 
                         title = NULL) +
   xlim(c(0,1)) +
   xlab("Standardized Proportion Difference") +
@@ -1353,7 +1352,7 @@ love_part2 <- love.plot(res_match_template_stream_serie_VOD,
                         thresholds = c(m = .05), 
                         binary = "std",
                         continuous = "std",
-                        sample.names = c("Unmatched", "Matched"),
+                        sample.names = c("Before matching", "After matching"),
                         title = NULL) +
   xlab("Standardized Proportion Difference") +
   scale_x_continuous(breaks = seq(0, 1.5, by = 0.25), limits = c(0, 1.5)) +
@@ -1538,7 +1537,7 @@ d_music_detail_diff <- d_music_detail %>%
               values_from = "value")
 
 plot <- d_music_detail_diff %>% 
-  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
   ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
@@ -1550,8 +1549,8 @@ plot <- d_music_detail_diff %>%
   guides(color = guide_legend(reverse = T)) +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample") +
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  labs(color="") +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -1562,8 +1561,7 @@ plot <- d_music_detail_diff %>%
 
 plot
 
-ggsave(filename = "Figure A7 Diff in proportion music genre detailed.png",
-       path = "output",
+ggsave(filename = here("output", "Figure A7 Diff in proportion music genre detailed.png"),
        device = "png",
        width = 13,
        height = 10,
@@ -1719,7 +1717,7 @@ d_film_detail_diff <- d_film_detail %>%
 
 
 plot <- d_film_detail_diff %>% 
-  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
   ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
@@ -1731,8 +1729,8 @@ plot <- d_film_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample") +
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  labs(color="") +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -1743,8 +1741,7 @@ plot <- d_film_detail_diff %>%
 
 plot
 
-ggsave(filename = "Figure A8 Diff in proportion film genre detailed.png",
-       path = "output",
+ggsave(filename = here(  "output","Figure A8 Diff in proportion film genre detailed.png"),
        device = "png",
        width = 13,
        height = 11,
@@ -1901,7 +1898,7 @@ d_show_detail_diff <- d_show_detail %>%
               values_from = "value")
 
 plot <- d_show_detail_diff %>% 
-  mutate(group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
+  mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
   ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
@@ -1913,8 +1910,8 @@ plot <- d_show_detail_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample") +
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  labs(color="") +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -1926,8 +1923,7 @@ plot <- d_show_detail_diff %>%
 
 plot
 
-ggsave(filename = "Figure A9 Diff in proportion show genre detailed.png",
-       path = "output",
+ggsave(filename = here("output","Figure A9 Diff in proportion show genre detailed.png"),
        device = "png",
        width = 13,
        height = 11,
@@ -1964,7 +1960,7 @@ plot <- d_three_diff %>%
   ylab("Difference in proportion") +
   labs(color="Sample",
        title = "Difference in the prevalence of genres consumed beetween users and non-users") +
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -2181,8 +2177,8 @@ result_to_plot <- bind_rows(diff_unm, diff_m) %>%
 
 plot <- result_to_plot %>%  
   mutate(sample = recode_factor(sample,
-                                "matched" = "Matched",
-                                "unmatched" = "All population"),
+                                "matched" = "Net difference",
+                                "unmatched" = "Raw difference"),
          name = recode_factor(name, 
                               "nbr_genre_prgtele_" = "TV programs",
                               "nbr_genre_actu_" = "News",
@@ -2197,10 +2193,10 @@ plot <- result_to_plot %>%
   xlab("") +
   ylab("Standardized mean difference") +
   facet_wrap(~model) +
-  labs(color="Sample") +
+  labs(color="") +
   coord_flip() +
   guides(color = guide_legend(reverse = T)) +
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
@@ -2212,8 +2208,7 @@ plot <- result_to_plot %>%
 plot
 
 
-ggsave(filename = "Figure A10. Robustness_other_outcomes.png",
-       path = "output",
+ggsave(filename = here("output","Figure A10. Robustness_other_outcomes.png"),
        device = "png",
        width = 13,
        height = 6,

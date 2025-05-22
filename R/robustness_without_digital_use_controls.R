@@ -1720,8 +1720,8 @@ plot <- result_to_plot %>%
                               "nbr_genre_serie_deteste" = "hated"),
          name = factor(name, c("hated", "liked", "consumed")),
          sample = recode_factor(sample,
-                                "matched" = "Matched",
-                                "unmatched" = "All population")) %>% 
+                                "matched" = "Net difference",
+                                "unmatched" = "Raw difference")) %>% 
   ggplot(aes(x = name, y = smd, color = sample)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = smd - 1.96*std.error, 
@@ -1733,9 +1733,9 @@ plot <- result_to_plot %>%
   facet_grid(cat ~ .) +
   xlab("Number of genres...") +
   ylab("Standardized mean difference") +
-  labs(color="Sample") +
+  labs(color="") +
   guides(color = guide_legend(reverse = T)) + 
-  scale_color_manual(values=c("#D09898", "#722929")) +
+  scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() + 
   theme(legend.position = "bottom",
         legend.margin = margin(t = 0),
