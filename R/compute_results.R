@@ -971,7 +971,7 @@ controls <- read_csv(here("data", "control_variables.csv")) %>%
                                  "Propensity towards diversity")
          ),
          full_line = paste(varlabel, vartype, 
-                           #varorig, 
+                           varorig, 
                            model, sep = " & ") %>% 
            paste(., "\\\\\n")
   ) 
