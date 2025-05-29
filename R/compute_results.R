@@ -61,7 +61,7 @@ tmp_series <- bind_rows(PC18_to_m_serie %>% select(serie_stream_VOD) %>%
                           mutate(matching_status = 0),
                         PC18_m_serie %>% select(serie_stream_VOD) %>% 
                           mutate(matching_status = 1)) %>% 
-  mutate(medium = "Series") %>% 
+  mutate(medium = "TV Shows") %>% 
   rename("stream" = "serie_stream_VOD")
 
 overall_summary <- bind_rows(tmp_music, tmp_movie, tmp_series) %>% 
@@ -507,8 +507,8 @@ plot <- result_to_plot %>%
   mutate(name = recode_factor(name, 
                               "nbr_genre_music" = "Music genre",
                               "nbr_genre_film" = "Film genre",
-                              "nbr_genre_serie" = "Series genre"),
-         name = factor(name, c("Series genre", "Film genre", "Music genre")),
+                              "nbr_genre_serie" = "TV shows genre"),
+         name = factor(name, c("TV shows genre", "Film genre", "Music genre")),
          sample = recode_factor(sample,
                                 "matched" = "Net difference",
                                 "unmatched" = "Raw difference")) %>% 
@@ -552,9 +552,9 @@ plot <- result_to_plot %>%
                              "nbr_genre_film" = "Movies",
                              "nbr_genre_film_aime" = "Movies",
                              "nbr_genre_film_deteste" = "Movies",
-                             "nbr_genre_serie" = "TV series",
-                             "nbr_genre_serie_aime" = "TV series",
-                             "nbr_genre_serie_deteste" = "TV series"),
+                             "nbr_genre_serie" = "TV shows",
+                             "nbr_genre_serie_aime" = "TV shows",
+                             "nbr_genre_serie_deteste" = "TV shows"),
          name = recode_factor(name, 
                               "nbr_genre_music" = "consumed",
                               "nbr_genre_aime" = "liked",
@@ -917,8 +917,8 @@ d_show_lang_diff <- d_show_lang %>%
 
 d_three_diff <- dplyr::union(d_music_lang_diff %>% mutate(medium = "Music"),
                              d_film_lang_diff %>% mutate(medium = "Movie")) %>% 
-  dplyr::union(d_show_lang_diff %>% mutate(medium = "Series")) %>% 
-  mutate(medium = factor(medium, c("Series", "Movie", "Music"), labels = c("Series", "Movie", "Music")),
+  dplyr::union(d_show_lang_diff %>% mutate(medium = "TV shows")) %>% 
+  mutate(medium = factor(medium, c("TV shows", "Movie", "Music"), labels = c("TV shows", "Movie", "Music")),
          group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) 
 
 plot <- d_three_diff %>% 
@@ -954,6 +954,7 @@ ggsave(filename = here("output","Figure 2 Diff in foreign language.png"),
 # Table A1: Control variables ------
 
 controls <- read_csv(here("data", "control_variables.csv")) %>% 
+  filter(film | music | serie) %>% 
   mutate(film = ifelse(film, "F", ""),
          music = ifelse(music, "M", ""),
          serie = ifelse(serie, "S", ""),
@@ -969,9 +970,11 @@ controls <- read_csv(here("data", "control_variables.csv")) %>%
                                  "Intensity of Cultural Participation",
                                  "Propensity towards diversity")
          ),
-         full_line = paste(varlabel, vartype, varorig, model, sep = " & ") %>% 
+         full_line = paste(varlabel, vartype, 
+                           #varorig, 
+                           model, sep = " & ") %>% 
            paste(., "\\\\\n")
-  )
+  ) 
 if(file.exists(here("output", "Table A1_controls.tex"))) file.remove(here("output", "Table A1_controls.tex"))
 cat("
 \\begin{ThreePartTable}
@@ -979,7 +982,7 @@ cat("
 \\begingroup\\small
 \\begin{TableNotes}
 \\item Model indicates whether the variable was used as a control
-in the Music (M), Movies (F) and/or Series (S) model.
+in the Music (M), Movies (F) and/or TV Shows (S) model.
 \\item Type indicates whether the variable is binary (Bin), categorical
 (Cat), or numeric (Num).
 \\vspace{10pt}
@@ -1129,7 +1132,7 @@ t_stream_serie_socdem
 tbl_all_stream_socdem <-
   tbl_merge(
     tbls = list(t_stream_music_socdem, t_stream_film_socdem, t_stream_serie_socdem),
-    tab_spanner = c("**Music**", "**Movies**", "**Series**")
+    tab_spanner = c("**Music**", "**Movies**", "**TV shows**")
   ) %>%
   as_gt()
 
@@ -1934,14 +1937,14 @@ ggsave(filename = here("output","Figure A9 Diff in proportion show genre detaile
 ## the three together
 
 d_three_diff <- dplyr::union(d_music_detail_diff %>% mutate(medium = "Music"),
-                             d_film_detail_diff %>% mutate(medium = "Film")) %>% 
-  dplyr::union(d_show_detail_diff %>% mutate(medium = "Show")) %>% 
-  mutate(medium = factor(medium, c("Music", "Film", "Show"), labels = c("Music", "Film", "Show")),
+                             d_film_detail_diff %>% mutate(medium = "Movies")) %>% 
+  dplyr::union(d_show_detail_diff %>% mutate(medium = "TV shows")) %>% 
+  mutate(medium = factor(medium, c("Music", "Movies", "TV shows")),
          group = factor(group, c("m", "unm"), labels = c("Matched", "Unmatched"))) %>% 
   group_by(medium) %>% 
   filter(medium == "Music" & label %in% c("Pop", "EDM", "Rock") |
-           medium == "Film" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Horror", "Science fiction") |
-           medium == "Show" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Drama", "Animated", "Horror", "Author", "Documentary", "Western", "Science fiction")
+           medium == "Movies" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Horror", "Science fiction") |
+           medium == "TV shows" & label %in% c("Comedy", "Action", "Historical", "Thrillers", "Adventure", "Drama", "Animated", "Horror", "Author", "Documentary", "Western", "Science fiction")
   )
 
 
@@ -2140,7 +2143,7 @@ diff_unm <- PC18_to_m_music %>% summarize_at(
     .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = serie_stream_VOD, w = POND, gref = 2, std.error = T)$std.error)) %>%
-      rename_with(~paste0("TV series_", .x)) 
+      rename_with(~paste0("TV shows_", .x)) 
   ) %>%   
   mutate(sample = "unmatched")
 
@@ -2160,7 +2163,7 @@ diff_m <- PC18_m_music %>% summarize_at(
     .vars = vars(c(nbr_genre_prgtele, nbr_genre_actu, nbr_genre_radio)),
     .funs = list(smd = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$estimate,
                  std.error = ~ smd(., g = serie_stream_VOD, w = POND_m, gref = 2, std.error = T)$std.error)) %>%
-      rename_with(~paste0("TV series_", .x)) 
+      rename_with(~paste0("TV shows_", .x)) 
   ) %>% 
   mutate(sample = "matched")
 
@@ -2169,8 +2172,8 @@ result_to_plot <- bind_rows(diff_unm, diff_m) %>%
   pivot_longer(-sample) %>%
   mutate(ind = str_extract(name, "(smd|std.error)"),
          name = str_remove(name, "(smd|std.error)"),
-         model = str_extract(name, "^(Music|Movies|TV series)"),
-         name = str_remove(name, "^(Music|Movies|TV series)_"),
+         model = str_extract(name, "^(Music|Movies|TV shows)"),
+         name = str_remove(name, "^(Music|Movies|TV shows)_"),
   )  %>%
   pivot_wider(names_from = ind, values_from = value) 
 
@@ -2213,3 +2216,4 @@ ggsave(filename = here("output","Figure A10. Robustness_other_outcomes.png"),
        width = 13,
        height = 6,
        units = "cm")
+
