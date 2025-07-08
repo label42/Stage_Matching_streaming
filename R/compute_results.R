@@ -565,7 +565,7 @@ plot <- result_to_plot %>%
                               "nbr_genre_serie" = "consumed",
                               "nbr_genre_serie_aime" = "liked",
                               "nbr_genre_serie_deteste" = "hated"),
-         name = factor(name, c("hated", "liked", "consumed")),
+         name = factor(name, c("hated", "liked", "consumed"), c("disliked", "liked", "consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Net difference",
                                 "unmatched" = "Raw difference")) %>% 
@@ -947,8 +947,8 @@ plot
 
 ggsave(filename = here("output","Figure 2 Diff in foreign language.png"),
        device = "png",
-       width = 9,
-       height = 4,
+       width = 10,
+       height = 5,
        units = "cm")
 
 # Table A1: Control variables ------
@@ -1539,9 +1539,11 @@ d_music_detail_diff <- d_music_detail %>%
   pivot_wider(names_from = "stat",
               values_from = "value")
 
+
 plot <- d_music_detail_diff %>% 
   mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
-  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  mutate(label = fct_reorder(label, diff * (group == "Net difference"), .desc = F)) %>% 
+  ggplot(aes(x = label, y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
                     ymax = diff + ci),
@@ -1721,7 +1723,7 @@ d_film_detail_diff <- d_film_detail %>%
 
 plot <- d_film_detail_diff %>% 
   mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
-  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  ggplot(aes(x = fct_reorder(label, diff * (group == "Net difference"), .desc = F), y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
                     ymax = diff + ci),
@@ -1902,7 +1904,7 @@ d_show_detail_diff <- d_show_detail %>%
 
 plot <- d_show_detail_diff %>% 
   mutate(group = factor(group, c("m", "unm"), labels = c("Net difference", "Raw difference"))) %>% 
-  ggplot(aes(x = fct_reorder(label, diff, .desc = F), y = diff, color = group)) +
+  ggplot(aes(x = fct_reorder(label, diff * (group == "Net difference"), .desc = F), y = diff, color = group)) +
   geom_point(position = position_dodge(.4)) +
   geom_errorbar(aes(ymin = diff - ci, 
                     ymax = diff + ci),

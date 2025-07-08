@@ -1712,7 +1712,7 @@ plot <- result_to_plot %>%
                               "nbr_genre_serie" = "consumed",
                               "nbr_genre_serie_aime" = "liked",
                               "nbr_genre_serie_deteste" = "hated"),
-         name = factor(name, c("hated", "liked", "consumed")),
+         name = factor(name, c("hated", "liked", "consumed"), c("disliked", "liked", "consumed")),
          sample = recode_factor(sample,
                                 "matched" = "Net difference",
                                 "unmatched" = "Raw difference")) %>% 
