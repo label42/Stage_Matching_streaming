@@ -933,7 +933,7 @@ plot <- d_three_diff %>%
   coord_flip() +
   xlab("") +
   ylab("Difference in proportion") +
-  labs(color="Sample")  + 
+  labs(color="")  + 
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() + 
   theme(legend.position = "bottom",
@@ -1552,9 +1552,7 @@ plot <- d_music_detail_diff %>%
   geom_hline(aes(yintercept=0)) +
   coord_flip() +
   guides(color = guide_legend(reverse = T)) +
-  xlab("") +
-  ylab("Difference in proportion") +
-  labs(color="") +
+  labs(x = "", y = "Difference in proportion", color="", title = "Music Genres") +
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
@@ -1684,8 +1682,6 @@ plot <- d_film_detail %>%
   facet_grid(fct_reorder(label, v, .desc = T) ~ ., switch = "y") +
   labs(color = "Groups") +
   guides(color = guide_legend(reverse = T)) +
-  xlab("") +
-  ylab("") +
   scale_color_manual(values=c("#1b9e77", "#7570b3", "#d95f02")) +
   theme_bw()
 
@@ -1732,9 +1728,7 @@ plot <- d_film_detail_diff %>%
   geom_hline(aes(yintercept=0)) +
   guides(color = guide_legend(reverse = T)) +
   coord_flip() +
-  xlab("") +
-  ylab("Difference in proportion") +
-  labs(color="") +
+  labs(x = "", y = "Difference in proportion", color="", title = "Music Genres") +
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
@@ -1913,8 +1907,7 @@ plot <- d_show_detail_diff %>%
   geom_hline(aes(yintercept=0)) +
   guides(color = guide_legend(reverse = T)) +
   coord_flip() +
-  xlab("") +
-  ylab("Difference in proportion") +
+  labs(x = "", y = "Difference in proportion", color="", title = "TV Shows Genres") +
   labs(color="") +
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
