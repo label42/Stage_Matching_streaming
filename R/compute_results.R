@@ -1728,7 +1728,7 @@ plot <- d_film_detail_diff %>%
   geom_hline(aes(yintercept=0)) +
   guides(color = guide_legend(reverse = T)) +
   coord_flip() +
-  labs(x = "", y = "Difference in proportion", color="", title = "Music Genres") +
+  labs(x = "", y = "Difference in proportion", color="", title = "Film Genres") +
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
