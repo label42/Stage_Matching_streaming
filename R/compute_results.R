@@ -931,7 +931,7 @@ plot <- d_three_diff %>%
   geom_hline(aes(yintercept=0)) +
   guides(color = guide_legend(reverse = T)) +
   coord_flip() +
-  xlab("") +
+  xlab("Consumption of\nforeign language items") +
   ylab("Difference in proportion") +
   labs(color="")  + 
   scale_color_manual(values=c("#722929", "#D09898")) +
@@ -948,7 +948,7 @@ plot
 ggsave(filename = here("output","Figure 2 Diff in foreign language.png"),
        device = "png",
        width = 10,
-       height = 5,
+       height = 5.5,
        units = "cm")
 
 # Table A1: Control variables ------
@@ -1728,7 +1728,7 @@ plot <- d_film_detail_diff %>%
   geom_hline(aes(yintercept=0)) +
   guides(color = guide_legend(reverse = T)) +
   coord_flip() +
-  labs(x = "", y = "Difference in proportion", color="", title = "Film Genres") +
+  labs(x = "", y = "Difference in proportion", color="", title = "Movie Genres") +
   scale_color_manual(values=c("#722929", "#D09898")) +
   theme_bw() +
   theme(legend.position = "bottom",
